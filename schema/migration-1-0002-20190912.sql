@@ -1,9 +1,9 @@
--- Drop all VIEWs linked to the 'cexplorer' table.
+-- Drop all VIEWs linked to the 'bccexplorer' table.
 
 -- Many schema migration changes will fail if they operate on a table that is part of a VIEW.
 -- So we drop all VIEWs here and recreate them later.
 
-CREATE FUNCTION drop_cexplorer_views () RETURNS void language plpgsql as $$
+CREATE FUNCTION drop_bccexplorer_views () RETURNS void language plpgsql as $$
 
 DECLARE vname text;
 DECLARE next_version int;
@@ -29,6 +29,6 @@ BEGIN
     end loop ;
 end $$ ;
 
-SELECT drop_cexplorer_views () ;
+SELECT drop_bccexplorer_views () ;
 
-DROP FUNCTION drop_cexplorer_views () ;
+DROP FUNCTION drop_bccexplorer_views () ;

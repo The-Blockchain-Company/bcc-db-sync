@@ -230,7 +230,7 @@ in {
         home = "/var/lib/${cfg.user}";
         group = cfg.user;
       };
-      groups.cexplorer = {};
+      groups.bccexplorer = {};
     };
     systemd.services.bcc-db-sync = {
       wantedBy = [ "multi-user.target" ];

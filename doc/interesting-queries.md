@@ -5,7 +5,7 @@ The following is a set of example SQL queries that can be run against the `db-sy
 These queries are run using the `psql` executable distributed with PostgreSQL. Connecting to the
 database can be done from the `bcc-db-sync` git checkout using:
 ```sh
-PGPASSFILE=config/pgpass-mainnet psql cexplorer
+PGPASSFILE=config/pgpass-mainnet psql bccexplorer
 ```
 
 Some of these queries have Haskell/Esqueleto equivalents in the file [Query.hs][Query.hs] and where
@@ -53,9 +53,9 @@ select slot_no from block where block_no is not null
 
 ```
 
-### Size of the cexplorer database
+### Size of the bccexplorer database
 ```sql
-select pg_size_pretty (pg_database_size ('cexplorer'));
+select pg_size_pretty (pg_database_size ('bccexplorer'));
  pg_size_pretty
 ----------------
  4067 MB

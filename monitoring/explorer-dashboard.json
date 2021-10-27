@@ -346,12 +346,12 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "floor(cexplorerBlockCount_count/21600)",
+          "expr": "floor(bccexplorerBlockCount_count/21600)",
           "legendFormat": "epoch",
           "refId": "A"
         },
         {
-          "expr": "rate(cexplorerBlockCount_count[5m])",
+          "expr": "rate(bccexplorerBlockCount_count[5m])",
           "legendFormat": "db blocks/sec",
           "refId": "B"
         },
@@ -612,7 +612,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "floor(cexplorerBlockCount_count/21600)",
+          "expr": "floor(bccexplorerBlockCount_count/21600)",
           "refId": "A"
         }
       ],
