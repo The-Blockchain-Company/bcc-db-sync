@@ -1,0 +1,225 @@
+index-state: 2021-07-02T00:00:00Z
+
+packages:
+  bcc-db
+  bcc-db/test
+  bcc-db-sync
+  bcc-db-sync-extended
+  bcc-db-tool
+  bcc-sync
+
+constraints:
+    libsystemd-journal >= 1.4.4
+  , systemd >= 2.3.0
+    -- systemd-2.3.0 requires at least network 3.1.1.0 but it doesn't declare
+    -- that dependency
+  , network >= 3.1.1.0
+  , persistent-postgresql >= 2.11.0.1
+
+package bcc-db
+  ghc-options: -Wall -Werror -Wredundant-constraints -Wincomplete-uni-patterns -Wincomplete-record-updates -Wpartial-fields -Wunused-imports -Wunused-packages
+
+package bcc-db-sync
+  ghc-options: -Wall -Werror -Wredundant-constraints -Wincomplete-uni-patterns -Wincomplete-record-updates -Wpartial-fields -Wunused-imports -Wunused-packages
+
+package bcc-db-sync-extended
+  ghc-options: -Wall -Werror -Wredundant-constraints -Wincomplete-uni-patterns -Wincomplete-record-updates -Wpartial-fields -Wunused-imports -Wunused-packages
+
+package bcc-db-tool
+  ghc-options: -Wall -Werror -Wredundant-constraints -Wincomplete-uni-patterns -Wincomplete-record-updates -Wpartial-fields -Wunused-imports -Wunused-packages
+
+package bcc-sync
+  ghc-options: -Wall -Werror -Wredundant-constraints -Wincomplete-uni-patterns -Wincomplete-record-updates -Wpartial-fields -Wunused-imports -Wunused-packages
+
+package postgresql-libpq
+   flags: +use-pkg-config
+
+-- ---------------------------------------------------------
+-- Disable all tests by default
+
+tests: False
+
+test-show-details: direct
+
+-- Then enable specific tests in this repo
+
+package bcc-db
+  tests: True
+
+package bcc-db-sync
+  tests: True
+
+-- These are needed because Nix is doing something crazy.
+package bcc-api
+  tests: False
+
+package bcc-node
+  tests: False
+
+package shardagnostic-consensus-bcc-test
+  tests: False
+
+package goblins
+  tests: False
+
+package io-classes
+  tests: False
+
+allow-newer:
+  monoidal-containers:aeson,
+  size-based:template-haskell
+
+-- ---------------------------------------------------------
+
+-- The two following one-liners will cut off / restore the remainder of this file (for nix-shell users):
+-- when using the "cabal" wrapper script provided by nix-shell.
+-- --------------------------- 8< --------------------------
+-- Please do not put any `source-repository-package` clause above this line.
+
+-- Using a fork until our patches can be merged upstream
+source-repository-package
+  type: git
+  location: https://github.com/The-Blockchain-Company/criterion
+
+-- Using a fork until our patches can be merged upstream
+source-repository-package
+  type: git
+  location: https://github.com/input-output-hk/optparse-applicative
+  tag: 7497a29cb998721a9068d5725d49461f2bba0e7a
+  --sha256: 1gvsrg925vynwgqwplgjmp53vj953qyh3wbdf34pw21c8r47w35r
+
+source-repository-package
+  type: git
+  location: https://github.com/The-Blockchain-Company/hedgehog-extras
+
+source-repository-package
+  type: git
+  location: https://github.com/The-Blockchain-Company/bcc-base
+  
+  subdir:
+    base-deriving-via
+    binary
+    binary/test
+    bcc-crypto-class
+    bcc-crypto-praos
+    measures
+    orphans-deriving-via
+    slotting
+    strict-containers
+
+source-repository-package
+  type: git
+  location: https://github.com/The-Blockchain-Company/bcc-crypto
+  tag: 07397f0e50da97eaa0575d93bee7ac4b2b2576ec
+  --sha256: 06sdx5ndn2g722jhpicmg96vsrys89fl81k8290b3lr6b1b0w4m3
+
+source-repository-package
+  type: git
+  location: https://github.com/The-Blockchain-Company/bcc-ledger-specs
+  tag: f5d1b4139d78d9039365a31eca0ba00970682f28
+  --sha256: 
+  subdir:
+    aurum/impl
+    cole/chain/executable-spec
+    cole/crypto
+    cole/crypto/test
+    cole/ledger/executable-spec
+    cole/ledger/impl
+    cole/ledger/impl/test
+    bcc-ledger-core
+    semantics/executable-spec
+    semantics/small-steps-test
+    sophie/chain-and-ledger/dependencies/non-integer
+    sophie/chain-and-ledger/executable-spec
+    sophie/chain-and-ledger/sophie-spec-ledger-test
+    sophie-ma/impl
+    sophie-ma/sophie-ma-test
+
+source-repository-package
+  type: git
+  location: https://github.com/The-Blockchain-Company/bcc-node
+  tag: 9a6a6c81e3aebfaf757b562c823146c7da601e1c
+  --sha256: 1xiqrx3hf2s7j62clzzmlim81g7v2dvmirv78zf9gp9m1lqxzan6
+  subdir:
+    bcc-api
+    bcc-config
+    bcc-node
+
+source-repository-package
+  type: git
+  location: https://github.com/The-Blockchain-Company/bcc-prelude
+  tag: 583f26698d2a46b06ea251a4b3f1762d909f9ecb
+  --sha256:
+  subdir:
+    bcc-prelude
+    bcc-prelude-test
+
+source-repository-package
+  type: git
+  location: https://github.com/The-Blockchain-Company/shepards
+  tag: f3f78f1f98060115122a23f38eaf2c9a42806b87
+  --sha256: 
+
+source-repository-package
+  type: git
+  location: https://github.com/The-Blockchain-Company/tbco-monitoring-framework
+  tag: 43126a6331879c69b1a129d8aa17777eb8405039
+  --sha256: 
+  subdir:
+    contra-tracer
+    tbco-monitoring
+    plugins/backend-aggregation
+    plugins/backend-ekg
+    plugins/backend-monitoring
+    plugins/backend-trace-forwarder
+    plugins/scribe-systemd
+    tracer-transformers
+
+source-repository-package
+  type: git
+  location: https://github.com/The-Blockchain-Company/Win32-network
+  tag: 16cadcfe30bae30e8e6362f5087cad9f5bc274d5
+  --sha256: 
+
+source-repository-package
+  type: git
+  location: https://github.com/The-Blockchain-Company/shardagnostic-network
+
+  --sha256: 
+  subdir:
+    bcc-client
+    io-sim
+    io-classes
+    monoidal-synchronisation
+    network-mux
+    shardagnostic-consensus
+    shardagnostic-consensus-cole
+    shardagnostic-consensus-bcc
+    shardagnostic-consensus-sophie
+    shardagnostic-network
+    shardagnostic-network-framework
+    shardagnostic-network-testing
+    typed-protocols
+    typed-protocols-examples
+
+source-repository-package
+  type: git
+  location: https://github.com/The-Blockchain-Company/zerepoch
+  tag: f5d1b4139d78d9039365a31eca0ba00970682f28
+  --sha256: 
+  subdir:
+    zerepoch-core
+    zerepoch-ledger-api
+    zerepoch-tx
+    zerepoch-tx-plugin
+    prettyprinter-configurable
+    word-array
+
+
+-- Something in zerepoch-core requries this.
+source-repository-package
+  type: git
+  location: https://github.com/michaelpj/flat.git
+  tag: ee59880f47ab835dbd73bea0847dab7869fc20d8
+  --sha256: 1lrzknw765pz2j97nvv9ip3l1mcpf2zr4n56hwlz0rk7wq7ls4cm
+

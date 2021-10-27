@@ -1,0 +1,181 @@
+cabal-version:          2.2
+
+-- http://haskell.org/cabal/users-guide/
+
+name:                   bcc-db
+version:                10.0.1
+synopsis:               A base PostgreSQL component for the bcc-db-sync node.
+description:            Code for the Godx DB Sync node that is shared between the
+                        bcc-db-node and other components.
+homepage:               https://github.com/The-Blockchain-Company/bcc-db-sync
+bug-reports:		    https://github.com/The-Blockchain-Company/bcc-db-sync/issues
+license:                Apache-2.0
+license-file:           LICENSE
+author:                 tbco Engineering Team
+maintainer:             operations@tbco.io
+copyright:              (c) 2019 tbco
+category:               Cryptocurrency
+build-type:             Simple
+extra-source-files:     CHANGELOG.md
+
+library
+  default-language:     Haskell2010
+  hs-source-dirs:       src
+  ghc-options:          -Wall
+                        -Werror
+                        -Wcompat
+                        -Wredundant-constraints
+                        -Wincomplete-patterns
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+                        -Wunused-imports
+                        -Wunused-packages
+
+  exposed-modules:      Godx.Db
+
+  other-modules:        Godx.Db.Delete
+                        Godx.Db.Error
+                        Godx.Db.Insert
+                        Godx.Db.PGConfig
+                        Godx.Db.Migration
+                        Godx.Db.Migration.Haskell
+                        Godx.Db.Migration.Version
+                        Godx.Db.Query
+                        Godx.Db.Run
+                        Godx.Db.Schema
+                        Godx.Db.Schema.Types
+                        Godx.Db.Schema.Orphans
+                        Godx.Db.Text
+                        Godx.Db.Types
+
+
+  build-depends:        aeson
+                      , base                            >= 4.14         && < 4.16
+                      , base16-bytestring
+                      , bytestring
+                      , bcc-crypto-class
+                      , bcc-ledger-core
+                      , bcc-slotting
+                      , containers
+                      , conduit
+                      , conduit-extra
+                      , contra-tracer
+                      , directory
+                      , esqueleto
+                      , extra
+                      , fast-logger
+                      , filepath
+                      , tbco-monitoring
+                      , lifted-base
+                      , monad-control
+                      , monad-logger
+                      , shardagnostic-network
+                      , persistent
+                      , persistent-documentation
+                      , persistent-postgresql
+                      -- , persistent-template >= 2.7.0
+                      , postgresql-simple
+                      , quiet
+                      , resourcet
+                      , resource-pool
+                      , scientific
+                      , sophie-spec-ledger
+                      , text
+                      , template-haskell
+                      , time
+                      , transformers
+                      -- This is never intended to run on non-POSIX systems.
+                      , unix
+                      , wide-word
+
+test-suite test
+  default-language:     Haskell2010
+  type:                 exitcode-stdio-1.0
+  main-is:              test.hs
+  hs-source-dirs:       test
+
+  ghc-options:          -Wall
+                        -Werror
+                        -Wcompat
+                        -Wredundant-constraints
+                        -Wincomplete-patterns
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+                        -Wunused-imports
+                        -Wunused-packages
+
+  other-modules:        Test.Property.Godx.Db.Migration
+                        Test.Property.Godx.Db.Types
+                        Test.Property.Upstream
+
+  build-depends:        base                            >= 4.14         && < 4.16
+                      , aeson
+                      , bcc-db
+                      , bcc-ledger-cole
+                      , persistent
+                      , hedgehog
+                      , text
+                      , wide-word
+
+test-suite test-db
+  default-language:     Haskell2010
+  type:                 exitcode-stdio-1.0
+  main-is:              test-db.hs
+  hs-source-dirs:       test
+
+  other-modules:        Test.IO.Godx.Db.Insert
+                        Test.IO.Godx.Db.Migration
+                        Test.IO.Godx.Db.Rollback
+                        Test.IO.Godx.Db.TotalSupply
+                        Test.IO.Godx.Db.Util
+
+  ghc-options:          -Wall
+                        -Werror
+                        -Wcompat
+                        -Wredundant-constraints
+                        -Wincomplete-patterns
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+                        -Wunused-imports
+                        -Wunused-packages
+
+  build-depends:        base                            >= 4.14         && < 4.16
+                      , bytestring
+                      , bcc-db
+                      , bcc-slotting
+                      , directory
+                      , filepath
+                      , monad-control
+                      , persistent
+                      , tasty
+                      , tasty-hunit
+                      , text
+                      , time
+                      , transformers
+
+executable gen-schema-docs
+  default-language:     Haskell2010
+  main-is:              gen-schema-docs.hs
+  hs-source-dirs:       app
+
+  ghc-options:          -O2
+                        -Wall
+                        -Werror
+                        -Wcompat
+                        -Wredundant-constraints
+                        -Wincomplete-patterns
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+                        -Wunused-imports
+                        -Wunused-packages
+                        -Wno-unsafe
+                        -threaded
+                        -with-rtsopts=-N3
+
+  other-modules:        Paths_bcc_db
+
+  build-depends:        base                            >= 4.14         && < 4.16
+                      , bcc-db
+                      , persistent-documentation
+                      , process
+                      , text

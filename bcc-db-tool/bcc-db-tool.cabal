@@ -1,0 +1,106 @@
+cabal-version:          2.2
+
+-- http://haskell.org/cabal/users-guide/
+
+name:                   bcc-db-tool
+version:                10.0.1
+synopsis:               Utilities to manage the bcc-db-sync databases.
+description:            Utilities and executable, used to manage and validate the
+                        PostgreSQL db and the ledger database of the bcc-db-sync node
+homepage:               https://github.com/The-Blockchain-Company/bcc-db-sync
+bug-reports:		    https://github.com/The-Blockchain-Company/bcc-db-sync/issues
+license:                Apache-2.0
+license-file:           LICENSE
+author:                 tbco Engineering Team
+maintainer:             operations@tbco.io
+copyright:              (c) 2019 tbco
+category:               Cryptocurrency
+build-type:             Simple
+
+library
+  default-language:     Haskell2010
+  hs-source-dirs:       src
+
+  ghc-options:          -Wall
+                        -Wcompat
+                        -Wredundant-constraints
+                        -Wincomplete-patterns
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+                        -Wunused-imports
+                        -Wunused-packages
+
+  exposed-modules:      Godx.Db.Tool
+
+  other-modules:        Godx.Db.Tool.PrepareSnapshot
+                        Godx.Db.Tool.Report
+                        Godx.Db.Tool.Report.Balance
+                        Godx.Db.Tool.Report.Display
+                        Godx.Db.Tool.Report.StakeReward
+                        Godx.Db.Tool.Report.StakeReward.History
+                        Godx.Db.Tool.Report.StakeReward.Latest
+                        Godx.Db.Tool.Report.Synced
+                        Godx.Db.Tool.Report.Transactions
+                        Godx.Db.Tool.UtxoSet
+                        Godx.Db.Tool.Validation
+                        Godx.Db.Tool.Validate.GodxPots
+                        Godx.Db.Tool.Validate.Balance
+                        Godx.Db.Tool.Validate.BlockProperties
+                        Godx.Db.Tool.Validate.BlockTxs
+                        Godx.Db.Tool.Validate.EpochTable
+                        Godx.Db.Tool.Validate.Ledger
+                        Godx.Db.Tool.Validate.PoolOwner
+                        Godx.Db.Tool.Validate.TotalSupply
+                        Godx.Db.Tool.Validate.TxAccounting
+                        Godx.Db.Tool.Validate.Util
+                        Paths_bcc_db_tool
+
+  build-depends:        base                            >= 4.14         && < 4.16
+                      , base16-bytestring
+                      , bytestring
+                      , ansi-terminal
+                      , bcc-api
+                      , bcc-db
+                      , bcc-sync
+                      , bcc-ledger-aurum
+                      , bcc-ledger-cole
+                      , bcc-ledger-core
+                      , bcc-prelude
+                      , bcc-slotting
+                      , containers
+                      , esqueleto
+                      , extra
+                      , shardagnostic-consensus
+                      , shardagnostic-consensus-cole
+                      , shardagnostic-consensus-bcc
+                      , shardagnostic-consensus-sophie
+                      , shardagnostic-network
+                      , persistent
+                      , random
+                      , sophie-spec-ledger
+                      , text
+                      , time
+                      , transformers
+                      , transformers-except
+
+executable bcc-db-tool
+  default-language:     Haskell2010
+  main-is:              bcc-db-tool.hs
+  hs-source-dirs:       app
+
+  ghc-options:          -Wall
+                        -Wcompat
+                        -Wredundant-constraints
+                        -Wincomplete-patterns
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+                        -Wunused-imports
+                        -Wunused-packages
+
+  build-depends:        base                            >= 4.14         && < 4.16
+                      , bcc-db
+                      , bcc-db-tool
+                      , bcc-sync
+                      , bcc-slotting
+                      , optparse-applicative
+                      , text

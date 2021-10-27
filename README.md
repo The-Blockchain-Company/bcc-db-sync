@@ -1,1 +1,1 @@
-# bcc-db-sync
+initial read me file for bcc-db-sync

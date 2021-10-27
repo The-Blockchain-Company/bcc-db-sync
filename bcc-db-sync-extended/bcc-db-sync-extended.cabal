@@ -1,0 +1,83 @@
+cabal-version:          2.4
+
+-- http://haskell.org/cabal/users-guide/
+
+name:                   bcc-db-sync-extended
+version:                10.0.1
+synopsis:               The Extended Godx DB Sync node
+description:            A Godx node that follows the Godx chain and inserts data from the
+                        chain into a PostgresQL database. It is "extended" because it maintains an
+                        extra Epoch table.
+homepage:               https://github.com/The-Blockchain-Company/bcc-db-sync
+bug-reports:            https://github.com/The-Blockchain-Company/bcc-db-sync/issues
+license:                Apache-2.0
+license-file:           LICENSE
+author:                 tbco Engineering Team
+maintainer:             operations@tbco.io
+copyright:              (c) 2019 tbco
+category:               Cryptocurrency
+build-type:             Custom
+extra-source-files:     CHANGELOG.md
+                        schema/*.sql
+
+custom-setup
+  setup-depends:
+                        base
+                      , Cabal
+                      , bytestring
+                      , bcc-crypto-class
+                      , directory
+                      , filepath
+
+library
+  default-language:     Haskell2010
+  hs-source-dirs:       src
+
+  ghc-options:          -Wall
+                        -Wcompat
+                        -Wredundant-constraints
+                        -Wincomplete-patterns
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+                        -Wunused-imports
+                        -Wunused-packages
+
+  exposed-modules:      Godx.DbSync.Plugin.Extended
+
+  build-depends:        base                            >= 4.14         && < 4.16
+                      , bcc-db-sync
+                      , bcc-sync
+                      , persistent
+
+executable bcc-db-sync-extended
+  default-language:     Haskell2010
+  main-is:              bcc-db-sync-extended.hs
+  hs-source-dirs:       gen, app
+
+  ghc-options:          -O2
+                        -Wall
+                        -Wcompat
+                        -Wredundant-constraints
+                        -Wincomplete-patterns
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+                        -Wunused-imports
+                        -Wunused-packages
+                        -Wno-unsafe
+                        -threaded
+                        -with-rtsopts=-N3
+
+  autogen-modules:      Paths_bcc_db_sync_extended
+                        MigrationValidations
+  other-modules:        Paths_bcc_db_sync_extended
+                        MigrationValidations
+
+  build-depends:        base                            >= 4.14         && < 4.16
+                      , bcc-config
+                      , bcc-db-sync
+                      , bcc-db-sync-extended
+                      , bcc-sync
+                      , bcc-prelude
+                      , bcc-slotting
+                      , optparse-applicative
+                      , text

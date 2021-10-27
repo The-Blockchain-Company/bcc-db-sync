@@ -1,0 +1,117 @@
+cabal-version:          2.2
+
+-- http://haskell.org/cabal/users-guide/
+
+name:                   bcc-sync
+version:                10.0.1
+synopsis:               The Godx Sync node
+description:            A Godx node that follows the Godx chain and inserts data from the
+                        chain into a PostgresQL database.
+homepage:               https://github.com/The-Blockchain-Company/bcc-db-sync
+bug-reports:            https://github.com/The-Blockchain-Company/bcc-db-sync/issues
+license:                Apache-2.0
+license-file:           LICENSE
+author:                 tbco Engineering Team
+maintainer:             operations@tbco.io
+copyright:              (c) 2019 tbco
+category:               Cryptocurrency
+build-type:             Simple
+extra-source-files:     CHANGELOG.md
+
+library
+  default-language:     Haskell2010
+  hs-source-dirs:       src
+
+  ghc-options:          -Wall
+                        -Werror
+                        -Wcompat
+                        -Wredundant-constraints
+                        -Wincomplete-patterns
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+                        -Wunused-imports
+                        -Wunused-packages
+
+  exposed-modules:      Godx.Sync
+                        Godx.Sync.Api
+                        Godx.Sync.Config
+                        Godx.Sync.Config.Aurum
+                        Godx.Sync.Config.Cole
+                        Godx.Sync.Config.Godx
+                        Godx.Sync.Config.Node
+                        Godx.Sync.Config.Sophie
+                        Godx.Sync.Config.Types
+                        Godx.Sync.Database
+                        Godx.Sync.DbAction
+                        Godx.Sync.Error
+
+                        Godx.Sync.LedgerEvent
+                        Godx.Sync.LedgerState
+
+                        Godx.Sync.Era.Cole.Util
+                        Godx.Sync.Era.Godx.Util
+
+                        Godx.Sync.Era.Sophie.Generic
+                        Godx.Sync.Era.Sophie.Generic.EpochUpdate
+                        Godx.Sync.Era.Sophie.Generic.ProtoParams
+                        Godx.Sync.Era.Sophie.Generic.Rewards
+                        Godx.Sync.Era.Sophie.Generic.StakeCred
+                        Godx.Sync.Era.Sophie.Generic.StakeDist
+
+                        Godx.Sync.Metrics
+                        Godx.Sync.Plugin
+
+                        Godx.Sync.StateQuery
+                        Godx.Sync.Tracing.ToObjectOrphans
+                        Godx.Sync.Types
+                        Godx.Sync.Util
+
+  build-depends:        base                            >= 4.14         && < 4.16
+                      , aeson
+                      , base16-bytestring
+                      , bytestring
+                      , bcc-api
+                      , bcc-binary
+                      , bcc-client
+                      , bcc-crypto
+                      , bcc-crypto-class
+                      , bcc-crypto-wrapper
+                      , bcc-db
+                      , bcc-ledger-aurum
+                      , bcc-ledger-cole
+                      , bcc-ledger-core
+                      , bcc-ledger-sophie-ma
+                      -- Only for some orphan tracing instances.
+                      , bcc-node
+                      , bcc-prelude
+                      , bcc-slotting
+                      , cborg
+                      , containers
+                      , contra-tracer
+                      , directory
+                      , extra
+                      , filepath
+                      , tbco-monitoring
+                      , io-classes
+                      , lifted-base
+                      , monad-control
+                      , memory
+                      , network-mux
+                      , pretty-show
+                      , shardagnostic-consensus
+                      , shardagnostic-consensus-cole
+                      , shardagnostic-consensus-bcc
+                      , shardagnostic-consensus-sophie
+                      , shardagnostic-network
+                      , shardagnostic-network-framework
+                      , sophie-spec-ledger
+                      , small-steps
+                      , stm
+                      , strict
+                      , text
+                      , time
+                      , transformers
+                      , transformers-except
+                      , typed-protocols
+                      , unix
+                      , yaml

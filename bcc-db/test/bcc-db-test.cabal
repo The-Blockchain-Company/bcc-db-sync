@@ -1,0 +1,44 @@
+cabal-version:          >= 1.10
+
+-- http://haskell.org/cabal/users-guide/
+
+name:                   bcc-db-test
+version:                0.1.0.0
+synopsis:               Tests for the base functionality of the bcc-db library
+description:            Code for the Godx DB Sync node that is shared between the
+                        bcc-db-node and other components.
+homepage:               https://github.com/The-Blockchain-Company/bcc-db-sync
+bug-reports:            https://github.com/The-Blockchain-Company/bcc-db-sync/issues
+license:                Apache-2.0
+license-file:           LICENSE
+author:                 tbco Engineering Team
+maintainer:             operations@tbco.io
+copyright:              (c) 2019 tbco
+category:               Cryptocurrency
+build-type:             Simple
+
+library
+  default-language:     Haskell2010
+  ghc-options:          -Wall
+                        -Wcompat
+                        -fwarn-redundant-constraints
+                        -fwarn-incomplete-patterns
+                        -fwarn-unused-imports
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+
+  exposed-modules:      Test.Property.Godx.Db.Types
+                        Test.IO.Godx.Db.Util
+
+
+  build-depends:        aeson
+                      , base                            >= 4.14         && < 4.16
+                      , bytestring
+                      , bcc-db
+                      , bcc-ledger-cole
+                      , hedgehog
+                      , persistent
+                      , text
+                      , time
+                      , transformers
+                      , wide-word

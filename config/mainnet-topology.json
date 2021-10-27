@@ -1,0 +1,9 @@
+{
+  "Producers": [
+    {
+      "addr": "relays-new.bcc-mainnet.tbco.io",
+      "port": 3001,
+      "valency": 2
+    }
+  ]
+}
