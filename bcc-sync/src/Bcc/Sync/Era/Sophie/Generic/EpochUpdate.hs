@@ -57,7 +57,7 @@ extractEpochNonce extLedgerState =
       ChainDepStateJen st -> extractNonce st
       ChainDepStateAurum st -> extractNonce st
   where
-    extractNonce :: Consensus.TPraosState crypto -> Ledger.Nonce
+    extractNonce :: Consensus.TOptimumState crypto -> Ledger.Nonce
     extractNonce =
-      Sophie.ticknStateEpochNonce . Sophie.csTickn . Consensus.tpraosStateChainDepState
+      Sophie.ticknStateEpochNonce . Sophie.csTickn . Consensus.toptimumStateChainDepState
 

@@ -20,7 +20,7 @@ import qualified Godx.Api.Sophie as Api
 import qualified Godx.Crypto.Hash as Crypto
 import qualified Godx.Crypto.KES.Class as KES
 
-import           Godx.Crypto.VRF.Praos (PraosVRF)
+import           Godx.Crypto.VRF.Optimum (OptimumVRF)
 
 import           Godx.DbSync.Era.Sophie.Generic.Tx
 import           Godx.DbSync.Era.Sophie.Generic.Util
@@ -188,7 +188,7 @@ blockTxs
     => SophieBlock era -> [(Word64, Sophie.Tx era)]
 blockTxs = zip [0 ..] . unTxSeq . Sophie.bbody . Consensus.sophieBlockRaw
 
-blockVrfKeyView :: (SophieBasedEra era, VRF (Crypto era) ~ PraosVRF) => SophieBlock era -> Text
+blockVrfKeyView :: (SophieBasedEra era, VRF (Crypto era) ~ OptimumVRF) => SophieBlock era -> Text
 blockVrfKeyView = Api.serialiseToBech32 . Api.VrfVerificationKey . Sophie.bheaderVrfVk . blockBody
 
 creatorPoolHash :: SophieBasedEra era => SophieBlock era -> ByteString

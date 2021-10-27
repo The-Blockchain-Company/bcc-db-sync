@@ -92,7 +92,7 @@ mkProtocolInfoGodx ge =
             }
           Consensus.ProtocolParamsSophieBased
             { Consensus.sophieBasedGenesis = scConfig sophieGenesis
-            , Consensus.sophieBasedInitialNonce = sophiePraosNonce sophieGenesis
+            , Consensus.sophieBasedInitialNonce = sophieOptimumNonce sophieGenesis
             , Consensus.sophieBasedLeaderCredentials = []
             }
           Consensus.ProtocolParamsSophie
@@ -116,8 +116,8 @@ mkProtocolInfoGodx ge =
           (Consensus.ProtocolTransitionParamsSophieBased () $ dncJenHardFork dnc)
           (Consensus.ProtocolTransitionParamsSophieBased aurumGenesis $ dncAurumHardFork dnc)
 
-sophiePraosNonce :: SophieConfig -> Nonce
-sophiePraosNonce sCfg = Nonce (Crypto.castHash . unGenesisHashSophie $ scGenesisHash sCfg)
+sophieOptimumNonce :: SophieConfig -> Nonce
+sophieOptimumNonce sCfg = Nonce (Crypto.castHash . unGenesisHashSophie $ scGenesisHash sCfg)
 
 sophieProtVer :: SyncNodeConfig -> Sophie.ProtVer
 sophieProtVer dnc =

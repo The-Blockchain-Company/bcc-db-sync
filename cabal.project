@@ -101,7 +101,7 @@ source-repository-package
     binary
     binary/test
     bcc-crypto-class
-    bcc-crypto-praos
+    bcc-crypto-optimum
     measures
     orphans-deriving-via
     slotting

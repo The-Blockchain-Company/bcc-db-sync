@@ -90,7 +90,7 @@ library
                       , bcc-binary
                       , bcc-crypto
                       , bcc-crypto-class
-                      , bcc-crypto-praos
+                      , bcc-crypto-optimum
                       , bcc-crypto-wrapper
                       , bcc-db
                       , bcc-sync
