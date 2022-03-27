@@ -12,7 +12,7 @@ bug-reports:            https://github.com/The-Blockchain-Company/bcc-db-sync/is
 license:                Apache-2.0
 license-file:           LICENSE
 author:                 tbco Engineering Team
-maintainer:             operations@tbco.io
+maintainer:             operations@blockchain-company.io
 copyright:              (c) 2019 tbco
 category:               Cryptocurrency
 build-type:             Custom
