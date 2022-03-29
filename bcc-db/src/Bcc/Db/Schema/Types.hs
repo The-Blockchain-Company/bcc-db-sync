@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingVia #-}
 
-module Godx.Db.Schema.Types
+module Bcc.Db.Schema.Types
   ( Address (..)
   , AddressHash (..)
   , PaymentAddrHash (..)

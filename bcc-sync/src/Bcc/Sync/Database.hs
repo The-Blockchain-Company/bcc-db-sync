@@ -3,7 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.Sync.Database
+module Bcc.Sync.Database
   ( DbAction (..)
   , DbActionQueue (..)
   , lengthDbActionQueue
@@ -14,24 +14,24 @@ module Godx.Sync.Database
   , writeDbActionQueue
   ) where
 
-import           Godx.Prelude hiding (atomically)
+import           Bcc.Prelude hiding (atomically)
 
-import           Godx.BM.Trace (Trace, logDebug, logError, logInfo)
+import           Bcc.BM.Trace (Trace, logDebug, logError, logInfo)
 
 import           Control.Monad.Class.MonadSTM.Strict
 import           Control.Monad.Extra (whenJust)
 import           Control.Monad.Trans.Except.Extra (newExceptT)
 
-import           Godx.Sync.Api
-import           Godx.Sync.DbAction
-import           Godx.Sync.Error
-import           Godx.Sync.LedgerState
-import           Godx.Sync.Metrics
-import           Godx.Sync.Plugin
-import           Godx.Sync.Types
-import           Godx.Sync.Util hiding (whenJust)
+import           Bcc.Sync.Api
+import           Bcc.Sync.DbAction
+import           Bcc.Sync.Error
+import           Bcc.Sync.LedgerState
+import           Bcc.Sync.Metrics
+import           Bcc.Sync.Plugin
+import           Bcc.Sync.Types
+import           Bcc.Sync.Util hiding (whenJust)
 
-import           Godx.Slotting.Slot (WithOrigin (..))
+import           Bcc.Slotting.Slot (WithOrigin (..))
 
 import           Shardagnostic.Consensus.HeaderValidation
 import           Shardagnostic.Consensus.Ledger.Extended
@@ -102,7 +102,7 @@ runActions trce env plugin actions = do
             then pure Continue
             else dbAction Continue zs
 
-rollbackLedger :: Trace IO Text -> SyncNodePlugin -> SyncEnv -> GodxPoint -> IO (Maybe [GodxPoint])
+rollbackLedger :: Trace IO Text -> SyncNodePlugin -> SyncEnv -> BccPoint -> IO (Maybe [BccPoint])
 rollbackLedger _trce _plugin env point = do
     mst <- loadLedgerAtPoint (envLedger env) point
     dbBlock <- sdlGetLatestBlock (envDataLayer env)
@@ -119,7 +119,7 @@ rollbackLedger _trce _plugin env point = do
         pure $ Just points
   where
 
-    checkDBWithState :: GodxPoint -> Maybe Block -> IO ()
+    checkDBWithState :: BccPoint -> Maybe Block -> IO ()
     checkDBWithState pnt blk =
       if compareTips pnt blk
         then pure ()
@@ -129,7 +129,7 @@ rollbackLedger _trce _plugin env point = do
                     , show blk, " don't match"
                     ]
 
-compareTips :: GodxPoint -> Maybe Block -> Bool
+compareTips :: BccPoint -> Maybe Block -> Bool
 compareTips = go
   where
     go (Point Origin) Nothing = True
@@ -139,7 +139,7 @@ compareTips = go
     go  _ _ = False
 
 runRollbacksDB
-    :: Trace IO Text -> SyncNodePlugin -> GodxPoint
+    :: Trace IO Text -> SyncNodePlugin -> BccPoint
     -> ExceptT SyncNodeError IO ()
 runRollbacksDB trce plugin point =
   newExceptT

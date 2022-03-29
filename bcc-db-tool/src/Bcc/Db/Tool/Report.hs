@@ -1,14 +1,14 @@
-module Godx.Db.Tool.Report
+module Bcc.Db.Tool.Report
   ( module X
   , Report (..)
   , runReport
   ) where
 
-import           Godx.Db.Tool.Report.Balance (reportBalance)
-import           Godx.Db.Tool.Report.StakeReward (reportLatestStakeRewards,
+import           Bcc.Db.Tool.Report.Balance (reportBalance)
+import           Bcc.Db.Tool.Report.StakeReward (reportLatestStakeRewards,
                    reportStakeRewardHistory)
-import           Godx.Db.Tool.Report.Synced as X
-import           Godx.Db.Tool.Report.Transactions (reportTransactions)
+import           Bcc.Db.Tool.Report.Synced as X
+import           Bcc.Db.Tool.Report.Transactions (reportTransactions)
 
 import           Data.Text (Text)
 

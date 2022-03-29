@@ -7,7 +7,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.DbSync.Era.Sophie.Generic.Tx
+module Bcc.DbSync.Era.Sophie.Generic.Tx
   ( Tx (..)
   , TxCertificate (..)
   , TxIn (..)
@@ -21,35 +21,35 @@ module Godx.DbSync.Era.Sophie.Generic.Tx
   , fromAurumTx
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.Api.Sophie (TxMetadataValue (..))
+import           Bcc.Api.Sophie (TxMetadataValue (..))
 
-import qualified Godx.Crypto.Hash as Crypto
+import qualified Bcc.Crypto.Hash as Crypto
 
-import           Godx.DbSync.Era.Sophie.Generic.Metadata
-import           Godx.DbSync.Era.Sophie.Generic.ParamProposal
-import           Godx.DbSync.Era.Sophie.Generic.Util
-import           Godx.DbSync.Era.Sophie.Generic.Witness
+import           Bcc.DbSync.Era.Sophie.Generic.Metadata
+import           Bcc.DbSync.Era.Sophie.Generic.ParamProposal
+import           Bcc.DbSync.Era.Sophie.Generic.Util
+import           Bcc.DbSync.Era.Sophie.Generic.Witness
 
-import qualified Godx.Ledger.Address as Ledger
-import           Godx.Ledger.Aurum (AurumEra)
-import qualified Godx.Ledger.Aurum.Data as Aurum
-import qualified Godx.Ledger.Aurum.PParams as Aurum
-import           Godx.Ledger.Aurum.Scripts (ExUnits (..), Script (..), Tag (..), txscriptfee)
-import           Godx.Ledger.Aurum.Tx (ValidatedTx (..))
-import qualified Godx.Ledger.Aurum.Tx as Aurum
-import qualified Godx.Ledger.Aurum.TxBody as Aurum
-import qualified Godx.Ledger.Aurum.TxWitness as Ledger
-import           Godx.Ledger.Coin (Coin (..))
-import qualified Godx.Ledger.Core as Ledger
-import qualified Godx.Ledger.Era as Ledger
-import           Godx.Ledger.Jen.Value (AssetName, PolicyID, Value (..))
-import qualified Godx.Ledger.SafeHash as Ledger
-import qualified Godx.Ledger.SophieMA.AuxiliaryData as SophieMa
-import qualified Godx.Ledger.SophieMA.TxBody as SophieMa
+import qualified Bcc.Ledger.Address as Ledger
+import           Bcc.Ledger.Aurum (AurumEra)
+import qualified Bcc.Ledger.Aurum.Data as Aurum
+import qualified Bcc.Ledger.Aurum.PParams as Aurum
+import           Bcc.Ledger.Aurum.Scripts (ExUnits (..), Script (..), Tag (..), txscriptfee)
+import           Bcc.Ledger.Aurum.Tx (ValidatedTx (..))
+import qualified Bcc.Ledger.Aurum.Tx as Aurum
+import qualified Bcc.Ledger.Aurum.TxBody as Aurum
+import qualified Bcc.Ledger.Aurum.TxWitness as Ledger
+import           Bcc.Ledger.Coin (Coin (..))
+import qualified Bcc.Ledger.Core as Ledger
+import qualified Bcc.Ledger.Era as Ledger
+import           Bcc.Ledger.Jen.Value (AssetName, PolicyID, Value (..))
+import qualified Bcc.Ledger.SafeHash as Ledger
+import qualified Bcc.Ledger.SophieMA.AuxiliaryData as SophieMa
+import qualified Bcc.Ledger.SophieMA.TxBody as SophieMa
 
-import           Godx.Slotting.Slot (SlotNo (..))
+import           Bcc.Slotting.Slot (SlotNo (..))
 
 import qualified Data.ByteString.Short as SBS
 import           Data.Coerce (coerce)
@@ -59,7 +59,7 @@ import           Data.MemoBytes (MemoBytes (..))
 import           Data.Sequence.Strict (StrictSeq)
 import qualified Data.Set as Set
 
-import           Shardagnostic.Consensus.Godx.Block (StandardAllegra, StandardAurum, StandardCrypto,
+import           Shardagnostic.Consensus.Bcc.Block (StandardAllegra, StandardAurum, StandardCrypto,
                    StandardJen, StandardSophie)
 import           Shardagnostic.Consensus.Sophie.Ledger.Block (SophieBasedEra)
 
@@ -112,7 +112,7 @@ data TxIn = TxIn
 data TxOut = TxOut
   { txOutIndex :: !Word16
   , txOutAddress :: !(Ledger.Addr StandardCrypto)
-  , txOutGodxValue :: !Coin
+  , txOutBccValue :: !Coin
   , txOutMaValue :: !(Map (PolicyID StandardCrypto) (Map AssetName Integer))
   , txOutDataHash :: !(Maybe ByteString)
   }
@@ -163,7 +163,7 @@ fromAllegraTx (blkIndex, tx) =
       TxOut
         { txOutIndex = index
         , txOutAddress = coerceAddress addr
-        , txOutGodxValue = bcc
+        , txOutBccValue = bcc
         , txOutMaValue = mempty -- Allegra does not support Multi-Assets
         , txOutDataHash = mempty -- Allegra does not support scripts
         }
@@ -212,7 +212,7 @@ fromSophieTx (blkIndex, tx) =
       TxOut
         { txOutIndex = index
         , txOutAddress = coerceAddress addr
-        , txOutGodxValue = bcc
+        , txOutBccValue = bcc
         , txOutMaValue = mempty -- Sophie does not support Multi-Assets
         , txOutDataHash = mempty -- Sophie does not support scripts
         }
@@ -252,7 +252,7 @@ fromJenTx (blkIndex, tx) =
       TxOut
         { txOutIndex = index
         , txOutAddress = coerceAddress addr
-        , txOutGodxValue = Coin bcc
+        , txOutBccValue = Coin bcc
         , txOutMaValue = coerceMultiAsset maMap
         , txOutDataHash = mempty -- Jen does not support scripts
         }
@@ -298,7 +298,7 @@ fromAurumTx pp (blkIndex, tx) =
       TxOut
         { txOutIndex = index
         , txOutAddress = coerceAddress addr
-        , txOutGodxValue = Coin bcc
+        , txOutBccValue = Coin bcc
         , txOutMaValue = coerceMultiAsset maMap
         , txOutDataHash = getDataHash mDataHash
         }

@@ -1,10 +1,10 @@
-module Godx.Db.Tool.Validate.BlockTxs
+module Bcc.Db.Tool.Validate.BlockTxs
   ( validateEpochBlockTxs
   ) where
 
-import           Godx.Db.Tool.Validate.Util
+import           Bcc.Db.Tool.Validate.Util
 
-import           Godx.Db hiding (queryBlockTxCount)
+import           Bcc.Db hiding (queryBlockTxCount)
 
 import           Control.Monad (forM_, when)
 import           Control.Monad.IO.Class (MonadIO)
@@ -64,7 +64,7 @@ validateBlockCount (blockNo, txCountExpected) = do
           then Right ()
           else Left $ ValidateError blockNo txCountActual txCountExpected
 
--- This queries by BlockNo, the one in Godx.Db.Query queries by BlockId.
+-- This queries by BlockNo, the one in Bcc.Db.Query queries by BlockId.
 queryBlockTxCount :: MonadIO m => Word64 -> ReaderT SqlBackend m Word64
 queryBlockTxCount blockNo = do
   res <- select . from $ \ (blk `InnerJoin` tx) -> do

@@ -2,19 +2,19 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.DbSync.Era.Sophie.Validate
+module Bcc.DbSync.Era.Sophie.Validate
   ( validateEpochRewardsBefore
   ) where
 
-import           Godx.Prelude hiding (from, on)
+import           Bcc.Prelude hiding (from, on)
 
-import           Godx.BM.Trace (Trace, logError)
+import           Bcc.BM.Trace (Trace, logError)
 
-import qualified Godx.Db as Db
+import qualified Bcc.Db as Db
 
-import           Godx.Sync.Util
+import           Bcc.Sync.Util
 
-import           Godx.Slotting.Slot (EpochNo (..))
+import           Bcc.Slotting.Slot (EpochNo (..))
 
 import           Control.Monad.Trans.Control (MonadBaseControl)
 
@@ -51,18 +51,18 @@ validateEpochRewardsBefore tracer epochNo = do
 
 queryEpochRewardTotal
     :: (MonadBaseControl IO m, MonadIO m)
-    => EpochNo -> ReaderT SqlBackend m Db.Godx
+    => EpochNo -> ReaderT SqlBackend m Db.Bcc
 queryEpochRewardTotal (EpochNo epochNo) = do
   res <- select . from $ \ rwd -> do
             where_ (rwd ^. Db.RewardEarnedEpoch ==. val epochNo)
             pure (sum_ $ rwd ^. Db.RewardAmount)
-  pure $ Db.unValueSumGodx (listToMaybe res)
+  pure $ Db.unValueSumBcc (listToMaybe res)
 
 queryEpochRewardTotalReceived
     :: (MonadBaseControl IO m, MonadIO m)
-    => EpochNo -> ReaderT SqlBackend m (Maybe Db.Godx)
+    => EpochNo -> ReaderT SqlBackend m (Maybe Db.Bcc)
 queryEpochRewardTotalReceived (EpochNo epochNo) = do
   res <- select . from $ \ ertr -> do
             where_ (ertr ^. Db.EpochRewardTotalReceivedEarnedEpoch==. val epochNo)
             pure (ertr ^. Db.EpochRewardTotalReceivedAmount)
-  pure $ Db.word64ToGodx . Db.unDbIsaac . unValue <$> listToMaybe res
+  pure $ Db.word64ToBcc . Db.unDbEntropic . unValue <$> listToMaybe res

@@ -2,7 +2,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-module Godx.Sync.Era.Sophie.Generic.Rewards
+module Bcc.Sync.Era.Sophie.Generic.Rewards
   ( Reward (..)
   , Rewards (..)
   , epochRewards
@@ -10,29 +10,29 @@ module Godx.Sync.Era.Sophie.Generic.Rewards
   , rewardsStakeCreds
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.Db (RewardSource (..), rewardTypeToSource, textShow)
+import           Bcc.Db (RewardSource (..), rewardTypeToSource, textShow)
 
-import qualified Godx.Ledger.Aurum.PParams as Aurum
-import qualified Godx.Ledger.BaseTypes as Ledger
-import           Godx.Ledger.Coin (Coin (..))
-import qualified Godx.Ledger.Core as Ledger
-import qualified Godx.Ledger.Credential as Ledger
-import           Godx.Ledger.Era (Crypto)
-import qualified Godx.Ledger.Keys as Ledger
+import qualified Bcc.Ledger.Aurum.PParams as Aurum
+import qualified Bcc.Ledger.BaseTypes as Ledger
+import           Bcc.Ledger.Coin (Coin (..))
+import qualified Bcc.Ledger.Core as Ledger
+import qualified Bcc.Ledger.Credential as Ledger
+import           Bcc.Ledger.Era (Crypto)
+import qualified Bcc.Ledger.Keys as Ledger
 
-import           Godx.Slotting.Slot (EpochNo (..))
+import           Bcc.Slotting.Slot (EpochNo (..))
 
-import           Godx.Sync.Era.Sophie.Generic.StakeCred
-import           Godx.Sync.Types
+import           Bcc.Sync.Era.Sophie.Generic.StakeCred
+import           Bcc.Sync.Types
 
 import           Data.Coerce (coerce)
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 
-import           Shardagnostic.Consensus.Godx.Block (LedgerState (..), StandardCrypto)
-import           Shardagnostic.Consensus.Godx.CanHardFork ()
+import           Shardagnostic.Consensus.Bcc.Block (LedgerState (..), StandardCrypto)
+import           Shardagnostic.Consensus.Bcc.CanHardFork ()
 import           Shardagnostic.Consensus.Ledger.Extended (ExtLedgerState (..))
 import           Shardagnostic.Consensus.Sophie.Ledger.Block (SophieBlock)
 import qualified Shardagnostic.Consensus.Sophie.Ledger.Ledger as Consensus
@@ -58,7 +58,7 @@ data Rewards = Rewards
   , rwdRewards :: !(Map StakeCred (Set Reward))
   } deriving Eq
 
-epochRewards :: Ledger.Network -> EpochNo -> ExtLedgerState GodxBlock -> Maybe Rewards
+epochRewards :: Ledger.Network -> EpochNo -> ExtLedgerState BccBlock -> Maybe Rewards
 epochRewards nw epoch lstate =
     case ledgerState lstate of
       LedgerStateCole _ -> Nothing
@@ -88,7 +88,7 @@ rewardBlockEra pv =
     Sophie.ProtVer 6 0 -> Aurum
     x -> panic $ "rewardBlockEra: " <> textShow x
 
-rewardProtoVer :: ExtLedgerState GodxBlock -> Sophie.ProtVer
+rewardProtoVer :: ExtLedgerState BccBlock -> Sophie.ProtVer
 rewardProtoVer lstate =
     case ledgerState lstate of
       LedgerStateCole _ -> Sophie.ProtVer 1 0 -- Should never happen.

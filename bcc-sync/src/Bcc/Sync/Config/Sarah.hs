@@ -4,17 +4,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
 
-module Godx.Sync.Config.Sophie
+module Bcc.Sync.Config.Sophie
   ( SophieConfig (..)
   , readSophieGenesisConfig
   ) where
 
-import qualified Godx.Crypto.Hash as Crypto
+import qualified Bcc.Crypto.Hash as Crypto
 
-import           Godx.Db (textShow)
+import           Bcc.Db (textShow)
 
-import           Godx.Sync.Config.Types
-import           Godx.Sync.Error
+import           Bcc.Sync.Config.Types
+import           Bcc.Sync.Error
 
 import           Control.Monad.Trans.Except (ExceptT)
 import           Control.Monad.Trans.Except.Extra (firstExceptT, handleIOExceptT, hoistEither, left)

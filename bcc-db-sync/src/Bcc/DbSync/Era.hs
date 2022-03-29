@@ -3,21 +3,21 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
 
-module Godx.DbSync.Era
+module Bcc.DbSync.Era
   ( module X
   , insertValidateGenesisDist
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.BM.Data.Trace (Trace)
+import           Bcc.BM.Data.Trace (Trace)
 
-import           Godx.Sync.Config
-import           Godx.Sync.Error
+import           Bcc.Sync.Config
+import           Bcc.Sync.Error
 
-import qualified Godx.DbSync.Era.Cole.Genesis as Cole
-import qualified Godx.DbSync.Era.Sophie.Genesis as Sophie
-import           Godx.DbSync.Era.Sophie.Offline as X
+import qualified Bcc.DbSync.Era.Cole.Genesis as Cole
+import qualified Bcc.DbSync.Era.Sophie.Genesis as Sophie
+import           Bcc.DbSync.Era.Sophie.Offline as X
 
 import           Database.Persist.Sql (SqlBackend)
 
@@ -26,6 +26,6 @@ insertValidateGenesisDist
     -> ExceptT SyncNodeError IO ()
 insertValidateGenesisDist backend trce nname genCfg =
   case genCfg of
-    GenesisGodx _ bCfg sCfg _aCfg -> do
+    GenesisBcc _ bCfg sCfg _aCfg -> do
       Cole.insertValidateGenesisDist backend trce (unNetworkName nname) bCfg
       Sophie.insertValidateGenesisDist backend trce (unNetworkName nname) (scConfig sCfg)

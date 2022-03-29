@@ -5,7 +5,7 @@ cabal-version:          >= 1.10
 name:                   bcc-db-test
 version:                0.1.0.0
 synopsis:               Tests for the base functionality of the bcc-db library
-description:            Code for the Godx DB Sync node that is shared between the
+description:            Code for the Bcc DB Sync node that is shared between the
                         bcc-db-node and other components.
 homepage:               https://github.com/The-Blockchain-Company/bcc-db-sync
 bug-reports:            https://github.com/The-Blockchain-Company/bcc-db-sync/issues
@@ -27,8 +27,8 @@ library
                         -Wincomplete-record-updates
                         -Wincomplete-uni-patterns
 
-  exposed-modules:      Test.Property.Godx.Db.Types
-                        Test.IO.Godx.Db.Util
+  exposed-modules:      Test.Property.Bcc.Db.Types
+                        Test.IO.Bcc.Db.Util
 
 
   build-depends:        aeson

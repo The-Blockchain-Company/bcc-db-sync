@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.Db.Migration.Version
+module Bcc.Db.Migration.Version
   ( MigrationVersion (..)
   , parseMigrationVersionFromFile
   , nextMigrationVersion

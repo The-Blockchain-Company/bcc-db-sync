@@ -1,7 +1,7 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.Db.Migration.Haskell
+module Bcc.Db.Migration.Haskell
   ( runHaskellMigration
   ) where
 
@@ -14,8 +14,8 @@ import qualified Data.Map.Strict as Map
 
 import           Database.Persist.Sql (SqlBackend)
 
-import           Godx.Db.Migration.Version
-import           Godx.Db.Run
+import           Bcc.Db.Migration.Version
+import           Bcc.Db.Run
 
 import           System.Exit (exitFailure)
 import           System.IO (Handle, hClose, hFlush, hPutStrLn, stdout)

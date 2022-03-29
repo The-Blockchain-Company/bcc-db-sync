@@ -1,17 +1,17 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.Config.Git.Rev (gitRev)
+import           Bcc.Config.Git.Rev (gitRev)
 
-import           Godx.DbSync (runDbSyncNode)
-import           Godx.DbSync.Metrics (withMetricSetters)
-import           Godx.DbSync.Plugin.Extended (extendedDbSyncNodePlugin)
+import           Bcc.DbSync (runDbSyncNode)
+import           Bcc.DbSync.Metrics (withMetricSetters)
+import           Bcc.DbSync.Plugin.Extended (extendedDbSyncNodePlugin)
 
-import           Godx.Slotting.Slot (SlotNo (..))
-import           Godx.Sync.Config
-import           Godx.Sync.Config.Types
+import           Bcc.Slotting.Slot (SlotNo (..))
+import           Bcc.Sync.Config
+import           Bcc.Sync.Config.Types
 
 import           Data.String (String)
 import qualified Data.Text as Text
@@ -47,7 +47,7 @@ opts :: ParserInfo SyncCommand
 opts =
   Opt.info (pCommandLine <**> Opt.helper)
     ( Opt.fullDesc
-    <> Opt.progDesc "Extended Godx POstgreSQL sync node."
+    <> Opt.progDesc "Extended Bcc POstgreSQL sync node."
     )
 
 pCommandLine :: Parser SyncCommand

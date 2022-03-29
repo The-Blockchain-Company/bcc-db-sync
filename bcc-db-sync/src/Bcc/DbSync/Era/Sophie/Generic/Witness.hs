@@ -1,17 +1,17 @@
 {-# LANGUAGE GADTs #-}
 
-module Godx.DbSync.Era.Sophie.Generic.Witness
+module Bcc.DbSync.Era.Sophie.Generic.Witness
   ( Evidence (..)
   , Witness (..)
   ) where
 
 
-import           Godx.Ledger.Allegra (AllegraEra)
-import           Godx.Ledger.Aurum (AurumEra)
-import           Godx.Ledger.Jen (JenEra)
-import           Godx.Ledger.Sophie (SophieEra)
+import           Bcc.Ledger.Allegra (AllegraEra)
+import           Bcc.Ledger.Aurum (AurumEra)
+import           Bcc.Ledger.Jen (JenEra)
+import           Bcc.Ledger.Sophie (SophieEra)
 
-import           Shardagnostic.Consensus.Godx.Block (StandardCrypto)
+import           Shardagnostic.Consensus.Bcc.Block (StandardCrypto)
 
 
 -- Cargo culted from ledger-specs. Written by Tim Sheard and PRed in

@@ -7,23 +7,23 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.Sync.StateQuery
+module Bcc.Sync.StateQuery
   ( StateQueryTMVar -- Opaque, so it cannot be misused.
   , getSlotDetails
   , localStateQueryHandler
   , newStateQueryTMVar
   ) where
 
-import           Godx.BM.Trace (Trace, logInfo)
+import           Bcc.BM.Trace (Trace, logInfo)
 
-import           Godx.Slotting.Slot (SlotNo (..))
+import           Bcc.Slotting.Slot (SlotNo (..))
 
-import           Godx.Db (textShow)
+import           Bcc.Db (textShow)
 
-import           Godx.Sync.Api
-import           Godx.Sync.Types
+import           Bcc.Sync.Api
+import           Bcc.Sync.Types
 
-import           Godx.Prelude hiding (atomically)
+import           Bcc.Prelude hiding (atomically)
 
 import           Control.Monad.Class.MonadSTM.Strict (StrictTMVar, atomically, newEmptyTMVarIO,
                    putTMVar, takeTMVar)
@@ -33,8 +33,8 @@ import           Data.Time.Clock (UTCTime, addUTCTime, getCurrentTime)
 
 import           Shardagnostic.Consensus.BlockchainTime.WallClock.Types (RelativeTime (..),
                    SystemStart (..))
-import           Shardagnostic.Consensus.Godx.Block (BlockQuery (QueryHardFork), GodxEras)
-import           Shardagnostic.Consensus.Godx.Node ()
+import           Shardagnostic.Consensus.Bcc.Block (BlockQuery (QueryHardFork), BccEras)
+import           Shardagnostic.Consensus.Bcc.Node ()
 import           Shardagnostic.Consensus.HardFork.Combinator.Basics (HardForkBlock (..))
 import           Shardagnostic.Consensus.HardFork.Combinator.Ledger.Query
                    (QueryHardFork (GetInterpreter))
@@ -69,7 +69,7 @@ newStateQueryTMVar = StateQueryTMVar <$> newEmptyTMVarIO
 -- If the existing history interpreter returns an error, get a new one and try again.
 getSlotDetails
     :: Trace IO Text -> SyncEnv
-    -> StateQueryTMVar (HardForkBlock (GodxEras StandardCrypto)) (Interpreter (GodxEras StandardCrypto))
+    -> StateQueryTMVar (HardForkBlock (BccEras StandardCrypto)) (Interpreter (BccEras StandardCrypto))
     -> SlotNo
     -> IO SlotDetails
 getSlotDetails tracer env queryVar slot = do
@@ -82,7 +82,7 @@ getSlotDetails tracer env queryVar slot = do
           Left err -> panic $ "getSlotDetails: " <> textShow err
           Right sd -> insertCurrentTime sd
   where
-    evalSlotDetails :: Interpreter (GodxEras StandardCrypto) -> Either PastHorizonException SlotDetails
+    evalSlotDetails :: Interpreter (BccEras StandardCrypto) -> Either PastHorizonException SlotDetails
     evalSlotDetails interp =
       interpretQuery interp (querySlotDetails (envSystemStart env) slot)
 
@@ -94,13 +94,13 @@ getSlotDetails tracer env queryVar slot = do
 -- -------------------------------------------------------------------------------------------------
 
 {-# NOINLINE historyInterpVar #-}
-historyInterpVar :: IORef (Maybe (Interpreter (GodxEras StandardCrypto)))
+historyInterpVar :: IORef (Maybe (Interpreter (BccEras StandardCrypto)))
 historyInterpVar = unsafePerformIO $ newIORef Nothing
 
 getHistoryInterpreter
     :: Trace IO Text
-    -> StateQueryTMVar (HardForkBlock (GodxEras StandardCrypto)) (Interpreter (GodxEras StandardCrypto))
-    -> IO (Interpreter (GodxEras StandardCrypto))
+    -> StateQueryTMVar (HardForkBlock (BccEras StandardCrypto)) (Interpreter (BccEras StandardCrypto))
+    -> IO (Interpreter (BccEras StandardCrypto))
 getHistoryInterpreter tracer queryVar = do
   respVar <- newEmptyTMVarIO
   atomically $ putTMVar (unStateQueryTMVar queryVar) (BlockQuery $ QueryHardFork GetInterpreter, respVar)

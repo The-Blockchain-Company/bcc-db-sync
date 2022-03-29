@@ -45,11 +45,11 @@ a new top-level [program][new-top-level].
 
 
 
-[default]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/bcc-db-sync/src/Godx/DbSync/Plugin/Default.hs
-[epoch]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/bcc-db-sync/src/Godx/DbSync/Plugin/Epoch.hs
-[extended]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/bcc-db-sync-extended/src/Godx/DbSync/Plugin/Extended.hs
+[default]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/bcc-db-sync/src/Bcc/DbSync/Plugin/Default.hs
+[epoch]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/bcc-db-sync/src/Bcc/DbSync/Plugin/Epoch.hs
+[extended]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/bcc-db-sync-extended/src/Bcc/DbSync/Plugin/Extended.hs
 [new-top-level]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/bcc-db-sync-extended/app/bcc-db-sync-extended.hs
-[plugin]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/bcc-db-sync/src/Godx/DbSync/Plugin.hs
+[plugin]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/bcc-db-sync/src/Bcc/DbSync/Plugin.hs
 [program]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/bcc-db-sync/app/bcc-db-sync.hs
-[schema]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/bcc-db-sync-db/src/Godx/Db/Schema.hs
+[schema]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/bcc-db-sync-db/src/Bcc/Db/Schema.hs
 [schema-doc]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/doc/schema-management.md

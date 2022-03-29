@@ -5,7 +5,7 @@ NetworkName: sophie-qa
 EnableLogMetrics: False
 EnableLogging: True
 
-Protocol: Godx
+Protocol: Bcc
 
 # The config file for the node we are connecting to. If this is not the correct
 # config, it will likely lead to db-sync throwing up weird error messages from

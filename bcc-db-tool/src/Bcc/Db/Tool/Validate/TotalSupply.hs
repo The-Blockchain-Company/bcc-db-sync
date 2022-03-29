@@ -1,13 +1,13 @@
 {-# LANGUAGE StrictData #-}
-module Godx.Db.Tool.Validate.TotalSupply
+module Bcc.Db.Tool.Validate.TotalSupply
   ( validateTotalSupplyDecreasing
   ) where
 
-import           Godx.Db.Tool.Validate.Util
+import           Bcc.Db.Tool.Validate.Util
 
 import           Data.Word (Word64)
 
-import           Godx.Db
+import           Bcc.Db
 
 import           System.Random (randomRIO)
 
@@ -32,22 +32,22 @@ validateTotalSupplyDecreasing = do
 -- -----------------------------------------------------------------------------
 
 data Accounting = Accounting
-  { accFees :: Godx
-  , accDeposit :: Godx
-  , accWithdrawals :: Godx
-  , accSupply :: Godx
+  { accFees :: Bcc
+  , accDeposit :: Bcc
+  , accWithdrawals :: Bcc
+  , accSupply :: Bcc
   }
 
 data TestParams = TestParams
   { testBlockNo :: Word64
-  , genesisSupply :: Godx
+  , genesisSupply :: Bcc
   }
 
 genTestParameters :: IO TestParams
 genTestParameters = do
   mlatest <- runDbNoLogging queryLatestBlockNo
   case mlatest of
-    Nothing -> error "Godx.Db.Tool.Validation: Empty database"
+    Nothing -> error "Bcc.Db.Tool.Validation: Empty database"
     Just latest ->
       TestParams
           <$> randomRIO (1, latest - 1)

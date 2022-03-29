@@ -2,19 +2,19 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.DbSync.Era.Sophie.Adjust
+module Bcc.DbSync.Era.Sophie.Adjust
   ( adjustEpochRewards
   ) where
 
-import           Godx.Prelude hiding (from, on)
+import           Bcc.Prelude hiding (from, on)
 
-import           Godx.BM.Trace (Trace, logInfo)
+import           Bcc.BM.Trace (Trace, logInfo)
 
-import qualified Godx.Db as Db
+import qualified Bcc.Db as Db
 
-import           Godx.Sync.Util
+import           Bcc.Sync.Util
 
-import           Godx.Slotting.Slot (EpochNo (..))
+import           Bcc.Slotting.Slot (EpochNo (..))
 
 import           Control.Monad.Trans.Control (MonadBaseControl)
 

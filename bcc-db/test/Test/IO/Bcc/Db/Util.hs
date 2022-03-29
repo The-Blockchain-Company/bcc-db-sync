@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Test.IO.Godx.Db.Util
+module Test.IO.Bcc.Db.Util
   ( assertBool
   , deleteAllBlocksCascade
   , dummyUTCTime
@@ -29,7 +29,7 @@ import           Data.Word (Word64)
 
 import           Database.Persist.Sql (SqlBackend, delete, selectKeysList)
 
-import           Godx.Db
+import           Bcc.Db
 
 import           Text.Printf (printf)
 
@@ -88,8 +88,8 @@ mkTxs blkId count =
         { txHash = mkTxHash blkId w
         , txBlockId = blkId
         , txBlockIndex = 0
-        , txOutSum = DbIsaac 2
-        , txFee = DbIsaac 1
+        , txOutSum = DbEntropic 2
+        , txFee = DbEntropic 1
         , txDeposit = 0
         , txSize = 12
         , txInvalidHereafter = Nothing
@@ -105,4 +105,4 @@ testSlotLeader =
 mkTxOut :: BlockId -> TxId -> TxOut
 mkTxOut blkId txId =
   let addr = mkAddressHash blkId txId in
-  TxOut txId 0 (Text.pack addr) (BS.pack addr) False Nothing Nothing (DbIsaac 1000000000) Nothing
+  TxOut txId 0 (Text.pack addr) (BS.pack addr) False Nothing Nothing (DbEntropic 1000000000) Nothing

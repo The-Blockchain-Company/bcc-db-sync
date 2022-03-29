@@ -5,21 +5,21 @@
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Godx.DbSync.Era.Sophie.Offline
+module Bcc.DbSync.Era.Sophie.Offline
   ( insertOfflineResults
   , loadOfflineWorkQueue
   , runOfflineFetchThread
   ) where
 
-import           Godx.Prelude hiding (handle)
+import           Bcc.Prelude hiding (handle)
 
-import           Godx.BM.Trace (Trace, logInfo, logWarning)
+import           Bcc.BM.Trace (Trace, logInfo, logWarning)
 
-import           Godx.DbSync.Era.Sophie.Offline.Http
-import           Godx.DbSync.Era.Sophie.Offline.Query
-import           Godx.DbSync.Era.Sophie.Offline.Types
+import           Bcc.DbSync.Era.Sophie.Offline.Http
+import           Bcc.DbSync.Era.Sophie.Offline.Query
+import           Bcc.DbSync.Era.Sophie.Offline.Types
 
-import           Godx.Sync.Types
+import           Bcc.Sync.Types
 
 import           Control.Monad.Catch (MonadCatch, handle)
 import           Control.Monad.Class.MonadSTM.Strict (TBQueue, flushTBQueue, isEmptyTBQueue,
@@ -35,14 +35,14 @@ import qualified Data.Text.Encoding as Text
 import           Data.Time.Clock.POSIX (POSIXTime)
 import qualified Data.Time.Clock.POSIX as Time
 
-import qualified Godx.Crypto.Hash.Blake2b as Crypto
-import qualified Godx.Crypto.Hash.Class as Crypto
+import qualified Bcc.Crypto.Hash.Blake2b as Crypto
+import qualified Bcc.Crypto.Hash.Class as Crypto
 
-import           Godx.Db
-import qualified Godx.Db as DB
+import           Bcc.Db
+import qualified Bcc.Db as DB
 
-import           Godx.Sync.LedgerState
-import           Godx.Sync.Util
+import           Bcc.Sync.LedgerState
+import           Bcc.Sync.Util
 
 import           Database.Persist.Sql (SqlBackend)
 import           Database.PostgreSQL.Simple (SqlError, sqlErrorMsg)

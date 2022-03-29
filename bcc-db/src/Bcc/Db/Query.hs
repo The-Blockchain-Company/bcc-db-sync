@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Godx.Db.Query
+module Bcc.Db.Query
   ( LookupFail (..)
   , queryAddressBalanceAtSlot
   , queryGenesis
@@ -64,11 +64,11 @@ module Godx.Db.Query
   , unValue2
   , unValue3
   , unValue4
-  , unValueSumGodx
+  , unValueSumBcc
   ) where
 
 
-import           Godx.Slotting.Slot (SlotNo (..))
+import           Bcc.Slotting.Slot (SlotNo (..))
 
 import           Control.Monad.Extra (mapMaybeM)
 import           Control.Monad.IO.Class (MonadIO)
@@ -90,9 +90,9 @@ import           Database.Esqueleto.Legacy (Entity (..), From, InnerJoin (..), L
                    unValue, val, where_, (&&.), (<=.), (==.), (>.), (^.), (||.))
 import           Database.Persist.Sql (SqlBackend)
 
-import           Godx.Db.Error
-import           Godx.Db.Schema
-import           Godx.Db.Types
+import           Bcc.Db.Error
+import           Bcc.Db.Schema
+import           Bcc.Db.Types
 
 {- HLINT ignore "Reduce duplication" -}
 {- HLINT ignore "Redundant ^." -}
@@ -100,14 +100,14 @@ import           Godx.Db.Types
 -- If you squint, these Esqueleto queries almost look like SQL queries.
 
 
-queryAddressBalanceAtSlot :: MonadIO m => Text -> Word64 -> ReaderT SqlBackend m Godx
+queryAddressBalanceAtSlot :: MonadIO m => Text -> Word64 -> ReaderT SqlBackend m Bcc
 queryAddressBalanceAtSlot addr slotNo = do
     eblkId <- select . from $ \blk -> do
                   where_ (blk ^. BlockSlotNo ==. just (val slotNo))
                   pure (blk ^. BlockId)
     maybe (pure 0) (queryAddressBalanceAtBlockId . unValue) (listToMaybe eblkId)
   where
-    queryAddressBalanceAtBlockId :: MonadIO m => BlockId -> ReaderT SqlBackend m Godx
+    queryAddressBalanceAtBlockId :: MonadIO m => BlockId -> ReaderT SqlBackend m Bcc
     queryAddressBalanceAtBlockId blkid = do
         -- tx1 refers to the tx of the input spending this output (if it is ever spent)
         -- tx2 refers to the tx of the output
@@ -119,7 +119,7 @@ queryAddressBalanceAtSlot addr slotNo = do
                   where_ $ (txout ^. TxOutTxId `in_` txLessEqual blkid) &&. (isNothing (blk ^. BlockBlockNo) ||. (blk ^. BlockId >. val blkid))
                   where_ (txout ^. TxOutAddress ==. val addr)
                   pure $ sum_ (txout ^. TxOutValue)
-        pure $ unValueSumGodx (listToMaybe res)
+        pure $ unValueSumBcc (listToMaybe res)
 
 queryGenesis :: MonadIO m => ReaderT SqlBackend m (Either LookupFail BlockId)
 queryGenesis = do
@@ -235,17 +235,17 @@ queryCalcEpochEntry epochNum = do
     convertAll (blkCount, b, c) (d, e, txCount) =
       case (b, c, d, e) of
         (Just start, Just end, Just outSum, Just fees) ->
-            Epoch (fromIntegral $ numerator outSum) (DbIsaac . fromIntegral $ numerator fees)
+            Epoch (fromIntegral $ numerator outSum) (DbEntropic . fromIntegral $ numerator fees)
                         txCount blkCount epochNum start end
         (Just start, Just end, Nothing, Nothing) ->
-            Epoch 0 (DbIsaac 0) txCount blkCount epochNum start end
+            Epoch 0 (DbEntropic 0) txCount blkCount epochNum start end
         _otherwise ->
             emptyEpoch
 
     convertBlk :: (Word64, Maybe UTCTime, Maybe UTCTime) -> Epoch
     convertBlk (blkCount, b, c) =
       case (b, c) of
-        (Just start, Just end) -> Epoch 0 (DbIsaac 0) 0 blkCount epochNum start end
+        (Just start, Just end) -> Epoch 0 (DbEntropic 0) 0 blkCount epochNum start end
         _otherwise -> emptyEpoch
 
     -- We only return this when something has screwed up.
@@ -253,7 +253,7 @@ queryCalcEpochEntry epochNum = do
     emptyEpoch =
       Epoch
         { epochOutSum = 0
-        , epochFees = DbIsaac 0
+        , epochFees = DbEntropic 0
         , epochTxCount = 0
         , epochBlkCount = 0
         , epochNo = epochNum
@@ -288,13 +288,13 @@ queryCheckPoints limitCount = do
         (Nothing, _ ) -> Nothing
         (Just a, b) -> Just (a, b)
 
-queryDepositUpToBlockNo :: MonadIO m => Word64 -> ReaderT SqlBackend m Godx
+queryDepositUpToBlockNo :: MonadIO m => Word64 -> ReaderT SqlBackend m Bcc
 queryDepositUpToBlockNo blkNo = do
   res <- select . from $ \ (tx `InnerJoin` blk) -> do
             on (tx ^. TxBlockId ==. blk ^. BlockId)
             where_ (blk ^. BlockBlockNo <=. just (val blkNo))
             pure $ sum_ (tx ^. TxDeposit)
-  pure $ unValueSumGodx (listToMaybe res)
+  pure $ unValueSumBcc (listToMaybe res)
 
 queryEpochEntry :: MonadIO m => Word64 -> ReaderT SqlBackend m (Either LookupFail Epoch)
 queryEpochEntry epochNum = do
@@ -313,32 +313,32 @@ queryEpochNo blkId = do
   pure $ maybeToEither (DbLookupBlockId $ unBlockId blkId) unValue (listToMaybe res)
 
 -- | Get the fees paid in all block from genesis up to and including the specified block.
-queryFeesUpToBlockNo :: MonadIO m => Word64 -> ReaderT SqlBackend m Godx
+queryFeesUpToBlockNo :: MonadIO m => Word64 -> ReaderT SqlBackend m Bcc
 queryFeesUpToBlockNo blkNo = do
   res <- select . from $ \ (tx `InnerJoin` blk) -> do
             on (tx ^. TxBlockId ==. blk ^. BlockId)
             where_ (blk ^. BlockBlockNo <=. just (val blkNo))
             pure $ sum_ (tx ^. TxFee)
-  pure $ unValueSumGodx (listToMaybe res)
+  pure $ unValueSumBcc (listToMaybe res)
 
-queryFeesUpToSlotNo :: MonadIO m => Word64 -> ReaderT SqlBackend m Godx
+queryFeesUpToSlotNo :: MonadIO m => Word64 -> ReaderT SqlBackend m Bcc
 queryFeesUpToSlotNo slotNo = do
   res <- select . from $ \ (tx `InnerJoin` blk) -> do
             on (tx ^. TxBlockId ==. blk ^. BlockId)
             where_ (isJust $ blk ^. BlockSlotNo)
             where_ (blk ^. BlockSlotNo <=. just (val slotNo))
             pure $ sum_ (tx ^. TxFee)
-  pure $ unValueSumGodx (listToMaybe res)
+  pure $ unValueSumBcc (listToMaybe res)
 
 -- | Return the total Genesis coin supply.
-queryGenesisSupply :: MonadIO m => ReaderT SqlBackend m Godx
+queryGenesisSupply :: MonadIO m => ReaderT SqlBackend m Bcc
 queryGenesisSupply = do
     res <- select . from $ \ (txOut `InnerJoin` tx `InnerJoin` blk) -> do
                 on (tx ^. TxBlockId ==. blk ^. BlockId)
                 on (tx ^. TxId ==. txOut ^. TxOutTxId)
                 where_ (isNothing $ blk ^. BlockEpochNo)
                 pure $ sum_ (txOut ^. TxOutValue)
-    pure $ unValueSumGodx (listToMaybe res)
+    pure $ unValueSumBcc (listToMaybe res)
 
 -- | Get 'BlockId' of the latest block.
 queryLatestBlockId :: MonadIO m => ReaderT SqlBackend m (Maybe BlockId)
@@ -476,15 +476,15 @@ querySlotUtcTime slotNo = do
             pure (blk ^. BlockTime)
     pure $ maybe (Left $ DbLookupSlotNo slotNo) (Right . unValue) (listToMaybe le)
 
--- | Get the current total supply of Isaac. This only returns the on-chain supply which
+-- | Get the current total supply of Entropic. This only returns the on-chain supply which
 -- does not include staking rewards that have not yet been withdrawn. Before wihdrawal
 -- rewards are part of the ledger state and hence not on chain.
-queryTotalSupply :: MonadIO m => ReaderT SqlBackend m Godx
+queryTotalSupply :: MonadIO m => ReaderT SqlBackend m Bcc
 queryTotalSupply = do
     res <- select . from $ \ txOut -> do
                 txOutUnspentP txOut
                 pure $ sum_ (txOut ^. TxOutValue)
-    pure $ unValueSumGodx (listToMaybe res)
+    pure $ unValueSumBcc (listToMaybe res)
 
 -- | Count the number of transactions in the Tx table.
 queryTxCount :: MonadIO m => ReaderT SqlBackend m Word
@@ -517,7 +517,7 @@ queryTxOutCount = do
   pure $ maybe 0 unValue (listToMaybe res)
 
 -- | Give a (tx hash, index) pair, return the TxOut value.
-queryTxOutValue :: MonadIO m => (ByteString, Word16) -> ReaderT SqlBackend m (Either LookupFail (TxId, DbIsaac))
+queryTxOutValue :: MonadIO m => (ByteString, Word16) -> ReaderT SqlBackend m (Either LookupFail (TxId, DbEntropic))
 queryTxOutValue (hash, index) = do
   res <- select . from $ \ (tx `InnerJoin` txOut) -> do
             on (tx ^. TxId ==. txOut ^. TxOutTxId)
@@ -571,14 +571,14 @@ queryUtxoAtSlotNo slotNo = do
                 pure (blk ^. BlockId)
   maybe (pure []) (queryUtxoAtBlockId . unValue) (listToMaybe eblkId)
 
-queryWithdrawalsUpToBlockNo :: MonadIO m => Word64 -> ReaderT SqlBackend m Godx
+queryWithdrawalsUpToBlockNo :: MonadIO m => Word64 -> ReaderT SqlBackend m Bcc
 queryWithdrawalsUpToBlockNo blkNo = do
   res <- select . from $ \ (tx `InnerJoin` blk `InnerJoin` withDraw) -> do
             on (tx ^. TxId ==. withDraw ^. WithdrawalTxId)
             on (tx ^. TxBlockId ==. blk ^. BlockId)
             where_ (blk ^. BlockBlockNo <=. just (val blkNo))
             pure $ sum_ (withDraw ^. WithdrawalAmount)
-  pure $ unValueSumGodx (listToMaybe res)
+  pure $ unValueSumBcc (listToMaybe res)
 
 -- -----------------------------------------------------------------------------
 -- SqlQuery predicates
@@ -630,11 +630,11 @@ txLessEqual blkid =
 -- | Get the UTxO set after the specified 'BlockNo' has been applied to the chain.
 -- Unfortunately the 'sum_' operation above returns a 'PersistRational' so we need
 -- to un-wibble it.
-unValueSumGodx :: Maybe (Value (Maybe Micro)) -> Godx
-unValueSumGodx mvm =
+unValueSumBcc :: Maybe (Value (Maybe Micro)) -> Bcc
+unValueSumBcc mvm =
   case fmap unValue mvm of
-    Just (Just x) -> isaacToGodx x
-    _ -> Godx 0
+    Just (Just x) -> entropicToBcc x
+    _ -> Bcc 0
 
 -- -----------------------------------------------------------------------------
 

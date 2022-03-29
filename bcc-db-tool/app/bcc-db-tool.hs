@@ -1,8 +1,8 @@
-import           Godx.Db
-import           Godx.Db.Tool
-import           Godx.Sync.Config.Types hiding (LogFileDir, MigrationDir)
+import           Bcc.Db
+import           Bcc.Db.Tool
+import           Bcc.Sync.Config.Types hiding (LogFileDir, MigrationDir)
 
-import           Godx.Slotting.Slot (SlotNo (..))
+import           Bcc.Slotting.Slot (SlotNo (..))
 
 import           Control.Applicative (optional)
 import           Data.Text (Text)
@@ -20,7 +20,7 @@ main = do
     opts :: ParserInfo Command
     opts = Opt.info (Opt.helper <*> pVersion <*> pCommand)
       ( Opt.fullDesc
-      <> Opt.header "bcc-db-tool - Manage the Godx PostgreSQL Database"
+      <> Opt.header "bcc-db-tool - Manage the Bcc PostgreSQL Database"
       )
 
     p :: ParserPrefs
@@ -159,7 +159,7 @@ pAddress =
   Opt.strOption $
     mconcat
       [ Opt.long "address"
-      , Opt.help "Godx address"
+      , Opt.help "Bcc address"
       , Opt.metavar "ADDRESS"
       ]
 

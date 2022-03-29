@@ -5,8 +5,8 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.Db.Insert
-  ( insertGodxPots
+module Bcc.Db.Insert
+  ( insertBccPots
   , insertAdminUser
   , insertBlock
   , insertCollateralTxIn
@@ -74,7 +74,7 @@ import           Database.Persist.Types (ConstraintNameDB (..), EntityNameDB (..
                    PersistValue, entityKey)
 import           Database.PostgreSQL.Simple (SqlError)
 
-import           Godx.Db.Schema
+import           Bcc.Db.Schema
 
 
 -- The original naive way of inserting rows into Postgres was:
@@ -93,8 +93,8 @@ import           Godx.Db.Schema
 -- Instead we use `insertUnchecked` for tables where uniqueness constraints are unlikley to be hit
 -- and `insertChecked` for tables where the uniqueness constraint might can be hit.
 
-insertGodxPots :: (MonadBaseControl IO m, MonadIO m) => GodxPots -> ReaderT SqlBackend m GodxPotsId
-insertGodxPots = insertCheckUnique "GodxPots"
+insertBccPots :: (MonadBaseControl IO m, MonadIO m) => BccPots -> ReaderT SqlBackend m BccPotsId
+insertBccPots = insertCheckUnique "BccPots"
 
 insertAdminUser :: (MonadBaseControl IO m, MonadIO m) => AdminUser -> ReaderT SqlBackend m AdminUserId
 insertAdminUser = insertUnchecked "AdminUser"

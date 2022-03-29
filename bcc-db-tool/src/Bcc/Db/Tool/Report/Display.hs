@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Godx.Db.Tool.Report.Display
+module Bcc.Db.Tool.Report.Display
   ( leftPad
   , separator
   , spaces

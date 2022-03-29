@@ -1,10 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Godx.Db.Tool.Report.Transactions
+module Bcc.Db.Tool.Report.Transactions
   ( reportTransactions
   ) where
 
-import           Godx.Db
-import           Godx.Db.Tool.Report.Display
+import           Bcc.Db
+import           Bcc.Db.Tool.Report.Display
 
 import           Control.Monad (forM_)
 import           Control.Monad.IO.Class (MonadIO)
@@ -47,7 +47,7 @@ data Transaction = Transaction
   { trHash :: !Text
   , trTime :: !UTCTime
   , trDirection :: !Direction
-  , trAmount :: !Godx
+  , trAmount :: !Bcc
   } deriving Eq
 
 instance Ord Transaction where
@@ -110,11 +110,11 @@ queryInputs saId = do
                     , trAmount = sumAmounts xs
                     }
 
-sumAmounts :: [Transaction] -> Godx
+sumAmounts :: [Transaction] -> Bcc
 sumAmounts =
     List.foldl' func 0
   where
-    func :: Godx -> Transaction -> Godx
+    func :: Bcc -> Transaction -> Bcc
     func acc tr =
       case trDirection tr of
         Incoming -> acc + trAmount tr
@@ -161,13 +161,13 @@ coaleseTxs =
                             else Transaction (trHash a) (trTime a) Incoming (trAmount b - trAmount a)
         _otherwise -> error $ "coaleseTxs: " ++ show (length xs)
 
-convertTx :: Direction -> (Value ByteString, Value UTCTime, Value DbIsaac) -> Transaction
+convertTx :: Direction -> (Value ByteString, Value UTCTime, Value DbEntropic) -> Transaction
 convertTx dir (Value hash, Value time, Value ll) =
   Transaction
     { trHash = Text.decodeUtf8 (Base16.encode hash)
     , trTime = time
     , trDirection = dir
-    , trAmount = word64ToGodx (unDbIsaac ll)
+    , trAmount = word64ToBcc (unDbEntropic ll)
     }
 
 renderTransactions :: [Transaction] -> IO ()
@@ -187,5 +187,5 @@ renderTransactions xs = do
         , separator
         , " ", textShow (trDirection tr)
         , separator
-        , leftPad 14 (renderGodx $ trAmount tr)
+        , leftPad 14 (renderBcc $ trAmount tr)
         ]

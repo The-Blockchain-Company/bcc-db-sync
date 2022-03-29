@@ -1,6 +1,6 @@
 # Schema Management
 
-Schema management for the Godx PostgreSQL database is a little more complicated than we would
+Schema management for the Bcc PostgreSQL database is a little more complicated than we would
 like, but the scheme chosen allows for easy development, evolution and management of the database.
 
 The database schema is defined in three stages, each stage consisting of one or more SQL migrations.
@@ -25,7 +25,7 @@ order them in the correct order for applying to the database.
 
 ## Creating a Migration
 
-Whenever the Haskell schema definition in `Godx.Db.Schema` is updated, a schema migration can
+Whenever the Haskell schema definition in `Bcc.Db.Schema` is updated, a schema migration can
 be generated using the command:
 ```
 cabal run bcc-db-sync-db-tool -- create-migration --mdir schema/

@@ -2,12 +2,12 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TupleSections #-}
 
-module Test.Property.Godx.Db.Types
-  ( genGodx
+module Test.Property.Bcc.Db.Types
+  ( genBcc
   , tests
   ) where
 
-import           Godx.Chain.Common (maxIsaacVal)
+import           Bcc.Chain.Common (maxEntropicVal)
 
 import qualified Data.Aeson as Aeson
 import           Data.Bifunctor (first)
@@ -20,7 +20,7 @@ import           Data.Word (Word64)
 import           Database.Persist.Class (PersistField (..))
 import           Database.Persist.Types (PersistValue (..))
 
-import           Godx.Db
+import           Bcc.Db
 
 import           Numeric.Natural (Natural)
 
@@ -30,10 +30,10 @@ import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
 
-prop_roundtrip_Godx_via_JSON :: Property
-prop_roundtrip_Godx_via_JSON =
+prop_roundtrip_Bcc_via_JSON :: Property
+prop_roundtrip_Bcc_via_JSON =
   H.withTests 5000 . H.property $ do
-    mv <- H.forAll genGodx
+    mv <- H.forAll genBcc
     H.tripping mv Aeson.encode Aeson.eitherDecode
 
 prop_roundtrip_DbInt65_PersistField :: Property
@@ -42,10 +42,10 @@ prop_roundtrip_DbInt65_PersistField =
       (i65, pv) <- H.forAll genDbInt65PresistValue
       fromPersistValue pv === Right i65
 
-prop_roundtrip_DbIsaac_PersistField :: Property
-prop_roundtrip_DbIsaac_PersistField =
+prop_roundtrip_DbEntropic_PersistField :: Property
+prop_roundtrip_DbEntropic_PersistField =
     H.withTests 5000 . H.property $ do
-      (w64, pv) <- H.forAll genDbIsaacPresistValue
+      (w64, pv) <- H.forAll genDbEntropicPresistValue
       fromPersistValue pv === Right w64
 
 prop_roundtrip_DbWord64_PersistField :: Property
@@ -62,16 +62,16 @@ prop_roundtrip_Word128_PersistField =
 
 -- -----------------------------------------------------------------------------
 
-genGodx :: Gen Godx
-genGodx =
-    word64ToGodx <$> genWord64Godx
+genBcc :: Gen Bcc
+genBcc =
+    word64ToBcc <$> genWord64Bcc
   where
-    genWord64Godx :: Gen Word64
-    genWord64Godx =
+    genWord64Bcc :: Gen Word64
+    genWord64Bcc =
       Gen.choice
-        [ Gen.word64 (Range.linear 0 maxIsaacVal) -- Full range
+        [ Gen.word64 (Range.linear 0 maxEntropicVal) -- Full range
         , Gen.word64 (Range.linear 0 5000)           -- Small values
-        , Gen.word64 (Range.linear (maxIsaacVal - 5000) maxIsaacVal) -- Near max.
+        , Gen.word64 (Range.linear (maxEntropicVal - 5000) maxEntropicVal) -- Near max.
         ]
 
 genDbWord64 :: Gen DbWord64
@@ -96,8 +96,8 @@ genDbInt65PresistValue = do
         _other -> pv
 
 
-genDbIsaacPresistValue :: Gen (DbIsaac, PersistValue)
-genDbIsaacPresistValue = first DbIsaac <$> genWord64PresistValue
+genDbEntropicPresistValue :: Gen (DbEntropic, PersistValue)
+genDbEntropicPresistValue = first DbEntropic <$> genWord64PresistValue
 
 genDbWord64PresistValue :: Gen (DbWord64, PersistValue)
 genDbWord64PresistValue = first DbWord64 <$> genWord64PresistValue

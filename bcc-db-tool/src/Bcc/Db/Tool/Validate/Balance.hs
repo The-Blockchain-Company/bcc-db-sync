@@ -4,32 +4,32 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.Db.Tool.Validate.Balance
+module Bcc.Db.Tool.Validate.Balance
   ( ledgerAddrBalance
   ) where
 
-import qualified Godx.Api.Sophie as Api
+import qualified Bcc.Api.Sophie as Api
 
-import qualified Godx.Chain.Block as Cole
-import           Godx.Chain.Common (CompactAddress, Isaac, decodeAddressBase58, sumIsaac,
-                   toCompactAddress, unsafeGetIsaac)
-import qualified Godx.Chain.UTxO as Cole
+import qualified Bcc.Chain.Block as Cole
+import           Bcc.Chain.Common (CompactAddress, Entropic, decodeAddressBase58, sumEntropic,
+                   toCompactAddress, unsafeGetEntropic)
+import qualified Bcc.Chain.UTxO as Cole
 
-import           Godx.Ledger.Address (BootstrapAddress (..))
-import qualified Godx.Ledger.Aurum.TxBody as Aurum
-import qualified Godx.Ledger.Core as Ledger
-import           Godx.Ledger.Era (Crypto)
+import           Bcc.Ledger.Address (BootstrapAddress (..))
+import qualified Bcc.Ledger.Aurum.TxBody as Aurum
+import qualified Bcc.Ledger.Core as Ledger
+import           Bcc.Ledger.Era (Crypto)
 
-import           Godx.Ledger.Compactible
-import           Godx.Ledger.Val
-import           Godx.Prelude
+import           Bcc.Ledger.Compactible
+import           Bcc.Ledger.Val
+import           Bcc.Prelude
 
 import           Data.Coerce (coerce)
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as Text
 
 import           Shardagnostic.Consensus.Cole.Ledger
-import           Shardagnostic.Consensus.Godx.Block (GodxBlock, LedgerState (..), StandardCrypto)
+import           Shardagnostic.Consensus.Bcc.Block (BccBlock, LedgerState (..), StandardCrypto)
 import           Shardagnostic.Consensus.Sophie.Ledger.Block (SophieBlock)
 import           Shardagnostic.Consensus.Sophie.Ledger.Ledger
 
@@ -41,7 +41,7 @@ import qualified Sophie.Spec.Ledger.UTxO as Sophie
 import           Sophie.Spec.Ledger.API (Addr (..), Coin (..))
 
 -- Given an address, return it's current UTxO balance.
-ledgerAddrBalance :: Text -> LedgerState (GodxBlock StandardCrypto) -> Either Text Word64
+ledgerAddrBalance :: Text -> LedgerState (BccBlock StandardCrypto) -> Either Text Word64
 ledgerAddrBalance addr lsc =
     case lsc of
       LedgerStateCole st -> getColeBalance addr $ Cole.cvsUtxo $ coleLedgerState st
@@ -57,12 +57,12 @@ getColeBalance :: Text -> Cole.UTxO -> Either Text Word64
 getColeBalance addrText utxo = do
     case toCompactAddress <$> decodeAddressBase58 addrText of
       Left err -> Left $ textShow err
-      Right caddr -> bimap show unsafeGetIsaac . sumIsaac . mapMaybe (compactTxOutValue caddr) . Map.elems $ Cole.unUTxO utxo
+      Right caddr -> bimap show unsafeGetEntropic . sumEntropic . mapMaybe (compactTxOutValue caddr) . Map.elems $ Cole.unUTxO utxo
   where
-    compactTxOutValue :: CompactAddress -> Cole.CompactTxOut -> Maybe Isaac
-    compactTxOutValue caddr (Cole.CompactTxOut bcaddr isaac) =
+    compactTxOutValue :: CompactAddress -> Cole.CompactTxOut -> Maybe Entropic
+    compactTxOutValue caddr (Cole.CompactTxOut bcaddr entropic) =
       if caddr == bcaddr
-        then Just isaac
+        then Just entropic
         else Nothing
 
 getSophieBalance

@@ -1,15 +1,15 @@
-module Godx.Db.Tool.PrepareSnapshot
+module Bcc.Db.Tool.PrepareSnapshot
   ( PrepareSnapshotArgs (..)
   , runPrepareSnapshot
   ) where
 
-import           Godx.Prelude (Word64, fromMaybe)
+import           Bcc.Prelude (Word64, fromMaybe)
 
 import           Control.Monad
 
-import           Godx.Db
-import           Godx.Sync.Config.Types hiding (LogFileDir, MigrationDir)
-import           Godx.Sync.LedgerState
+import           Bcc.Db
+import           Bcc.Sync.Config.Types hiding (LogFileDir, MigrationDir)
+import           Bcc.Sync.LedgerState
 
 import qualified Data.ByteString.Base16 as Base16
 import           Data.Version (versionBranch)

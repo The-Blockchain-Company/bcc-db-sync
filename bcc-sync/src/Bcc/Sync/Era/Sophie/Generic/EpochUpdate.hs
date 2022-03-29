@@ -1,24 +1,24 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-module Godx.Sync.Era.Sophie.Generic.EpochUpdate
+module Bcc.Sync.Era.Sophie.Generic.EpochUpdate
   ( NewEpoch (..)
   , EpochUpdate (..)
   , epochUpdate
   ) where
 
-import           Godx.Prelude hiding (Maybe (..), fromMaybe)
+import           Bcc.Prelude hiding (Maybe (..), fromMaybe)
 
-import           Godx.Slotting.Slot (EpochNo (..))
+import           Bcc.Slotting.Slot (EpochNo (..))
 
-import qualified Godx.Ledger.BaseTypes as Ledger
+import qualified Bcc.Ledger.BaseTypes as Ledger
 
-import           Godx.Sync.Era.Sophie.Generic.ProtoParams
-import           Godx.Sync.Types
-import           Godx.Sync.Util
+import           Bcc.Sync.Era.Sophie.Generic.ProtoParams
+import           Bcc.Sync.Types
+import           Bcc.Sync.Util
 
 import           Data.Strict.Maybe (Maybe (..))
 
-import           Shardagnostic.Consensus.Godx.Block (HardForkState (..))
-import           Shardagnostic.Consensus.Godx.CanHardFork ()
+import           Shardagnostic.Consensus.Bcc.Block (HardForkState (..))
+import           Shardagnostic.Consensus.Bcc.CanHardFork ()
 import qualified Shardagnostic.Consensus.HeaderValidation as Consensus
 import           Shardagnostic.Consensus.Ledger.Extended (ExtLedgerState (..))
 import qualified Shardagnostic.Consensus.Sophie.Protocol as Consensus
@@ -30,7 +30,7 @@ import qualified Sophie.Spec.Ledger.STS.Tickn as Sophie
 data NewEpoch = NewEpoch
   { neEpoch :: !EpochNo
   , neIsEBB :: !Bool
-  , neGodxPots :: !(Maybe Sophie.GodxPots)
+  , neBccPots :: !(Maybe Sophie.BccPots)
   , neEpochUpdate :: !EpochUpdate
   }
 
@@ -39,7 +39,7 @@ data EpochUpdate = EpochUpdate
   , euNonce :: !Ledger.Nonce
   }
 
-epochUpdate :: ExtLedgerState GodxBlock -> EpochUpdate
+epochUpdate :: ExtLedgerState BccBlock -> EpochUpdate
 epochUpdate lstate =
   EpochUpdate
     { euProtoParams = maybeToStrict $ epochProtoParams lstate
@@ -48,7 +48,7 @@ epochUpdate lstate =
 
 -- -------------------------------------------------------------------------------------------------
 
-extractEpochNonce :: ExtLedgerState GodxBlock -> Ledger.Nonce
+extractEpochNonce :: ExtLedgerState BccBlock -> Ledger.Nonce
 extractEpochNonce extLedgerState =
     case Consensus.headerStateChainDep (headerState extLedgerState) of
       ChainDepStateCole _ -> Ledger.NeutralNonce

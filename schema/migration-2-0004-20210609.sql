@@ -13,10 +13,10 @@ BEGIN
     EXECUTE 'ALTER TABLE "param_proposal" ALTER COLUMN "max_bh_size" TYPE word64type' ;
     EXECUTE 'ALTER TABLE "param_proposal" ALTER COLUMN "max_epoch" TYPE word64type' ;
     EXECUTE 'ALTER TABLE "param_proposal" ALTER COLUMN "optimal_pool_count" TYPE word64type' ;
-    EXECUTE 'ALTER TABLE "param_proposal" ADD COLUMN "bccxx_per_u_tx_o_word" isaac NULL' ;
+    EXECUTE 'ALTER TABLE "param_proposal" ADD COLUMN "bccxx_per_u_tx_o_word" entropic NULL' ;
     EXECUTE 'ALTER TABLE "param_proposal" ADD COLUMN "cost_models" VARCHAR NULL' ;
-    EXECUTE 'ALTER TABLE "param_proposal" ADD COLUMN "price_mem" isaac NULL' ;
-    EXECUTE 'ALTER TABLE "param_proposal" ADD COLUMN "price_step" isaac NULL' ;
+    EXECUTE 'ALTER TABLE "param_proposal" ADD COLUMN "price_mem" entropic NULL' ;
+    EXECUTE 'ALTER TABLE "param_proposal" ADD COLUMN "price_step" entropic NULL' ;
     EXECUTE 'ALTER TABLE "param_proposal" ADD COLUMN "max_tx_ex_mem" word64type NULL' ;
     EXECUTE 'ALTER TABLE "param_proposal" ADD COLUMN "max_tx_ex_steps" word64type NULL' ;
     EXECUTE 'ALTER TABLE "param_proposal" ADD COLUMN "max_block_ex_mem" word64type NULL' ;

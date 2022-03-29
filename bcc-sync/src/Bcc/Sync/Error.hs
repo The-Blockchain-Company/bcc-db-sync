@@ -1,7 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.Sync.Error
+module Bcc.Sync.Error
   ( SyncInvariant (..)
   , SyncNodeError (..)
   , annotateInvariantTx
@@ -12,11 +12,11 @@ module Godx.Sync.Error
   , renderSyncNodeError
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import qualified Godx.Chain.Genesis as Cole
-import qualified Godx.Chain.UTxO as Cole
-import qualified Godx.Crypto as Crypto (serializeCborHash)
+import qualified Bcc.Chain.Genesis as Cole
+import qualified Bcc.Chain.UTxO as Cole
+import qualified Bcc.Crypto as Crypto (serializeCborHash)
 
 import           Control.Monad.Trans.Except.Extra (left)
 
@@ -24,8 +24,8 @@ import qualified Data.ByteString.Base16 as Base16
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
 
-import qualified Godx.Sync.Era.Cole.Util as Cole
-import           Godx.Sync.Util
+import qualified Bcc.Sync.Era.Cole.Util as Cole
+import           Bcc.Sync.Util
 
 data SyncInvariant
   = EInvInOut !Word64 !Word64
@@ -38,7 +38,7 @@ data SyncNodeError
   | NEColeConfig !FilePath !Cole.ConfigurationError
   | NESophieConfig !FilePath !Text
   | NEAurumConfig !FilePath !Text
-  | NEGodxConfig !Text
+  | NEBccConfig !Text
 
 annotateInvariantTx :: Cole.Tx -> SyncInvariant -> SyncInvariant
 annotateInvariantTx tx ei =
@@ -86,9 +86,9 @@ renderSyncNodeError ne =
       mconcat
         [ "Failed reading Aurum genesis file ", textShow fp, ": ", txt
         ]
-    NEGodxConfig err ->
+    NEBccConfig err ->
       mconcat
-        [ "With Godx protocol, Cole/Sophie config mismatch:\n"
+        [ "With Bcc protocol, Cole/Sophie config mismatch:\n"
         , "   ", err
         ]
 

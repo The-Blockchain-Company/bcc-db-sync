@@ -1,10 +1,10 @@
-module Godx.Db.Tool.Validate.PoolOwner
+module Bcc.Db.Tool.Validate.PoolOwner
   ( validateAllPoolsHaveOwners
   ) where
 
-import           Godx.Db.Tool.Validate.Util
+import           Bcc.Db.Tool.Validate.Util
 
-import           Godx.Db
+import           Bcc.Db
 
 import           Control.Monad.IO.Class (MonadIO)
 import           Control.Monad.Trans.Reader (ReaderT)

@@ -1,18 +1,18 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.DbSync.Metrics
+module Bcc.DbSync.Metrics
   ( Metrics (..)
   , makeMetrics
   , withMetricSetters
   , withMetricsServer
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.Slotting.Slot (SlotNo (..))
+import           Bcc.Slotting.Slot (SlotNo (..))
 
-import           Godx.Sync.Types (MetricSetters (..))
+import           Bcc.Sync.Types (MetricSetters (..))
 
 import           Shardagnostic.Network.Block (BlockNo (..))
 

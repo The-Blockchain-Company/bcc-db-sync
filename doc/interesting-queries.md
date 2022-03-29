@@ -21,9 +21,9 @@ select * from meta ;
 
 ```
 
-### Current total on-chain supply of Godx (`queryTotalSupply`)
+### Current total on-chain supply of Bcc (`queryTotalSupply`)
 
-Note: 1 BCC == 1,000,000 Isaac
+Note: 1 BCC == 1,000,000 Entropic
 
 This just queries the UTxO set for unspent transaction outputs. It does not include staking rewards
 that have have not yet been withdrawn. Before being withdrawn rewards exist in ledger state and not
@@ -220,10 +220,10 @@ select pool_id, sum (amount) from epoch_stake
 ```
 Or, to use the Bech32 pool identifier instead of the Postgres generated `pool_id` field:
 ```sql
-select pool_hash.view, sum (amount) as isaac from epoch_stake
+select pool_hash.view, sum (amount) as entropic from epoch_stake
     inner join pool_hash on epoch_stake.pool_id = pool_hash.id
     where epoch_no = 216 group by pool_hash.id ;
-                           view                           |    isaac
+                           view                           |    entropic
 ----------------------------------------------------------+-----------------
  pool10p6wd9k0fwk2zqkqnqr8efyr7gms627ujk9dxgk6majskhawr6r |    789466838780
  pool1vvh72z8dktfy2x965w0yp5psmnyv3845pmm37nerhl6jk6m2njw |   1427697660218
@@ -257,12 +257,12 @@ epochs 214, 216 and 217.
 ### Get the reward history for a specified stake address
 
 ```sql
-select reward.epoch_no, pool_hash.view as delegated_pool, reward.amount as isaac
+select reward.epoch_no, pool_hash.view as delegated_pool, reward.amount as entropic
     from reward inner join stake_address on reward.addr_id = stake_address.id
     inner join pool_hash on reward.pool_id = pool_hash.id
     where stake_address.view = 'stake1u8gsndukzghdukmqdsd7r7wd6kvamvjv2pzcgag8v6jd69qfqyl5h'
     order by epoch_no asc ;
- epoch_no |                      delegated_pool                      | isaac
+ epoch_no |                      delegated_pool                      | entropic
 ----------+----------------------------------------------------------+----------
       212 | pool1hwlghkwnjsjk8370qt3dvp23d7urwm36f95fmxcz3np2kghknj9 |  2953284
       213 | pool1hwlghkwnjsjk8370qt3dvp23d7urwm36f95fmxcz3np2kghknj9 |  3333940
@@ -375,7 +375,7 @@ select addr_id, amount, NULL as reward_epoch_no, tx_id as treasury_tx_id from tr
 The UTxO set is dependent on time, this will return it for a given timestamp
 ```sql
 # with const as (select to_timestamp ('2020-10-10 17:00:00', 'YYYY-MM-DD HH24:MI:SS') as effective_time_)
-  select tx_out.address as address, tx_out.value as isaac, generating_block.time as timestamp
+  select tx_out.address as address, tx_out.value as entropic, generating_block.time as timestamp
     from const
     cross join tx_out
     inner join tx as generating_tx on generating_tx.id = tx_out.tx_id
@@ -393,7 +393,7 @@ The UTxO set is dependent on time, this will return it for a given timestamp
 		const.effective_time_ <= consuming_block.time or consuming_input.id IS NULL
 		) ;
 
-                           address                           |   isaac    |      timestamp
+                           address                           |   entropic    |      timestamp
 -------------------------------------------------------------+---------------+---------------------
  Ae2tdPwUPEZFdcW8MaYNxoJJkKmkSwJD5D4AdJPBLLn7PCVMenKMvwtWV8K |       1000000 | 2017-09-23 21:44:51
  Ae2tdPwUPEZ1pRs1gSidtoRGMpJR54UyNrdVDMFxXu2pBkhxitAWhqrGqd9 |  715399000000 | 2017-09-23 21:44:51
@@ -411,7 +411,7 @@ select
     floor (genesis_output.value / 1000000) as bcc,
     redemption_block.time as redeemed_at,
     cast ((case
-			  when genesis_output.value = 1000000 then 'Test Godx'
+			  when genesis_output.value = 1000000 then 'Test Bcc'
 		      when genesis_output.address in (
 				'Ae2tdPwUPEZKQuZh2UndEoTKEakMYHGNjJVYmNZgJk2qqgHouxDsA5oT83n',
 				'Ae2tdPwUPEZGcVv9qJ3KSTx5wk3dHKNn6G3a3eshzqX2y3N9LzL3ZTBEApq',
@@ -437,7 +437,7 @@ select
 ...
 ```
 
-### Get Godx in UTxO locked by scripts
+### Get Bcc in UTxO locked by scripts
 ```sql
 select sum (value) / 1000000 as script_locked from tx_out as tx_outer where
     tx_outer.address_has_script = true and
@@ -517,4 +517,4 @@ tx_id |units_mem|units_steps|redeemer_fee|purpose|                      policy  
 ```
 ---
 
-[Query.hs]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/bcc-db/src/Godx/Db/Query.hs
+[Query.hs]: https://github.com/The-Blockchain-Company/bcc-db-sync/blob/master/bcc-db/src/Bcc/Db/Query.hs

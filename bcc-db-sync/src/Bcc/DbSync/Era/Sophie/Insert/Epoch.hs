@@ -8,31 +8,31 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.DbSync.Era.Sophie.Insert.Epoch
+module Bcc.DbSync.Era.Sophie.Insert.Epoch
   ( insertEpochInterleaved
   , postEpochRewards
   , postEpochStake
   , flushBulkOperation
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.BM.Trace (Trace, logInfo)
+import           Bcc.BM.Trace (Trace, logInfo)
 
-import qualified Godx.Db as DB
+import qualified Bcc.Db as DB
 
-import qualified Godx.DbSync.Era.Sophie.Generic as Generic
-import           Godx.DbSync.Era.Sophie.Query
+import qualified Bcc.DbSync.Era.Sophie.Generic as Generic
+import           Bcc.DbSync.Era.Sophie.Query
 
-import qualified Godx.Ledger.Coin as Sophie
+import qualified Bcc.Ledger.Coin as Sophie
 
-import qualified Godx.Sync.Era.Sophie.Generic as Generic
-import           Godx.Sync.Error
-import           Godx.Sync.LedgerState
-import           Godx.Sync.Types
-import           Godx.Sync.Util
+import qualified Bcc.Sync.Era.Sophie.Generic as Generic
+import           Bcc.Sync.Error
+import           Bcc.Sync.LedgerState
+import           Bcc.Sync.Types
+import           Bcc.Sync.Util
 
-import           Godx.Slotting.Slot (EpochNo (..))
+import           Bcc.Slotting.Slot (EpochNo (..))
 
 import           Control.Monad.Class.MonadSTM.Strict (flushTBQueue, readTVar, writeTBQueue,
                    writeTVar)
@@ -82,7 +82,7 @@ insertEpochInterleaved tracer bop =
 
 postEpochRewards
      :: (MonadBaseControl IO m, MonadIO m)
-     => LedgerEnv -> Generic.Rewards -> GodxPoint
+     => LedgerEnv -> Generic.Rewards -> BccPoint
      -> ExceptT SyncNodeError (ReaderT SqlBackend m) ()
 postEpochRewards lenv rwds point = do
   icache <- lift $ updateIndexCache lenv (Generic.rewardsStakeCreds rwds) (Generic.rewardsPoolHashKeys rwds)
@@ -95,7 +95,7 @@ postEpochRewards lenv rwds point = do
 
 postEpochStake
      :: (MonadBaseControl IO m, MonadIO m)
-     => LedgerEnv -> Generic.StakeDist -> GodxPoint
+     => LedgerEnv -> Generic.StakeDist -> BccPoint
      -> ExceptT SyncNodeError (ReaderT SqlBackend m) ()
 postEpochStake lenv smap point = do
   icache <- lift $ updateIndexCache lenv (Generic.stakeDistStakeCreds smap) (Generic.stakeDistPoolHashKeys smap)
@@ -126,7 +126,7 @@ insertEpochRewardTotalReceived epochNo total =
   void . DB.insertEpochRewardTotalReceived $
     DB.EpochRewardTotalReceived
       { DB.epochRewardTotalReceivedEarnedEpoch = unEpochNo epochNo
-      , DB.epochRewardTotalReceivedAmount = Generic.coinToDbIsaac total
+      , DB.epochRewardTotalReceivedAmount = Generic.coinToDbEntropic total
       }
 
 insertEpochStake
@@ -149,7 +149,7 @@ insertEpochStake _tracer icache epochNo stakeChunk = do
         DB.EpochStake
           { DB.epochStakeAddrId = saId
           , DB.epochStakePoolId = poolId
-          , DB.epochStakeAmount = Generic.coinToDbIsaac coin
+          , DB.epochStakeAmount = Generic.coinToDbEntropic coin
           , DB.epochStakeEpochNo = unEpochNo epochNo -- The epoch where this delegation becomes valid.
           }
 
@@ -171,7 +171,7 @@ insertRewards epoch icache rewardsChunk = do
         pure $ DB.Reward
                   { DB.rewardAddrId = saId
                   , DB.rewardType = DB.showRewardSource (Generic.rewardSource rwd)
-                  , DB.rewardAmount = Generic.coinToDbIsaac (Generic.rewardAmount rwd)
+                  , DB.rewardAmount = Generic.coinToDbEntropic (Generic.rewardAmount rwd)
                   , DB.rewardEarnedEpoch = unEpochNo epoch
                   , DB.rewardSpendableEpoch = 2 + unEpochNo epoch
                   , DB.rewardPoolId = lookupPoolIdPairMaybe (Generic.rewardPool rwd) icache

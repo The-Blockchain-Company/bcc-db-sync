@@ -14,7 +14,7 @@ BEGIN
     EXECUTE 'ALTER TABLE "stake_deregistration" ADD COLUMN "redeemer_id" INT8 NULL' ;
     EXECUTE 'ALTER TABLE "delegation" ADD COLUMN "redeemer_id" INT8 NULL' ;
     EXECUTE 'ALTER TABLE "withdrawal" ADD COLUMN "redeemer_id" INT8 NULL' ;
-    EXECUTE 'CREATe TABLE "redeemer"("id" SERIAL8  PRIMARY KEY UNIQUE,"tx_id" INT8 NOT NULL,"unit_mem" word63type NOT NULL,"unit_steps" word63type NOT NULL,"fee" isaac NOT NULL,"purpose" scriptpurposetype NOT NULL,"index" uinteger NOT NULL,"script_hash" hash28type NULL)' ;
+    EXECUTE 'CREATe TABLE "redeemer"("id" SERIAL8  PRIMARY KEY UNIQUE,"tx_id" INT8 NOT NULL,"unit_mem" word63type NOT NULL,"unit_steps" word63type NOT NULL,"fee" entropic NOT NULL,"purpose" scriptpurposetype NOT NULL,"index" uinteger NOT NULL,"script_hash" hash28type NULL)' ;
     EXECUTE 'ALTER TABLE "redeemer" ADD CONSTRAINT "unique_redeemer" UNIQUE("tx_id","purpose","index")' ;
     EXECUTE 'ALTER TABLE "redeemer" ADD CONSTRAINT "redeemer_tx_id_fkey" FOREIGN KEY("tx_id") REFERENCES "tx"("id") ON DELETE CASCADE  ON UPDATE RESTRICT' ;
     EXECUTE 'CREATe TABLE "script"("id" SERIAL8  PRIMARY KEY UNIQUE,"tx_id" INT8 NOT NULL,"hash" hash28type NOT NULL,"type" scripttype NOT NULL,"serialised_size" uinteger NULL)' ;

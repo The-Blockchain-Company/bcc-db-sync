@@ -1,10 +1,10 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Test.IO.Godx.Db.TotalSupply
+module Test.IO.Bcc.Db.TotalSupply
   ( tests
   ) where
 
-import           Godx.Db
+import           Bcc.Db
 
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Text as Text
@@ -12,7 +12,7 @@ import qualified Data.Text as Text
 import           Test.Tasty (TestTree, testGroup)
 import           Test.Tasty.HUnit (testCase)
 
-import           Test.IO.Godx.Db.Util
+import           Test.IO.Bcc.Db.Util
 
 tests :: TestTree
 tests =
@@ -35,7 +35,7 @@ initialSupplyTest =
     count <- queryBlockCount
     assertBool ("Block count should be 1, got " ++ show count) (count == 1)
     supply0 <- queryTotalSupply
-    assertBool "Total supply should not be > 0" (supply0 > Godx 0)
+    assertBool "Total supply should not be > 0" (supply0 > Bcc 0)
 
     -- Spend from the Utxo set.
     bid1 <- insertBlock (mkBlock 1 slid)
@@ -44,8 +44,8 @@ initialSupplyTest =
                   { txHash = mkTxHash bid1 1
                   , txBlockId = bid1
                   , txBlockIndex = 0
-                  , txOutSum = DbIsaac 500000000
-                  , txFee = DbIsaac 100
+                  , txOutSum = DbEntropic 500000000
+                  , txFee = DbEntropic 100
                   , txDeposit = 0
                   , txSize = 123
                   , txInvalidHereafter = Nothing
@@ -55,6 +55,6 @@ initialSupplyTest =
                   }
     _ <- insertTxIn (TxIn tx1Id (head tx0Ids) 0 Nothing)
     let addr = mkAddressHash bid1 tx1Id
-    _ <- insertTxOut $ TxOut tx1Id 0 (Text.pack addr) (BS.pack addr) False Nothing Nothing (DbIsaac 500000000) Nothing
+    _ <- insertTxOut $ TxOut tx1Id 0 (Text.pack addr) (BS.pack addr) False Nothing Nothing (DbEntropic 500000000) Nothing
     supply1 <- queryTotalSupply
     assertBool ("Total supply should be < " ++ show supply0) (supply1 < supply0)

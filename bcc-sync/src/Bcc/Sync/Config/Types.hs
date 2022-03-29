@@ -6,11 +6,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Godx.Sync.Config.Types
+module Bcc.Sync.Config.Types
   ( AllegraToJen
   , ColeToSophie
-  , GodxBlock
-  , GodxProtocol
+  , BccBlock
+  , BccProtocol
   , ConfigFile (..)
   , SyncCommand (..)
   , SyncNodeParams (..)
@@ -34,30 +34,30 @@ module Godx.Sync.Config.Types
   , pcNodeConfigFilePath
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import qualified Godx.BM.Configuration as Logging
-import qualified Godx.BM.Data.Configuration as Logging
+import qualified Bcc.BM.Configuration as Logging
+import qualified Bcc.BM.Data.Configuration as Logging
 
-import qualified Godx.Chain.Update as Cole
+import qualified Bcc.Chain.Update as Cole
 
-import           Godx.Crypto (RequiresNetworkMagic (..))
-import qualified Godx.Crypto.Hash as Crypto
+import           Bcc.Crypto (RequiresNetworkMagic (..))
+import qualified Bcc.Crypto.Hash as Crypto
 
-import           Godx.Ledger.Allegra (AllegraEra)
+import           Bcc.Ledger.Allegra (AllegraEra)
 
-import           Godx.Slotting.Slot (SlotNo (..))
+import           Bcc.Slotting.Slot (SlotNo (..))
 
 import           Data.Aeson (FromJSON (..), Object, Value (..), (.:), (.:?))
 import qualified Data.Aeson as Aeson
 import           Data.Aeson.Types (Parser, typeMismatch)
 
 import           Shardagnostic.Consensus.Cole.Ledger (ColeBlock (..))
-import           Shardagnostic.Consensus.Godx.Block (AurumEra, JenEra, SophieEra)
-import qualified Shardagnostic.Consensus.Godx.Block as Godx
-import qualified Shardagnostic.Consensus.Godx.CanHardFork as Sophie
-import           Shardagnostic.Consensus.Godx.Node (ProtocolTransitionParamsSophieBased)
-import qualified Shardagnostic.Consensus.HardFork.Combinator.Basics as Godx
+import           Shardagnostic.Consensus.Bcc.Block (AurumEra, JenEra, SophieEra)
+import qualified Shardagnostic.Consensus.Bcc.Block as Bcc
+import qualified Shardagnostic.Consensus.Bcc.CanHardFork as Sophie
+import           Shardagnostic.Consensus.Bcc.Node (ProtocolTransitionParamsSophieBased)
+import qualified Shardagnostic.Consensus.HardFork.Combinator.Basics as Bcc
 import           Shardagnostic.Consensus.Sophie.Eras (StandardSophie)
 import qualified Shardagnostic.Consensus.Sophie.Ledger.Block as Sophie
 import           Shardagnostic.Consensus.Sophie.Protocol (StandardCrypto)
@@ -70,16 +70,16 @@ newtype LogFileDir = LogFileDir
   { unLogFileDir :: FilePath
   }
 
-type GodxBlock =
-        Godx.HardForkBlock
-            (Godx.GodxEras StandardCrypto)
+type BccBlock =
+        Bcc.HardForkBlock
+            (Bcc.BccEras StandardCrypto)
 
-type GodxProtocol =
-        Godx.HardForkProtocol
+type BccProtocol =
+        Bcc.HardForkProtocol
             '[ ColeBlock
             , Sophie.SophieBlock StandardSophie
-            , Sophie.SophieBlock Godx.StandardAllegra
-            , Sophie.SophieBlock Godx.StandardJen
+            , Sophie.SophieBlock Bcc.StandardAllegra
+            , Sophie.SophieBlock Bcc.StandardJen
             ]
 
 type ColeToSophie =
@@ -113,7 +113,7 @@ data SyncNodeParams = SyncNodeParams
 
 -- May have other constructors when we are preparing for a HFC event.
 data SyncProtocol
-  = SyncProtocolGodx
+  = SyncProtocolBcc
   deriving Show
 
 data SyncNodeConfig = SyncNodeConfig
@@ -211,5 +211,5 @@ parseGenSyncNodeConfig o =
 instance FromJSON SyncProtocol where
   parseJSON o =
     case o of
-      String "Godx" -> pure SyncProtocolGodx
+      String "Bcc" -> pure SyncProtocolBcc
       x -> typeMismatch "Protocol" x

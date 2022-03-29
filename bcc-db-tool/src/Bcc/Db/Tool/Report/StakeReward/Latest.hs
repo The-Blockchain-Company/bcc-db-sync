@@ -1,10 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Godx.Db.Tool.Report.StakeReward.Latest
+module Bcc.Db.Tool.Report.StakeReward.Latest
   ( reportLatestStakeRewards
   ) where
 
-import           Godx.Db
-import           Godx.Db.Tool.Report.Display
+import           Bcc.Db
+import           Bcc.Db.Tool.Report.Display
 
 import           Control.Monad.IO.Class (MonadIO)
 import           Control.Monad.Trans.Reader (ReaderT)
@@ -37,8 +37,8 @@ data EpochReward = EpochReward
   , erEpochNo :: !Word64
   , erDate :: !UTCTime
   , erAddress :: !Text
-  , erReward :: !Godx
-  , erDelegated :: !Godx
+  , erReward :: !Bcc
+  , erDelegated :: !Bcc
   , erPercent :: !Double
   }
 
@@ -51,7 +51,7 @@ queryLatestStakeRewards address = do
   where
     queryDelegation
         :: MonadIO m
-        => Word64 -> ReaderT SqlBackend m (Maybe (StakeAddressId, Word64, UTCTime, DbIsaac))
+        => Word64 -> ReaderT SqlBackend m (Maybe (StakeAddressId, Word64, UTCTime, DbEntropic))
     queryDelegation maxEpoch = do
       res <- select . from $ \ (saddr `InnerJoin` es `InnerJoin` epoch) -> do
                 on (epoch ^. EpochNo ==. es ^. EpochStakeEpochNo)
@@ -65,9 +65,9 @@ queryLatestStakeRewards address = do
 
     queryRewards
         :: MonadIO m
-        => (StakeAddressId, Word64, UTCTime, DbIsaac)
+        => (StakeAddressId, Word64, UTCTime, DbEntropic)
         -> ReaderT SqlBackend m EpochReward
-    queryRewards (saId, en, date, DbIsaac delegated) = do
+    queryRewards (saId, en, date, DbEntropic delegated) = do
       res <- select . from $ \ (saddr `InnerJoin` reward `InnerJoin` epoch) -> do
                 on (epoch ^. EpochNo ==. reward ^. RewardEarnedEpoch)
                 on (saddr ^. StakeAddressId ==. reward ^. RewardAddrId)
@@ -75,14 +75,14 @@ queryLatestStakeRewards address = do
                 where_ (saddr ^. StakeAddressId ==. val saId)
                 orderBy [asc (epoch ^. EpochNo)]
                 pure  (reward ^. RewardAmount)
-      let reward = maybe 0 (unDbIsaac . unValue) (listToMaybe res)
+      let reward = maybe 0 (unDbEntropic . unValue) (listToMaybe res)
       pure $ EpochReward
               { erAddressId = saId
               , erEpochNo = en
               , erDate = date
               , erAddress = address
-              , erReward = word64ToGodx reward
-              , erDelegated = word64ToGodx delegated
+              , erReward = word64ToBcc reward
+              , erDelegated = word64ToBcc delegated
               , erPercent = rewardPercent reward (if delegated == 0 then Nothing else Just delegated)
               }
 
@@ -108,15 +108,15 @@ renderRewards xs = do
         , separator
         , erAddress er
         , separator
-        , leftPad 14 (renderGodx (erDelegated er))
+        , leftPad 14 (renderBcc (erDelegated er))
         , separator
-        , leftPad 12 (specialRenderGodx (erReward er))
+        , leftPad 12 (specialRenderBcc (erReward er))
         , separator
         , Text.pack (if erPercent er == 0.0 then "   0.0" else printf "%8.3f" (erPercent er))
         ]
 
-    specialRenderGodx :: Godx -> Text
-    specialRenderGodx bcc = if bcc == 0 then "0.0     " else renderGodx bcc
+    specialRenderBcc :: Bcc -> Text
+    specialRenderBcc bcc = if bcc == 0 then "0.0     " else renderBcc bcc
 
 rewardPercent :: Word64 -> Maybe Word64 -> Double
 rewardPercent reward mDelegated =

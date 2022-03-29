@@ -15,11 +15,11 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Godx.Db.Schema where
+module Bcc.Db.Schema where
 
-import           Godx.Db.Schema.Orphans ()
+import           Bcc.Db.Schema.Orphans ()
 
-import           Godx.Db.Types (DbInt65, DbIsaac, DbWord64, RewardSource, ScriptPurpose,
+import           Bcc.Db.Types (DbInt65, DbEntropic, DbWord64, RewardSource, ScriptPurpose,
                    ScriptType, SyncState)
 
 import           Data.ByteString.Char8 (ByteString)
@@ -46,7 +46,7 @@ import           Database.Persist.TH
 
 share
   [ mkPersist sqlSettings
-  , mkMigrate "migrateGodxDb"
+  , mkMigrate "migrateBccDb"
   , mkEntityDefList "entityDefs"
   , deriveShowFields
   ]
@@ -103,8 +103,8 @@ share
     hash                ByteString          sqltype=hash32type
     blockId             BlockId             OnDeleteCascade     -- This type is the primary key for the 'block' table.
     blockIndex          Word64              sqltype=uinteger    -- The index of this transaction within the block.
-    outSum              DbIsaac             sqltype=isaac
-    fee                 DbIsaac             sqltype=isaac
+    outSum              DbEntropic             sqltype=entropic
+    fee                 DbEntropic             sqltype=entropic
     deposit             Int64                                   -- Needs to allow negaitve values.
     size                Word64              sqltype=uinteger
 
@@ -132,7 +132,7 @@ share
     addressHasScript    Bool
     paymentCred         ByteString Maybe    sqltype=hash28type
     stakeAddressId      StakeAddressId Maybe OnDeleteCascade
-    value               DbIsaac             sqltype=isaac
+    value               DbEntropic             sqltype=entropic
     dataHash            ByteString Maybe    sqltype=hash32type
     UniqueTxout         txId index          -- The (tx_id, index) pair must be unique.
 
@@ -165,11 +165,11 @@ share
 
   -- The 'outsum' type in the PostgreSQL world is 'bigint >= 0' so it will error out if an
   -- overflow (sum of tx outputs in an epoch) is detected. 'maxBound :: Int` is big enough to
-  -- hold 204 times the total Isaac distribution. The chance of that much being transacted
+  -- hold 204 times the total Entropic distribution. The chance of that much being transacted
   -- in a single epoch is relatively low.
   Epoch
     outSum              Word128             sqltype=word128type
-    fees                DbIsaac             sqltype=isaac
+    fees                DbEntropic             sqltype=entropic
     txCount             Word64              sqltype=uinteger
     blkCount            Word64              sqltype=uinteger
     no                  Word64              sqltype=uinteger
@@ -182,17 +182,17 @@ share
   -- This is only populated for the Sophie and later eras, and only on epoch boundaries.
   -- The treasury and rewards fields will be correct for the whole epoch, but all other
   -- fields change block by block.
-  GodxPots
+  BccPots
     slotNo              Word64              sqltype=uinteger
     epochNo             Word64              sqltype=uinteger
-    treasury            DbIsaac             sqltype=isaac
-    reserves            DbIsaac             sqltype=isaac
-    rewards             DbIsaac             sqltype=isaac
-    utxo                DbIsaac             sqltype=isaac
-    deposits            DbIsaac             sqltype=isaac
-    fees                DbIsaac             sqltype=isaac
+    treasury            DbEntropic             sqltype=entropic
+    reserves            DbEntropic             sqltype=entropic
+    rewards             DbEntropic             sqltype=entropic
+    utxo                DbEntropic             sqltype=entropic
+    deposits            DbEntropic             sqltype=entropic
+    fees                DbEntropic             sqltype=entropic
     blockId             BlockId             OnDeleteCascade
-    UniqueGodxPots      blockId
+    UniqueBccPots      blockId
     deriving Eq
 
   -- -----------------------------------------------------------------------------------------------
@@ -209,12 +209,12 @@ share
     hashId              PoolHashId          OnDeleteCascade
     certIndex           Word16
     vrfKeyHash          ByteString          sqltype=hash32type
-    pledge              DbIsaac             sqltype=isaac
+    pledge              DbEntropic             sqltype=entropic
     rewardAddr          ByteString          sqltype=addr29type
     activeEpochNo       Word64
     metaId              PoolMetadataRefId Maybe OnDeleteCascade
     margin              Double                                  -- sqltype=percentage????
-    fixedCost           DbIsaac             sqltype=isaac
+    fixedCost           DbEntropic             sqltype=entropic
     registeredTxId      TxId                OnDeleteCascade     -- Slot number in which the pool was registered.
     UniquePoolUpdate    hashId registeredTxId
 
@@ -289,7 +289,7 @@ share
   Reward
     addrId              StakeAddressId      OnDeleteCascade
     type                RewardSource        sqltype=rewardtype
-    amount              DbIsaac             sqltype=isaac
+    amount              DbEntropic             sqltype=entropic
     earnedEpoch         Word64
     spendableEpoch      Word64
     poolId              PoolHashId Maybe    OnDeleteCascade
@@ -301,7 +301,7 @@ share
 
   Withdrawal
     addrId              StakeAddressId      OnDeleteCascade
-    amount              DbIsaac             sqltype=isaac
+    amount              DbEntropic             sqltype=entropic
     redeemerId          RedeemerId Maybe    OnDeleteCascade
     txId                TxId                OnDeleteCascade
     UniqueWithdrawal    addrId txId
@@ -310,7 +310,7 @@ share
   EpochStake
     addrId              StakeAddressId      OnDeleteCascade
     poolId              PoolHashId          OnDeleteCascade
-    amount              DbIsaac             sqltype=isaac
+    amount              DbEntropic             sqltype=entropic
     epochNo             Word64              sqltype=uinteger
     UniqueStake         epochNo addrId poolId
 
@@ -368,7 +368,7 @@ share
     txId                TxId                OnDeleteCascade
     unitMem             Word64              sqltype=word63type
     unitSteps           Word64              sqltype=word63type
-    fee                 DbIsaac             sqltype=isaac
+    fee                 DbEntropic             sqltype=entropic
     purpose             ScriptPurpose       sqltype=scriptpurposetype
     index               Word64              sqltype=uinteger
     scriptHash          ByteString Maybe    sqltype=hash28type
@@ -399,8 +399,8 @@ share
     maxBlockSize        Word64 Maybe        sqltype=word64type
     maxTxSize           Word64 Maybe        sqltype=word64type
     maxBhSize           Word64 Maybe        sqltype=word64type
-    keyDeposit          DbIsaac Maybe       sqltype=isaac
-    poolDeposit         DbIsaac Maybe       sqltype=isaac
+    keyDeposit          DbEntropic Maybe       sqltype=entropic
+    poolDeposit         DbEntropic Maybe       sqltype=entropic
     maxEpoch            Word64 Maybe        sqltype=word64type
     optimalPoolCount    Word64 Maybe        sqltype=word64type
     influence           Double Maybe        -- sqltype=rational
@@ -410,10 +410,10 @@ share
     entropy             ByteString Maybe    sqltype=hash32type
     protocolMajor       Word16 Maybe        sqltype=uinteger
     protocolMinor       Word16 Maybe        sqltype=uinteger
-    minUtxoValue        DbIsaac Maybe       sqltype=isaac
-    minPoolCost         DbIsaac Maybe       sqltype=isaac
+    minUtxoValue        DbEntropic Maybe       sqltype=entropic
+    minPoolCost         DbEntropic Maybe       sqltype=entropic
 
-    coinsPerUtxoWord    DbIsaac Maybe       sqltype=isaac
+    coinsPerUtxoWord    DbEntropic Maybe       sqltype=entropic
     costModelsId        CostModelsId Maybe
     priceMem            Double Maybe        -- sqltype=rational
     priceStep           Double Maybe        -- sqltype=rational
@@ -435,8 +435,8 @@ share
     maxBlockSize        Word64              sqltype=uinteger
     maxTxSize           Word64              sqltype=uinteger
     maxBhSize           Word64              sqltype=uinteger
-    keyDeposit          DbIsaac             sqltype=isaac
-    poolDeposit         DbIsaac             sqltype=isaac
+    keyDeposit          DbEntropic             sqltype=entropic
+    poolDeposit         DbEntropic             sqltype=entropic
     maxEpoch            Word64              sqltype=uinteger
     optimalPoolCount    Word64              sqltype=uinteger
     influence           Double              -- sqltype=rational
@@ -446,12 +446,12 @@ share
     entropy             ByteString Maybe    sqltype=hash32type
     protocolMajor       Word16              sqltype=uinteger
     protocolMinor       Word16              sqltype=uinteger
-    minUtxoValue        DbIsaac             sqltype=isaac
-    minPoolCost         DbIsaac             sqltype=isaac
+    minUtxoValue        DbEntropic             sqltype=entropic
+    minPoolCost         DbEntropic             sqltype=entropic
 
     nonce               ByteString Maybe    sqltype=hash32type
 
-    coinsPerUtxoWord    DbIsaac Maybe    sqltype=isaac
+    coinsPerUtxoWord    DbEntropic Maybe    sqltype=entropic
     costModelsId        CostModelsId Maybe
     priceMem            Double Maybe        -- sqltype=rational
     priceStep           Double Maybe        -- sqltype=rational
@@ -502,7 +502,7 @@ share
   -- Reward table.
   EpochRewardTotalReceived
     earnedEpoch         Word64              sqltype=uinteger
-    amount              DbIsaac             sqltype=isaac
+    amount              DbEntropic             sqltype=entropic
     UniqueEpochRewardTotalReceived earnedEpoch
 
   --------------------------------------------------------------------------
@@ -569,7 +569,7 @@ schemaDocs =
       TxHash # "The hash identifier of the transaction."
       TxBlockId # "The Block table index of the block that contains this transaction."
       TxBlockIndex # "The index of this transaction with the block (zero based)."
-      TxOutSum # "The sum of the transaction outputs (in Isaac)."
+      TxOutSum # "The sum of the transaction outputs (in Entropic)."
       TxFee # "The fees paid for this transaction."
       TxDeposit # "Deposit (or deposit refund) in this transaction. Deposits are positive, refunds negative."
       TxSize # "The size of the transaction in bytes."
@@ -594,7 +594,7 @@ schemaDocs =
       TxOutAddressHasScript # "Flag which shows if this address is locked by a script."
       TxOutPaymentCred # "The payment credential part of the Sophie address. (NULL for Cole addresses). For a script-locked address, this is the script hash."
       TxOutStakeAddressId # "The StakeAddress table index for the stake address part of the Sophie address. (NULL for Cole addresses)."
-      TxOutValue # "The output value (in Isaac) of the transaction output."
+      TxOutValue # "The output value (in Entropic) of the transaction output."
       TxOutDataHash # "The hash of the transaction output datum. (NULL for Txs without scripts)."
 
     TxIn --^ do
@@ -617,27 +617,27 @@ schemaDocs =
 
     Epoch --^ do
       "Aggregation of data within an epoch."
-      EpochOutSum # "The sum of the transaction output values (in Isaac) in this epoch."
-      EpochFees # "The sum of the fees (in Isaac) in this epoch."
+      EpochOutSum # "The sum of the transaction output values (in Entropic) in this epoch."
+      EpochFees # "The sum of the fees (in Entropic) in this epoch."
       EpochTxCount # "The number of transactions in this epoch."
       EpochBlkCount # "The number of blocks in this epoch."
       EpochNo # "The epoch number."
       EpochStartTime # "The epoch start time."
       EpochEndTime # "The epoch end time."
 
-    GodxPots --^ do
+    BccPots --^ do
       "A table with all the different types of total balances (Sophie only).\n\
         \The treasury and rewards fields will be correct for the whole epoch, but all other \
         \fields change block by block."
-      GodxPotsSlotNo # "The slot number where this GodxPots snapshot was taken."
-      GodxPotsEpochNo # "The epoch number where this GodxPots snapshot was taken."
-      GodxPotsTreasury # "The amount (in Isaac) in the treasury pot."
-      GodxPotsReserves # "The amount (in Isaac) in the reserves pot."
-      GodxPotsRewards # "The amount (in Isaac) in the rewards pot."
-      GodxPotsUtxo # "The amount (in Isaac) in the UTxO set."
-      GodxPotsDeposits # "The amount (in Isaac) in the deposit pot."
-      GodxPotsFees # "The amount (in Isaac) in the fee pot."
-      GodxPotsBlockId # "The Block table index of the block for which this snapshot was taken."
+      BccPotsSlotNo # "The slot number where this BccPots snapshot was taken."
+      BccPotsEpochNo # "The epoch number where this BccPots snapshot was taken."
+      BccPotsTreasury # "The amount (in Entropic) in the treasury pot."
+      BccPotsReserves # "The amount (in Entropic) in the reserves pot."
+      BccPotsRewards # "The amount (in Entropic) in the rewards pot."
+      BccPotsUtxo # "The amount (in Entropic) in the UTxO set."
+      BccPotsDeposits # "The amount (in Entropic) in the deposit pot."
+      BccPotsFees # "The amount (in Entropic) in the fee pot."
+      BccPotsBlockId # "The Block table index of the block for which this snapshot was taken."
 
     PoolMetadataRef --^ do
       "An on-chain reference to off-chain pool metadata."
@@ -651,7 +651,7 @@ schemaDocs =
       PoolUpdateHashId # "The PoolHash table index of the pool this update refers to."
       PoolUpdateCertIndex # "The index of this pool update within the certificates of this transaction."
       PoolUpdateVrfKeyHash # "The hash of the pool's VRF key."
-      PoolUpdatePledge # "The amount (in Isaac) the pool owner pledges to the pool."
+      PoolUpdatePledge # "The amount (in Entropic) the pool owner pledges to the pool."
       PoolUpdateRewardAddr # "The pool's rewards address."
       PoolUpdateActiveEpochNo # "The epoch number where this update becomes active."
       PoolUpdateMetaId # "The PoolMetadataRef table index this pool update refers to."
@@ -718,7 +718,7 @@ schemaDocs =
         \ start of epoch `N + 2`."
       RewardAddrId # "The StakeAddress table index for the stake address that earned the reward."
       RewardType # "The source of the rewards; pool `member`, pool `leader`, `treasury` or `reserves` payment."
-      RewardAmount # "The reward amount (in Isaac)."
+      RewardAmount # "The reward amount (in Entropic)."
       RewardEarnedEpoch # "The epoch in which the reward was earned."
       RewardPoolId # "The PoolHash table index for the pool the stake address was delegated to when\
             \ the reward is earned. Will be NULL for payments from the treasury or the reserves."
@@ -726,7 +726,7 @@ schemaDocs =
     Withdrawal --^ do
       "A table for withdrawals from a reward account."
       WithdrawalAddrId # "The StakeAddress table index for the stake address for which the withdrawal is for."
-      WithdrawalAmount # "The withdrawal amount (in Isaac)."
+      WithdrawalAmount # "The withdrawal amount (in Entropic)."
       WithdrawalTxId # "The Tx table index for the transaction that contains this withdrawal."
       WithdrawalRedeemerId # "The Redeemer table index that is related with this withdrawal."
 
@@ -734,28 +734,28 @@ schemaDocs =
       "A table containing the epoch stake distribution for each epoch."
       EpochStakeAddrId # "The StakeAddress table index for the stake address for this EpochStake entry."
       EpochStakePoolId # "The PoolHash table index for the pool this entry is delegated to."
-      EpochStakeAmount # "The amount (in Isaac) being staked."
+      EpochStakeAmount # "The amount (in Entropic) being staked."
       EpochStakeEpochNo # "The epoch number."
 
     Treasury --^ do
       "A table for payments from the treasury to a StakeAddress."
       TreasuryAddrId # "The StakeAddress table index for the stake address for this Treasury entry."
       TreasuryCertIndex # "The index of this payment certificate within the certificates of this transaction."
-      TreasuryAmount # "The payment amount (in Isaac)."
+      TreasuryAmount # "The payment amount (in Entropic)."
       TreasuryTxId # "The Tx table index for the transaction that contains this payment."
 
     Reserve --^ do
       "A table for payments from the reserves to a StakeAddress."
       ReserveAddrId # "The StakeAddress table index for the stake address for this Treasury entry."
       ReserveCertIndex # "The index of this payment certificate within the certificates of this transaction."
-      ReserveAmount # "The payment amount (in Isaac)."
+      ReserveAmount # "The payment amount (in Entropic)."
       ReserveTxId # "The Tx table index for the transaction that contains this payment."
 
     PotTransfer --^ do
       "A table containing transfers between the reserves pot and the treasury pot."
       PotTransferCertIndex # "The index of this transfer certificate within the certificates of this transaction."
-      PotTransferTreasury # "The amount (in Isaac) the treasury balance changes by."
-      PotTransferReserves # "The amount (in Isaac) the reserves balance changes by."
+      PotTransferTreasury # "The amount (in Entropic) the treasury balance changes by."
+      PotTransferReserves # "The amount (in Entropic) the reserves balance changes by."
       PotTransferTxId # "The Tx table index for the transaction that contains this transfer."
 
     EpochSyncTime --^ do
@@ -811,8 +811,8 @@ schemaDocs =
       ParamProposalMaxBlockSize # "The maximum block size (in bytes)."
       ParamProposalMaxTxSize # "The maximum transaction size (in bytes)."
       ParamProposalMaxBhSize # "The maximum block header size (in bytes)."
-      ParamProposalKeyDeposit # "The amount (in Isaac) require for a deposit to register a StakeAddress."
-      ParamProposalPoolDeposit # "The amount (in Isaac) require for a deposit to register a stake pool."
+      ParamProposalKeyDeposit # "The amount (in Entropic) require for a deposit to register a StakeAddress."
+      ParamProposalPoolDeposit # "The amount (in Entropic) require for a deposit to register a stake pool."
       ParamProposalMaxEpoch # "The maximum number of epochs in the future that a pool retirement is allowed to be scheduled for."
       ParamProposalOptimalPoolCount # "The optimal number of stake pools."
       ParamProposalInfluence # "The influence of the pledge on a stake pool's probability on minting a block."
@@ -845,8 +845,8 @@ schemaDocs =
       EpochParamMaxBlockSize # "The maximum block size (in bytes)."
       EpochParamMaxTxSize # "The maximum transaction size (in bytes)."
       EpochParamMaxBhSize # "The maximum block header size (in bytes)."
-      EpochParamKeyDeposit # "The amount (in Isaac) require for a deposit to register a StakeAddress."
-      EpochParamPoolDeposit # "The amount (in Isaac) require for a deposit to register a stake pool."
+      EpochParamKeyDeposit # "The amount (in Entropic) require for a deposit to register a StakeAddress."
+      EpochParamPoolDeposit # "The amount (in Entropic) require for a deposit to register a stake pool."
       EpochParamMaxEpoch  # "The maximum number of epochs in the future that a pool retirement is allowed to be scheduled for."
       EpochParamOptimalPoolCount # "The optimal number of stake pools."
       EpochParamInfluence # "The influence of the pledge on a stake pool's probability on minting a block."
@@ -899,7 +899,7 @@ schemaDocs =
         \ amount for each epoch received from the ledger state and includes orphaned rewards that \
         \ are later removed from the Reward table."
       EpochRewardTotalReceivedEarnedEpoch # "The epoch in which the reward was earned."
-      EpochRewardTotalReceivedAmount # "The total rewards for the epoch in Isaac."
+      EpochRewardTotalReceivedAmount # "The total rewards for the epoch in Entropic."
 
     ReservedPoolTicker --^ do
       "A table containing a managed list of reserved ticker names."

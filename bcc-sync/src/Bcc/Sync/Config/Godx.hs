@@ -3,34 +3,34 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes #-}
 
-module Godx.Sync.Config.Godx
+module Bcc.Sync.Config.Bcc
   ( GenesisConfig (..)
   , bccLedgerConfig
   , genesisProtocolMagicId
   , mkTopLevelConfig
-  , mkProtocolInfoGodx
-  , readGodxGenesisConfig
+  , mkProtocolInfoBcc
+  , readBccGenesisConfig
   ) where
 
-import qualified Godx.Chain.Genesis as Cole
-import qualified Godx.Chain.Update as Cole
-import           Godx.Crypto.ProtocolMagic (ProtocolMagicId (..))
+import qualified Bcc.Chain.Genesis as Cole
+import qualified Bcc.Chain.Update as Cole
+import           Bcc.Crypto.ProtocolMagic (ProtocolMagicId (..))
 
-import qualified Godx.Crypto.Hash.Class as Crypto
+import qualified Bcc.Crypto.Hash.Class as Crypto
 
-import           Godx.Ledger.Aurum.Genesis
+import           Bcc.Ledger.Aurum.Genesis
 
-import           Godx.Sync.Config.Aurum
-import           Godx.Sync.Config.Cole
-import           Godx.Sync.Config.Sophie
-import           Godx.Sync.Config.Types
-import           Godx.Sync.Error
+import           Bcc.Sync.Config.Aurum
+import           Bcc.Sync.Config.Cole
+import           Bcc.Sync.Config.Sophie
+import           Bcc.Sync.Config.Types
+import           Bcc.Sync.Error
 
 import           Control.Monad.Trans.Except (ExceptT)
 
-import           Shardagnostic.Consensus.Godx (Nonce (..))
-import qualified Shardagnostic.Consensus.Godx as Consensus
-import qualified Shardagnostic.Consensus.Godx.Node as Consensus
+import           Shardagnostic.Consensus.Bcc (Nonce (..))
+import qualified Shardagnostic.Consensus.Bcc as Consensus
+import qualified Shardagnostic.Consensus.Bcc.Node as Consensus
 import           Shardagnostic.Consensus.Config (TopLevelConfig (..))
 import           Shardagnostic.Consensus.Ledger.Basics (LedgerConfig)
 import qualified Shardagnostic.Consensus.Mempool.TxLimits as TxLimits
@@ -44,44 +44,44 @@ import qualified Sophie.Spec.Ledger.PParams as Sophie
 
 -- Usually only one constructor, but may have two when we are preparing for a HFC event.
 data GenesisConfig
-  = GenesisGodx !SyncNodeConfig !Cole.Config !SophieConfig !AurumGenesis
+  = GenesisBcc !SyncNodeConfig !Cole.Config !SophieConfig !AurumGenesis
 
 genesisProtocolMagicId :: GenesisConfig -> ProtocolMagicId
 genesisProtocolMagicId ge =
     case ge of
-      GenesisGodx _cfg _bCfg sCfg _aCfg -> sophieProtocolMagicId (scConfig sCfg)
+      GenesisBcc _cfg _bCfg sCfg _aCfg -> sophieProtocolMagicId (scConfig sCfg)
   where
     sophieProtocolMagicId :: SophieGenesis StandardSophie -> ProtocolMagicId
     sophieProtocolMagicId sCfg = ProtocolMagicId (sgNetworkMagic sCfg)
 
-readGodxGenesisConfig
+readBccGenesisConfig
         :: SyncNodeConfig
         -> ExceptT SyncNodeError IO GenesisConfig
-readGodxGenesisConfig enc =
+readBccGenesisConfig enc =
   case dncProtocol enc of
-    SyncProtocolGodx ->
-      GenesisGodx enc <$> readColeGenesisConfig enc
+    SyncProtocolBcc ->
+      GenesisBcc enc <$> readColeGenesisConfig enc
                          <*> readSophieGenesisConfig enc
                          <*> readAurumGenesisConfig enc
 
 -- -------------------------------------------------------------------------------------------------
 
-bccLedgerConfig :: GenesisConfig -> LedgerConfig GodxBlock
+bccLedgerConfig :: GenesisConfig -> LedgerConfig BccBlock
 bccLedgerConfig = topLevelConfigLedger . mkTopLevelConfig
 
-mkTopLevelConfig :: GenesisConfig -> TopLevelConfig GodxBlock
-mkTopLevelConfig = Consensus.pInfoConfig . mkProtocolInfoGodx
+mkTopLevelConfig :: GenesisConfig -> TopLevelConfig BccBlock
+mkTopLevelConfig = Consensus.pInfoConfig . mkProtocolInfoBcc
 
 -- Need a concrete type for 'm' ('IO') to make the type checker happy.
 -- | The vast majority of the following struct fields are *COMPLETELY IRRELEVANT* to the
 -- operation of db-sync, but I have no idea at all what happens of any of these are
 -- wrong. This really needs to be a done a different way.
--- mkProtocolGodx :: GenesisConfig -> Protocol m GodxBlock GodxProtocol
-mkProtocolInfoGodx :: GenesisConfig -> ProtocolInfo IO GodxBlock
-mkProtocolInfoGodx ge =
+-- mkProtocolBcc :: GenesisConfig -> Protocol m BccBlock BccProtocol
+mkProtocolInfoBcc :: GenesisConfig -> ProtocolInfo IO BccBlock
+mkProtocolInfoBcc ge =
   case ge of
-    GenesisGodx dnc coleGenesis sophieGenesis aurumGenesis ->
-        Consensus.protocolInfoGodx
+    GenesisBcc dnc coleGenesis sophieGenesis aurumGenesis ->
+        Consensus.protocolInfoBcc
           Consensus.ProtocolParamsCole
             { Consensus.coleGenesis = coleGenesis
             , Consensus.colePbftSignatureThreshold = Consensus.PBftSignatureThreshold <$> dncPBftSignatureThreshold dnc

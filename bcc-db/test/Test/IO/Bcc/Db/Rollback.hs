@@ -1,11 +1,11 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Test.IO.Godx.Db.Rollback
+module Test.IO.Bcc.Db.Rollback
   ( tests
   ) where
 
-import           Godx.Slotting.Slot (SlotNo (..))
+import           Bcc.Slotting.Slot (SlotNo (..))
 
 import           Control.Monad (void)
 import           Control.Monad.IO.Class (MonadIO)
@@ -16,12 +16,12 @@ import           Data.Word (Word64)
 
 import           Database.Persist.Sql (SqlBackend)
 
-import           Godx.Db
+import           Bcc.Db
 
 import           Test.Tasty (TestTree, testGroup)
 import           Test.Tasty.HUnit (testCase)
 
-import           Test.IO.Godx.Db.Util
+import           Test.IO.Bcc.Db.Util
 
 
 tests :: TestTree
@@ -115,7 +115,7 @@ createAndInsertBlocks blockCount =
         newMTxOutId <- if indx /= 0
                       then pure mTxOutId
                       else do
-                        txId <- insertTx $ Tx (mkTxHash blkId 0) blkId 0 (DbIsaac 0) (DbIsaac 0) 0 12 Nothing Nothing True 0
+                        txId <- insertTx $ Tx (mkTxHash blkId 0) blkId 0 (DbEntropic 0) (DbEntropic 0) 0 12 Nothing Nothing True 0
                         void $ insertTxOut (mkTxOut blkId txId)
                         pure $ Just txId
         case (indx, mTxOutId) of

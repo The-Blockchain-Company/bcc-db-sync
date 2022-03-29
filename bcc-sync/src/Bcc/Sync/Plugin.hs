@@ -1,14 +1,14 @@
-module Godx.Sync.Plugin
+module Bcc.Sync.Plugin
   ( SyncNodePlugin (..)
   ) where
 
-import           Godx.BM.Trace (Trace)
+import           Bcc.BM.Trace (Trace)
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.Sync.Api
-import           Godx.Sync.Error
-import           Godx.Sync.Types
+import           Bcc.Sync.Api
+import           Bcc.Sync.Error
+import           Bcc.Sync.Types
 
 
 -- | This plugin system allows access to the database to be extended by running one or more
@@ -39,5 +39,5 @@ data SyncNodePlugin = SyncNodePlugin
   , plugInsertBlock :: [Trace IO Text -> SyncEnv -> [BlockDetails] -> IO (Either SyncNodeError ())]
 
     -- Rollback to the specified Point.
-  , plugRollbackBlock :: [Trace IO Text -> GodxPoint -> IO (Either SyncNodeError ())]
+  , plugRollbackBlock :: [Trace IO Text -> BccPoint -> IO (Either SyncNodeError ())]
   }

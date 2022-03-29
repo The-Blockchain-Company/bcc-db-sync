@@ -8,9 +8,9 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.Sync.LedgerState
+module Bcc.Sync.LedgerState
   ( BulkOperation (..)
-  , GodxLedgerState (..)
+  , BccLedgerState (..)
   , IndexCache (..)
   , LedgerEnv (..)
   , LedgerEvent (..)
@@ -34,35 +34,35 @@ module Godx.Sync.LedgerState
 
 import           Prelude (String, id)
 
-import           Godx.BM.Trace (Trace, logInfo, logWarning)
+import           Bcc.BM.Trace (Trace, logInfo, logWarning)
 
-import           Godx.Binary (DecoderError)
-import qualified Godx.Binary as Serialize
+import           Bcc.Binary (DecoderError)
+import qualified Bcc.Binary as Serialize
 
-import           Godx.Db (SyncState (..))
-import qualified Godx.Db as DB
+import           Bcc.Db (SyncState (..))
+import qualified Bcc.Db as DB
 
-import qualified Godx.Ledger.BaseTypes as Ledger
-import           Godx.Ledger.Coin (Coin)
-import           Godx.Ledger.Core (PParams)
-import           Godx.Ledger.Credential (StakeCredential)
-import           Godx.Ledger.Era
-import           Godx.Ledger.Keys (KeyHash (..), KeyRole (..))
-import           Godx.Ledger.Sophie.Constraints (UsesValue)
+import qualified Bcc.Ledger.BaseTypes as Ledger
+import           Bcc.Ledger.Coin (Coin)
+import           Bcc.Ledger.Core (PParams)
+import           Bcc.Ledger.Credential (StakeCredential)
+import           Bcc.Ledger.Era
+import           Bcc.Ledger.Keys (KeyHash (..), KeyRole (..))
+import           Bcc.Ledger.Sophie.Constraints (UsesValue)
 
-import           Godx.Sync.Config.Types
-import qualified Godx.Sync.Era.Godx.Util as Godx
-import           Godx.Sync.Era.Sophie.Generic (StakeCred)
-import qualified Godx.Sync.Era.Sophie.Generic as Generic
-import           Godx.Sync.LedgerEvent
-import           Godx.Sync.Types hiding (GodxBlock)
-import           Godx.Sync.Util
+import           Bcc.Sync.Config.Types
+import qualified Bcc.Sync.Era.Bcc.Util as Bcc
+import           Bcc.Sync.Era.Sophie.Generic (StakeCred)
+import qualified Bcc.Sync.Era.Sophie.Generic as Generic
+import           Bcc.Sync.LedgerEvent
+import           Bcc.Sync.Types hiding (BccBlock)
+import           Bcc.Sync.Util
 
-import           Godx.Prelude hiding (atomically)
-import           Godx.Slotting.Block (BlockNo (..))
+import           Bcc.Prelude hiding (atomically)
+import           Bcc.Slotting.Block (BlockNo (..))
 
-import           Godx.Slotting.EpochInfo (EpochInfo, epochInfoEpoch)
-import           Godx.Slotting.Slot (EpochNo (..), SlotNo (..), WithOrigin (..), fromWithOrigin)
+import           Bcc.Slotting.EpochInfo (EpochInfo, epochInfoEpoch)
+import           Bcc.Slotting.Slot (EpochNo (..), SlotNo (..), WithOrigin (..), fromWithOrigin)
 
 import qualified Control.Exception as Exception
 import           Control.Monad.Class.MonadSTM.Strict (StrictTMVar, StrictTVar, TBQueue, atomically,
@@ -83,9 +83,9 @@ import           Data.Time.Clock (UTCTime, getCurrentTime)
 import           Shardagnostic.Consensus.Block (CodecConfig, Point (..), WithOrigin (..), blockHash,
                    blockIsEBB, blockPoint, blockPrevHash, pointSlot)
 import           Shardagnostic.Consensus.Block.Abstract (ConvertRawHash (..))
-import           Shardagnostic.Consensus.Godx.Block (LedgerState (..), StandardAurum,
+import           Shardagnostic.Consensus.Bcc.Block (LedgerState (..), StandardAurum,
                    StandardCrypto)
-import           Shardagnostic.Consensus.Godx.CanHardFork ()
+import           Shardagnostic.Consensus.Bcc.CanHardFork ()
 import           Shardagnostic.Consensus.Config (TopLevelConfig (..), configCodec, configLedger)
 import qualified Shardagnostic.Consensus.HardFork.Combinator as Consensus
 import           Shardagnostic.Consensus.HardFork.Combinator.Basics (LedgerState (..))
@@ -124,15 +124,15 @@ import           System.Mem (performMajorGC)
 {- HLINT ignore "Reduce duplication" -}
 {- HLINT ignore "Use readTVarIO" -}
 
--- 'GodxPoint' indicates at which point the 'BulkOperation' became available.
+-- 'BccPoint' indicates at which point the 'BulkOperation' became available.
 -- It is only used in case of a rollback.
 data BulkOperation
-  = BulkRewardChunk !EpochNo !GodxPoint !IndexCache ![(StakeCred, Set Generic.Reward)]
-  | BulkRewardReport !EpochNo !GodxPoint !Int !Coin
-  | BulkStakeDistChunk !EpochNo !GodxPoint !IndexCache ![(StakeCred, (Coin, PoolKeyHash))]
-  | BulkStakeDistReport !EpochNo !GodxPoint !Int
+  = BulkRewardChunk !EpochNo !BccPoint !IndexCache ![(StakeCred, Set Generic.Reward)]
+  | BulkRewardReport !EpochNo !BccPoint !Int !Coin
+  | BulkStakeDistChunk !EpochNo !BccPoint !IndexCache ![(StakeCred, (Coin, PoolKeyHash))]
+  | BulkStakeDistReport !EpochNo !BccPoint !Int
 
-getBulkOpPoint :: BulkOperation -> GodxPoint
+getBulkOpPoint :: BulkOperation -> BccPoint
 getBulkOpPoint = go
   where
     go (BulkRewardChunk _ point _ _) = point
@@ -147,7 +147,7 @@ data IndexCache = IndexCache
 
 data LedgerEnv = LedgerEnv
   { leTrace :: Trace IO Text
-  , leProtocolInfo :: !(Consensus.ProtocolInfo IO GodxBlock)
+  , leProtocolInfo :: !(Consensus.ProtocolInfo IO BccBlock)
   , leDir :: !LedgerStateDir
   , leNetwork :: !Ledger.Network
   , leStateVar :: !(StrictTVar IO (Maybe LedgerDB))
@@ -170,14 +170,14 @@ data LedgerEventState = LedgerEventState
   , lesEpochNo :: !(Maybe EpochNo)
   , lesLastRewardsEpoch :: !(Maybe EpochNo)
   , lesLastStateDistEpoch :: !(Maybe EpochNo)
-  , lesLastAdded :: !GodxPoint
+  , lesLastAdded :: !BccPoint
   }
 
-topLevelConfig :: LedgerEnv -> TopLevelConfig GodxBlock
+topLevelConfig :: LedgerEnv -> TopLevelConfig BccBlock
 topLevelConfig = Consensus.pInfoConfig . leProtocolInfo
 
-newtype GodxLedgerState = GodxLedgerState
-  { clsState :: ExtLedgerState GodxBlock
+newtype BccLedgerState = BccLedgerState
+  { clsState :: ExtLedgerState BccBlock
   }
 
 data LedgerStateFile = LedgerStateFile
@@ -188,19 +188,19 @@ data LedgerStateFile = LedgerStateFile
   } deriving Show
 
 data LedgerStateSnapshot = LedgerStateSnapshot
-  { lssState :: !GodxLedgerState
-  , lssOldState :: !GodxLedgerState
+  { lssState :: !BccLedgerState
+  , lssOldState :: !BccLedgerState
   , lssNewEpoch :: !(Strict.Maybe Generic.NewEpoch) -- Only Just for a single block at the epoch boundary
   , lssSlotDetails :: !SlotDetails
-  , lssPoint :: !GodxPoint
+  , lssPoint :: !BccPoint
   , lssEvents :: ![LedgerEvent]
   }
 
 newtype LedgerDB = LedgerDB
-  { ledgerDbCheckpoints :: AnchoredSeq (WithOrigin SlotNo) GodxLedgerState GodxLedgerState
+  { ledgerDbCheckpoints :: AnchoredSeq (WithOrigin SlotNo) BccLedgerState BccLedgerState
   }
 
-pushLedgerDB :: LedgerDB -> GodxLedgerState -> LedgerDB
+pushLedgerDB :: LedgerDB -> BccLedgerState -> LedgerDB
 pushLedgerDB db st =
   pruneLedgerDb 10 db
     { ledgerDbCheckpoints = ledgerDbCheckpoints db :> st
@@ -212,16 +212,16 @@ pruneLedgerDb :: Word64 -> LedgerDB -> LedgerDB
 pruneLedgerDb k db =
   db { ledgerDbCheckpoints = AS.anchorNewest k (ledgerDbCheckpoints db) }
 
-instance Anchorable (WithOrigin SlotNo) GodxLedgerState GodxLedgerState where
+instance Anchorable (WithOrigin SlotNo) BccLedgerState BccLedgerState where
   asAnchor = id
   getAnchorMeasure _ = getTipSlot . clsState
 
 -- | The ledger state at the tip of the chain
-ledgerDbCurrent :: LedgerDB -> GodxLedgerState
+ledgerDbCurrent :: LedgerDB -> BccLedgerState
 ledgerDbCurrent = either id id . AS.head . ledgerDbCheckpoints
 
 mkLedgerEnv
-    :: Trace IO Text -> Consensus.ProtocolInfo IO GodxBlock -> LedgerStateDir
+    :: Trace IO Text -> Consensus.ProtocolInfo IO BccBlock -> LedgerStateDir
     -> Ledger.Network -> EpochSlot
     -> IO LedgerEnv
 mkLedgerEnv trce protocolInfo dir nw stableEpochSlot = do
@@ -264,8 +264,8 @@ mkLedgerEnv trce protocolInfo dir nw stableEpochSlot = do
         }
 
 
-initGodxLedgerState :: Consensus.ProtocolInfo IO GodxBlock -> GodxLedgerState
-initGodxLedgerState pInfo = GodxLedgerState
+initBccLedgerState :: Consensus.ProtocolInfo IO BccBlock -> BccLedgerState
+initBccLedgerState pInfo = BccLedgerState
       { clsState = Consensus.pInfoInitLedger pInfo
       }
 
@@ -281,7 +281,7 @@ readStateUnsafe env = do
 -- The function 'tickThenReapply' does zero validation, so add minimal validation ('blockPrevHash'
 -- matches the tip hash of the 'LedgerState'). This was originally for debugging but the check is
 -- cheap enough to keep.
-applyBlock :: LedgerEnv -> GodxBlock -> SlotDetails -> IO LedgerStateSnapshot
+applyBlock :: LedgerEnv -> BccBlock -> SlotDetails -> IO LedgerStateSnapshot
 applyBlock env blk details =
     -- 'LedgerStateVar' is just being used as a mutable variable. There should not ever
     -- be any contention on this variable, so putting everything inside 'atomically'
@@ -305,15 +305,15 @@ applyBlock env blk details =
                 }
   where
     applyBlk
-        :: ExtLedgerCfg GodxBlock -> GodxBlock
-        -> ExtLedgerState GodxBlock
-        -> LedgerResult (ExtLedgerState GodxBlock) (ExtLedgerState GodxBlock)
+        :: ExtLedgerCfg BccBlock -> BccBlock
+        -> ExtLedgerState BccBlock
+        -> LedgerResult (ExtLedgerState BccBlock) (ExtLedgerState BccBlock)
     applyBlk cfg block lsb =
       case tickThenReapplyCheckHash cfg block lsb of
         Left err -> panic err
         Right result -> result
 
-    mkNewEpoch :: GodxLedgerState -> GodxLedgerState -> Maybe Generic.NewEpoch
+    mkNewEpoch :: BccLedgerState -> BccLedgerState -> Maybe Generic.NewEpoch
     mkNewEpoch oldState newState =
       if ledgerEpochNo env newState /= ledgerEpochNo env oldState + 1
         then Nothing
@@ -322,11 +322,11 @@ applyBlock env blk details =
             Generic.NewEpoch
               { Generic.neEpoch = ledgerEpochNo env newState
               , Generic.neIsEBB = isJust $ blockIsEBB blk
-              , Generic.neGodxPots = maybeToStrict $ getGodxPots newState
+              , Generic.neBccPots = maybeToStrict $ getBccPots newState
               , Generic.neEpochUpdate = Generic.epochUpdate (clsState newState)
               }
 
-generateEvents :: LedgerEnv -> LedgerEventState -> SlotDetails -> GodxLedgerState -> GodxPoint -> STM [LedgerEvent]
+generateEvents :: LedgerEnv -> LedgerEventState -> SlotDetails -> BccLedgerState -> BccPoint -> STM [LedgerEvent]
 generateEvents env oldEventState details cls pnt = do
     writeTVar (leEventState env) newEventState
     pure $ catMaybes
@@ -392,7 +392,7 @@ generateEvents env oldEventState details cls pnt = do
               else pnt
         }
 
-saveCurrentLedgerState :: LedgerEnv -> ExtLedgerState GodxBlock -> Maybe EpochNo -> IO ()
+saveCurrentLedgerState :: LedgerEnv -> ExtLedgerState BccBlock -> Maybe EpochNo -> IO ()
 saveCurrentLedgerState env ledger mEpochNo = do
     case mkLedgerStateFilename (leDir env) ledger mEpochNo of
       Origin -> pure () -- we don't store genesis
@@ -411,14 +411,14 @@ saveCurrentLedgerState env ledger mEpochNo = do
                  ledger
           logInfo (leTrace env) $ mconcat ["Took a ledger snapshot at ", Text.pack file]
   where
-    codecConfig :: CodecConfig GodxBlock
+    codecConfig :: CodecConfig BccBlock
     codecConfig = configCodec (topLevelConfig env)
 
-mkLedgerStateFilename :: LedgerStateDir -> ExtLedgerState GodxBlock -> Maybe EpochNo -> WithOrigin FilePath
+mkLedgerStateFilename :: LedgerStateDir -> ExtLedgerState BccBlock -> Maybe EpochNo -> WithOrigin FilePath
 mkLedgerStateFilename dir ledger mEpochNo = lsfFilePath . dbPointToFileName dir mEpochNo
-    <$> getPoint (ledgerTipPoint (Proxy @GodxBlock) (ledgerState ledger))
+    <$> getPoint (ledgerTipPoint (Proxy @BccBlock) (ledgerState ledger))
 
-saveCleanupState :: LedgerEnv -> GodxLedgerState -> SyncState -> Maybe EpochNo -> IO ()
+saveCleanupState :: LedgerEnv -> BccLedgerState -> SyncState -> Maybe EpochNo -> IO ()
 saveCleanupState env ledger _syncState mEpochNo = do
   let st = clsState ledger
   saveCurrentLedgerState env st mEpochNo
@@ -428,13 +428,13 @@ saveCleanupState env ledger _syncState mEpochNo = do
 hashToAnnotation :: ByteString -> ByteString
 hashToAnnotation = Base16.encode . BS.take 5
 
-mkRawHash :: HeaderHash GodxBlock -> ByteString
-mkRawHash = toRawHash (Proxy @GodxBlock)
+mkRawHash :: HeaderHash BccBlock -> ByteString
+mkRawHash = toRawHash (Proxy @BccBlock)
 
-mkShortHash :: HeaderHash GodxBlock -> ByteString
+mkShortHash :: HeaderHash BccBlock -> ByteString
 mkShortHash = hashToAnnotation . mkRawHash
 
-dbPointToFileName :: LedgerStateDir -> Maybe EpochNo -> Point.Block SlotNo (HeaderHash GodxBlock) -> LedgerStateFile
+dbPointToFileName :: LedgerStateDir -> Maybe EpochNo -> Point.Block SlotNo (HeaderHash BccBlock) -> LedgerStateFile
 dbPointToFileName (LedgerStateDir stateDir) mEpochNo (Point.Block slot hash) =
     LedgerStateFile
       { lsfSlotNo = slot
@@ -505,7 +505,7 @@ cleanupLedgerStateFiles env slotNo = do
       | otherwise =
         (epochBoundary, lFile : regularFile, invalid)
 
-loadLedgerAtPoint :: LedgerEnv -> GodxPoint -> IO (Either [LedgerStateFile] GodxLedgerState)
+loadLedgerAtPoint :: LedgerEnv -> BccPoint -> IO (Either [LedgerStateFile] BccLedgerState)
 loadLedgerAtPoint env point = do
     mLedgerDB <- atomically $ readTVar $ leStateVar env
     -- First try to find the ledger in memory
@@ -538,13 +538,13 @@ loadLedgerAtPoint env point = do
   where
     rollbackLedger
         :: Maybe LedgerDB
-        -> Maybe (AnchoredSeq (WithOrigin SlotNo) GodxLedgerState GodxLedgerState)
+        -> Maybe (AnchoredSeq (WithOrigin SlotNo) BccLedgerState BccLedgerState)
     rollbackLedger mLedgerDB = do
       ledgerDB <- mLedgerDB
       AS.rollback (pointSlot point) (const True) (ledgerDbCheckpoints ledgerDB)
 
 -- Filter out the BulkOperation's added after the specific point.
-drainBulkOperation :: LedgerEnv -> GodxPoint -> IO ()
+drainBulkOperation :: LedgerEnv -> BccPoint -> IO ()
 drainBulkOperation lenv point = do
     bops <- atomically $ flushTBQueue (leBulkOpQueue lenv)
     let bops' = filter (\bop -> getBulkOpPoint bop <= point) bops
@@ -555,7 +555,7 @@ drainBulkOperation lenv point = do
     atomically $ mapM_ (writeTBQueue (leBulkOpQueue lenv)) bops'
     pure ()
 
-deleteNewerFiles :: LedgerEnv -> GodxPoint -> IO ()
+deleteNewerFiles :: LedgerEnv -> BccPoint -> IO ()
 deleteNewerFiles env point = do
   files <- listLedgerStateFilesOrdered (leDir env)
     -- Genesis can be reproduced from configuration.
@@ -576,7 +576,7 @@ deleteAndLogFiles env descr files = unless (null files) $ do
 deleteAndLogStateFile :: LedgerEnv -> Text -> [LedgerStateFile] -> IO ()
 deleteAndLogStateFile env descr lsfs = deleteAndLogFiles env descr (lsfFilePath <$> lsfs)
 
-findStateFromPoint :: LedgerEnv -> GodxPoint -> IO (Either [LedgerStateFile] GodxLedgerState)
+findStateFromPoint :: LedgerEnv -> BccPoint -> IO (Either [LedgerStateFile] BccLedgerState)
 findStateFromPoint env point = do
   files <- listLedgerStateFilesOrdered (leDir env)
     -- Genesis can be reproduced from configuration.
@@ -584,7 +584,7 @@ findStateFromPoint env point = do
   case getPoint point of
     Origin -> do
       deleteAndLogStateFile env "newer" files
-      pure . Right $ initGodxLedgerState (leProtocolInfo env)
+      pure . Right $ initBccLedgerState (leProtocolInfo env)
     At blk -> do
       let (newerFiles, found, olderFiles) =
             findLedgerStateFile files (Point.blockPointSlot blk, mkRawHash $ Point.blockPointHash blk)
@@ -648,14 +648,14 @@ comparePointToFile lsf (blSlotNo, blHash) =
         else GT
     x -> x
 
-loadLedgerStateFromFile :: TopLevelConfig GodxBlock -> Bool -> LedgerStateFile -> IO (Either Text GodxLedgerState)
+loadLedgerStateFromFile :: TopLevelConfig BccBlock -> Bool -> LedgerStateFile -> IO (Either Text BccLedgerState)
 loadLedgerStateFromFile config delete lsf = do
     mst <- safeReadFile (lsfFilePath lsf)
     case mst of
       Left err -> when delete (safeRemoveFile $ lsfFilePath lsf) >> pure (Left err)
-      Right st -> pure . Right $ GodxLedgerState { clsState = st }
+      Right st -> pure . Right $ BccLedgerState { clsState = st }
   where
-    safeReadFile :: FilePath -> IO (Either Text (ExtLedgerState GodxBlock))
+    safeReadFile :: FilePath -> IO (Either Text (ExtLedgerState BccBlock))
     safeReadFile fp = do
       mbs <- Exception.try $ BS.readFile fp
       case mbs of
@@ -665,10 +665,10 @@ loadLedgerStateFromFile config delete lsf = do
             Left err -> pure $ Left $ textShow err
             Right ls -> pure $ Right ls
 
-    codecConfig :: CodecConfig GodxBlock
+    codecConfig :: CodecConfig BccBlock
     codecConfig = configCodec config
 
-    decode :: ByteString -> Either DecoderError (ExtLedgerState GodxBlock)
+    decode :: ByteString -> Either DecoderError (ExtLedgerState BccBlock)
     decode =
       Serialize.decodeFullDecoder
           "Ledger state file"
@@ -697,7 +697,7 @@ writeLedgerState env mLedgerDb = atomically $ writeTVar (leStateVar env) mLedger
 safeRemoveFile :: FilePath -> IO ()
 safeRemoveFile fp = handle (\(_ :: IOException) -> pure ()) $ removeFile fp
 
-getPoolParams :: GodxLedgerState -> Set.Set (KeyHash 'StakePool StandardCrypto)
+getPoolParams :: BccLedgerState -> Set.Set (KeyHash 'StakePool StandardCrypto)
 getPoolParams st =
     case ledgerState $ clsState st of
       LedgerStateCole _ -> Set.empty
@@ -714,18 +714,18 @@ getPoolParamsSophie lState =
   Map.keysSet $ Sophie._pParams $ Sophie._pstate $ Sophie._delegationState
               $ Sophie.esLState $ Sophie.nesEs $ Consensus.sophieLedgerState lState
 
--- We only compute 'GodxPots' for later eras. This is a time consuming
+-- We only compute 'BccPots' for later eras. This is a time consuming
 -- function and we only want to run it on epoch boundaries.
-getGodxPots :: GodxLedgerState -> Maybe Sophie.GodxPots
-getGodxPots st =
+getBccPots :: BccLedgerState -> Maybe Sophie.BccPots
+getBccPots st =
     case ledgerState $ clsState st of
       LedgerStateCole _ -> Nothing
-      LedgerStateSophie sts -> Just $ totalGodxPots sts
-      LedgerStateAllegra sta -> Just $ totalGodxPots sta
-      LedgerStateJen stm -> Just $ totalGodxPots stm
-      LedgerStateAurum sta -> Just $ totalGodxPots sta
+      LedgerStateSophie sts -> Just $ totalBccPots sts
+      LedgerStateAllegra sta -> Just $ totalBccPots sta
+      LedgerStateJen stm -> Just $ totalBccPots stm
+      LedgerStateAurum sta -> Just $ totalBccPots sta
 
-ledgerEpochNo :: LedgerEnv -> GodxLedgerState -> EpochNo
+ledgerEpochNo :: LedgerEnv -> BccLedgerState -> EpochNo
 ledgerEpochNo env cls =
     case ledgerTipSlot (ledgerState (clsState cls)) of
       Origin -> 0 -- An empty chain is in epoch 0
@@ -740,33 +740,33 @@ ledgerEpochNo env cls =
 -- Like 'Consensus.tickThenReapply' but also checks that the previous hash from the block matches
 -- the head hash of the ledger state.
 tickThenReapplyCheckHash
-    :: ExtLedgerCfg GodxBlock -> GodxBlock
-    -> ExtLedgerState GodxBlock
-    -> Either Text (LedgerResult (ExtLedgerState GodxBlock) (ExtLedgerState GodxBlock))
+    :: ExtLedgerCfg BccBlock -> BccBlock
+    -> ExtLedgerState BccBlock
+    -> Either Text (LedgerResult (ExtLedgerState BccBlock) (ExtLedgerState BccBlock))
 tickThenReapplyCheckHash cfg block lsb =
   if blockPrevHash block == ledgerTipHash (ledgerState lsb)
     then Right $ tickThenReapplyLedgerResult cfg block lsb
     else Left $ mconcat
                   [ "Ledger state hash mismatch. Ledger head is slot "
                   , textShow (unSlotNo $ fromWithOrigin (SlotNo 0) (ledgerTipSlot $ ledgerState lsb))
-                  , " hash ", renderByteArray (Godx.unChainHash (ledgerTipHash $ ledgerState lsb))
+                  , " hash ", renderByteArray (Bcc.unChainHash (ledgerTipHash $ ledgerState lsb))
                   , " but block previous hash is "
-                  , renderByteArray (Godx.unChainHash $ blockPrevHash block)
+                  , renderByteArray (Bcc.unChainHash $ blockPrevHash block)
                   , " and block current hash is "
                   , renderByteArray (BSS.fromShort . Consensus.getOneEraHash $ blockHash block), "."
                   ]
 
-totalGodxPots
+totalBccPots
     :: forall era. UsesValue era
     => LedgerState (SophieBlock era)
-    -> Sophie.GodxPots
-totalGodxPots = Sophie.totalGodxPotsES . Sophie.nesEs . Consensus.sophieLedgerState
+    -> Sophie.BccPots
+totalBccPots = Sophie.totalBccPotsES . Sophie.nesEs . Consensus.sophieLedgerState
 
-getHeaderHash :: HeaderHash GodxBlock -> ByteString
+getHeaderHash :: HeaderHash BccBlock -> ByteString
 getHeaderHash bh = BSS.fromShort (Consensus.getOneEraHash bh)
 
 -- | This will fail if the state is not a 'LedgerStateAurum'
-getAurumPParams :: GodxLedgerState -> PParams StandardAurum
+getAurumPParams :: BccLedgerState -> PParams StandardAurum
 getAurumPParams cls =
   case ledgerState $ clsState cls of
     LedgerStateAurum als -> esPp $ Sophie.nesEs $ Consensus.sophieLedgerState als

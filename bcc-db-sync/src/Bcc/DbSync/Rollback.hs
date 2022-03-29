@@ -1,23 +1,23 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Godx.DbSync.Rollback
+module Bcc.DbSync.Rollback
   ( rollbackToPoint
   , unsafeRollback
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 import qualified Data.ByteString.Short as BSS
 
-import           Godx.BM.Trace (Trace, logInfo)
+import           Bcc.BM.Trace (Trace, logInfo)
 
-import qualified Godx.Db as DB
+import qualified Bcc.Db as DB
 
-import           Godx.DbSync.Era.Util
+import           Bcc.DbSync.Era.Util
 
-import           Godx.Sync.Error
-import           Godx.Sync.Types
-import           Godx.Sync.Util
+import           Bcc.Sync.Error
+import           Bcc.Sync.Types
+import           Bcc.Sync.Util
 
 import qualified Data.List as List
 import           Database.Persist.Sql (SqlBackend)
@@ -29,7 +29,7 @@ import           Shardagnostic.Network.Point
 
 -- Rollbacks are done in an Era generic way based on the 'Point' we are
 -- rolling back to.
-rollbackToPoint :: SqlBackend -> Trace IO Text -> GodxPoint -> IO (Either SyncNodeError ())
+rollbackToPoint :: SqlBackend -> Trace IO Text -> BccPoint -> IO (Either SyncNodeError ())
 rollbackToPoint backend trce point =
     DB.runDbtbcoNoLogging backend $ runExceptT action
   where
@@ -60,7 +60,7 @@ rollbackToPoint backend trce point =
         Origin -> DB.querySlotNos
         At sl -> DB.querySlotNosGreaterThan (unSlotNo sl)
 
-    queryBlockId :: MonadIO m => Point GodxBlock -> ReaderT SqlBackend m (Either DB.LookupFail DB.BlockId)
+    queryBlockId :: MonadIO m => Point BccBlock -> ReaderT SqlBackend m (Either DB.LookupFail DB.BlockId)
     queryBlockId pnt =
       case getPoint pnt of
         Origin -> DB.queryGenesis

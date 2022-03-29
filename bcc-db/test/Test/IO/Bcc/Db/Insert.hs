@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Test.IO.Godx.Db.Insert
+module Test.IO.Bcc.Db.Insert
   ( tests
   ) where
 
@@ -8,12 +8,12 @@ import           Control.Monad (void)
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as BS
 
-import           Godx.Db
+import           Bcc.Db
 
 import           Test.Tasty (TestTree, testGroup)
 import           Test.Tasty.HUnit (testCase)
 
-import           Test.IO.Godx.Db.Util
+import           Test.IO.Bcc.Db.Util
 
 
 tests :: TestTree

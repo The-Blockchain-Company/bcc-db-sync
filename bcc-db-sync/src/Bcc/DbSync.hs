@@ -8,7 +8,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.DbSync
+module Bcc.DbSync
   ( ConfigFile (..)
   , SyncCommand (..)
   , SyncNodeParams (..)
@@ -23,27 +23,27 @@ module Godx.DbSync
   , runDbSyncNode
   ) where
 
-import           Godx.Prelude hiding (Nat, option, (%))
+import           Bcc.Prelude hiding (Nat, option, (%))
 
 import           Control.Monad.Trans.Maybe (MaybeT (..))
 
-import           Godx.Slotting.Slot (EpochNo (..), SlotNo (..))
+import           Bcc.Slotting.Slot (EpochNo (..), SlotNo (..))
 
-import           Godx.BM.Trace (Trace, logError, logInfo)
+import           Bcc.BM.Trace (Trace, logError, logInfo)
 
-import qualified Godx.Db as DB
+import qualified Bcc.Db as DB
 
-import           Godx.DbSync.Era (insertValidateGenesisDist)
-import           Godx.DbSync.Plugin.Default (defDbSyncNodePlugin)
-import           Godx.DbSync.Rollback (unsafeRollback)
-import           Godx.Sync.Database (runDbThread)
+import           Bcc.DbSync.Era (insertValidateGenesisDist)
+import           Bcc.DbSync.Plugin.Default (defDbSyncNodePlugin)
+import           Bcc.DbSync.Rollback (unsafeRollback)
+import           Bcc.Sync.Database (runDbThread)
 
-import           Godx.Sync (Block (..), MetricSetters, SyncDataLayer (..), SyncNodePlugin (..),
+import           Bcc.Sync (Block (..), MetricSetters, SyncDataLayer (..), SyncNodePlugin (..),
                    configureLogging, runSyncNode)
-import           Godx.Sync.Config.Types (ConfigFile (..), GenesisFile (..), LedgerStateDir (..),
+import           Bcc.Sync.Config.Types (ConfigFile (..), GenesisFile (..), LedgerStateDir (..),
                    MigrationDir (..), NetworkName (..), SocketPath (..), SyncCommand (..),
                    SyncNodeParams (..))
-import           Godx.Sync.Tracing.ToObjectOrphans ()
+import           Bcc.Sync.Tracing.ToObjectOrphans ()
 
 import           Control.Monad.Extra (whenJust)
 

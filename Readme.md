@@ -1,13 +1,13 @@
-# Godx DB Sync
+# Bcc DB Sync
 
 ## Purpose
 
-The purpose of Godx DB Sync is to follow the Godx chain and take information from the chain
+The purpose of Bcc DB Sync is to follow the Bcc chain and take information from the chain
 and an internally maintained copy of ledger state. Data is then extracted from the chain and
 inserted into a PostgreSQL database. SQL queries can then be written directly against the database
 schema or as queries embedded in any language with libraries for interacting with an SQL database.
 
-Examples of what someone would be able to do via an SQL query against a Godx DB Sync
+Examples of what someone would be able to do via an SQL query against a Bcc DB Sync
 instance fully synced fully synced to a specific network is:
 
 * Look up any block, transaction, address, stake pool etc on that network, usually by the hash that
@@ -25,7 +25,7 @@ The bcc-db-sync component consists of a set of components:
   to interact with the data base from Haskell. In particular, it defines the database schema.
 * `bcc-db-tool` a tool used to manage the databases of bcc-db-sync (create
   and run migrations, validate and analyse)
-* `bcc-db-sync` which acts as a Godx node, following the chain and inserting
+* `bcc-db-sync` which acts as a Bcc node, following the chain and inserting
   data from the chain into a PostgreSQL database.
 * `bcc-db-sync-extended` is a relatively simple extension to `bcc-db-sync` which maintains
   an extra table containing epoch data.
@@ -37,7 +37,7 @@ table. The non-extended version will still create this table but will not mainta
 The db-sync node is written in a highly modular fashion to allow it to be as flexible as possible.
 
 The `bcc-db-sync` node connects to a locally running `bcc-node` (ie one connected to other
-nodes in the Godx network over the internet with TCP/IP) using a Unix domain socket, retrieves
+nodes in the Bcc network over the internet with TCP/IP) using a Unix domain socket, retrieves
 blocks, updates its internal ledger state and stores parts of each block in a local PostgreSQL
 database. The database does not store things like cryptographic signatures but does store enough
 information to follow the chain of blocks and look at the transactions within blocks.
@@ -82,7 +82,7 @@ possible solutions.
 * [Validation][Validation]: Explanation of validation done by the db-sync node and assumptions made.
 
 [BuildingRunning]: doc/building-running.md
-[DB Schema]: https://hydra.tbco.io/job/Godx/bcc-db-sync/native.haskellPackages.bcc-db.checks.test-db.x86_64-linux/latest/download/1
+[DB Schema]: https://hydra.tbco.io/job/Bcc/bcc-db-sync/native.haskellPackages.bcc-db.checks.test-db.x86_64-linux/latest/download/1
 [Docker]: doc/docker.md
 [ExampleQueries]: doc/interesting-queries.md
 [PostgresView]: https://www.postgresql.org/docs/current/sql-createview.html

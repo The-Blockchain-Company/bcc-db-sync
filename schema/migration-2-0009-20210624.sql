@@ -6,9 +6,9 @@ DECLARE
 BEGIN
   SELECT stage_two + 1 INTO next_version FROM schema_version ;
   IF next_version = 9 THEN
-    EXECUTE 'ALTER TABLE "param_proposal" ADD COLUMN "coins_per_utxo_word" isaac NULL' ;
+    EXECUTE 'ALTER TABLE "param_proposal" ADD COLUMN "coins_per_utxo_word" entropic NULL' ;
     EXECUTE 'ALTER TABLE "param_proposal" DROP COLUMN "bccxx_per_u_tx_o_word"' ;
-    EXECUTE 'ALTER TABLE "epoch_param" ADD COLUMN "coins_per_utxo_word" isaac NULL' ;
+    EXECUTE 'ALTER TABLE "epoch_param" ADD COLUMN "coins_per_utxo_word" entropic NULL' ;
     EXECUTE 'ALTER TABLE "epoch_param" DROP COLUMN "bcc_per_u_tx_o_word"' ;
     -- Hand written SQL statements can be added here.
     UPDATE schema_version SET stage_two = next_version ;

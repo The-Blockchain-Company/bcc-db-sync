@@ -5,7 +5,7 @@ cabal-version:          2.2
 name:                   bcc-db
 version:                10.0.1
 synopsis:               A base PostgreSQL component for the bcc-db-sync node.
-description:            Code for the Godx DB Sync node that is shared between the
+description:            Code for the Bcc DB Sync node that is shared between the
                         bcc-db-node and other components.
 homepage:               https://github.com/The-Blockchain-Company/bcc-db-sync
 bug-reports:		    https://github.com/The-Blockchain-Company/bcc-db-sync/issues
@@ -31,22 +31,22 @@ library
                         -Wunused-imports
                         -Wunused-packages
 
-  exposed-modules:      Godx.Db
+  exposed-modules:      Bcc.Db
 
-  other-modules:        Godx.Db.Delete
-                        Godx.Db.Error
-                        Godx.Db.Insert
-                        Godx.Db.PGConfig
-                        Godx.Db.Migration
-                        Godx.Db.Migration.Haskell
-                        Godx.Db.Migration.Version
-                        Godx.Db.Query
-                        Godx.Db.Run
-                        Godx.Db.Schema
-                        Godx.Db.Schema.Types
-                        Godx.Db.Schema.Orphans
-                        Godx.Db.Text
-                        Godx.Db.Types
+  other-modules:        Bcc.Db.Delete
+                        Bcc.Db.Error
+                        Bcc.Db.Insert
+                        Bcc.Db.PGConfig
+                        Bcc.Db.Migration
+                        Bcc.Db.Migration.Haskell
+                        Bcc.Db.Migration.Version
+                        Bcc.Db.Query
+                        Bcc.Db.Run
+                        Bcc.Db.Schema
+                        Bcc.Db.Schema.Types
+                        Bcc.Db.Schema.Orphans
+                        Bcc.Db.Text
+                        Bcc.Db.Types
 
 
   build-depends:        aeson
@@ -104,8 +104,8 @@ test-suite test
                         -Wunused-imports
                         -Wunused-packages
 
-  other-modules:        Test.Property.Godx.Db.Migration
-                        Test.Property.Godx.Db.Types
+  other-modules:        Test.Property.Bcc.Db.Migration
+                        Test.Property.Bcc.Db.Types
                         Test.Property.Upstream
 
   build-depends:        base                            >= 4.14         && < 4.16
@@ -123,11 +123,11 @@ test-suite test-db
   main-is:              test-db.hs
   hs-source-dirs:       test
 
-  other-modules:        Test.IO.Godx.Db.Insert
-                        Test.IO.Godx.Db.Migration
-                        Test.IO.Godx.Db.Rollback
-                        Test.IO.Godx.Db.TotalSupply
-                        Test.IO.Godx.Db.Util
+  other-modules:        Test.IO.Bcc.Db.Insert
+                        Test.IO.Bcc.Db.Migration
+                        Test.IO.Bcc.Db.Rollback
+                        Test.IO.Bcc.Db.TotalSupply
+                        Test.IO.Bcc.Db.Util
 
   ghc-options:          -Wall
                         -Werror

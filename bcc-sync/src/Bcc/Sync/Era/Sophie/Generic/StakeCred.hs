@@ -1,16 +1,16 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-module Godx.Sync.Era.Sophie.Generic.StakeCred
+module Bcc.Sync.Era.Sophie.Generic.StakeCred
   ( StakeCred (..)
   , toStakeCred
   ) where
 
-import           Godx.Prelude hiding (Show)
+import           Bcc.Prelude hiding (Show)
 
-import qualified Godx.Ledger.Address as Ledger
-import qualified Godx.Ledger.BaseTypes as Ledger
-import qualified Godx.Ledger.Credential as Ledger
-import qualified Godx.Ledger.Keys as Ledger
+import qualified Bcc.Ledger.Address as Ledger
+import qualified Bcc.Ledger.BaseTypes as Ledger
+import qualified Bcc.Ledger.Credential as Ledger
+import qualified Bcc.Ledger.Keys as Ledger
 
 import qualified Data.ByteString.Base16 as Base16
 import qualified Data.ByteString.Char8 as BS

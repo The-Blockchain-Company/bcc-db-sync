@@ -1,11 +1,11 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
-module Godx.Sync.Types
+module Bcc.Sync.Types
   ( BlockDetails (..)
   , BlockEra (..)
-  , GodxBlock
-  , GodxPoint
-  , GodxProtocol
+  , BccBlock
+  , BccPoint
+  , BccProtocol
   , EpochSlot (..)
   , FetchResult (..)
   , PoolKeyHash
@@ -16,30 +16,30 @@ module Godx.Sync.Types
   , Retry (..)
   ) where
 
-import           Godx.Prelude hiding (Meta)
+import           Bcc.Prelude hiding (Meta)
 
-import qualified Godx.Ledger.Keys as Ledger
+import qualified Bcc.Ledger.Keys as Ledger
 
-import           Godx.Db (PoolHashId, PoolMetaHash, PoolMetadataRefId, PoolOfflineData,
+import           Bcc.Db (PoolHashId, PoolMetaHash, PoolMetadataRefId, PoolOfflineData,
                    PoolOfflineFetchError, PoolUrl)
 
-import           Godx.Sync.Config.Types (GodxBlock, GodxProtocol)
+import           Bcc.Sync.Config.Types (BccBlock, BccProtocol)
 
-import           Godx.Slotting.Slot (EpochNo (..), EpochSize (..), SlotNo (..))
+import           Bcc.Slotting.Slot (EpochNo (..), EpochSize (..), SlotNo (..))
 
 import           Data.Time.Clock (UTCTime)
 import           Data.Time.Clock.POSIX (POSIXTime)
 
-import           Shardagnostic.Consensus.Godx.Block (StandardCrypto)
+import           Shardagnostic.Consensus.Bcc.Block (StandardCrypto)
 import           Shardagnostic.Network.Block (BlockNo, Point)
 
 
-type GodxPoint = Point GodxBlock
+type BccPoint = Point BccBlock
 
 type PoolKeyHash = Ledger.KeyHash 'Ledger.StakePool StandardCrypto
 
 data BlockDetails = BlockDetails
-  { bdBlock :: !GodxBlock
+  { bdBlock :: !BccBlock
   , bdSlot :: !SlotDetails
   }
 

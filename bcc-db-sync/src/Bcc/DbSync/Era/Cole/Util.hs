@@ -3,7 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.DbSync.Era.Cole.Util
+module Bcc.DbSync.Era.Cole.Util
   ( blockHash
   , blockNumber
   , blockPayload
@@ -24,21 +24,21 @@ module Godx.DbSync.Era.Cole.Util
   , unTxHash
   ) where
 
-import           Godx.Prelude hiding (catch)
+import           Bcc.Prelude hiding (catch)
 
-import           Godx.Binary (Raw)
-import qualified Godx.Crypto as Crypto
-import qualified Godx.Crypto.Wallet as Crypto
+import           Bcc.Binary (Raw)
+import qualified Bcc.Crypto as Crypto
+import qualified Bcc.Crypto.Wallet as Crypto
 
 -- Import all 'bcc-ledger' functions and data types qualified so they do not
--- clash with the Godx.Db functions and data types which are also imported
+-- clash with the Bcc.Db functions and data types which are also imported
 -- qualified.
-import qualified Godx.Chain.Block as Cole
-import qualified Godx.Chain.Common as Cole
-import qualified Godx.Chain.Genesis as Cole
-import qualified Godx.Chain.Slotting as Cole
-import qualified Godx.Chain.UTxO as Cole
-import qualified Godx.Chain.Update as Cole
+import qualified Bcc.Chain.Block as Cole
+import qualified Bcc.Chain.Common as Cole
+import qualified Bcc.Chain.Genesis as Cole
+import qualified Bcc.Chain.Slotting as Cole
+import qualified Bcc.Chain.UTxO as Cole
+import qualified Bcc.Chain.Update as Cole
 
 import qualified Data.ByteString.Base16 as Base16
 import qualified Data.ByteString.Char8 as BS
@@ -46,7 +46,7 @@ import qualified Data.ByteString.Lazy.Char8 as LBS
 import           Data.Coerce (coerce)
 import qualified Data.Text.Encoding as Text
 
-import qualified Godx.Db as DB
+import qualified Bcc.Db as DB
 
 
 blockHash :: Cole.ABlock ByteString -> ByteString

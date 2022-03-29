@@ -1,10 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Godx.Db.Tool.Report.Balance
+module Bcc.Db.Tool.Report.Balance
   ( reportBalance
   ) where
 
-import           Godx.Db
-import           Godx.Db.Tool.Report.Display
+import           Bcc.Db
+import           Bcc.Db.Tool.Report.Display
 
 import           Control.Monad.IO.Class (MonadIO)
 import           Control.Monad.Trans.Reader (ReaderT)
@@ -32,13 +32,13 @@ reportBalance saddr = do
 data Balance = Balance
   { balAddressId :: !StakeAddressId
   , balAddress :: !Text
-  , balInputs :: !Godx
-  , balOutputs :: !Godx
-  , balFees :: !Godx
-  , balDeposit :: !Godx
-  , balRewards :: !Godx
-  , balWithdrawals :: !Godx
-  , balTotal :: !Godx
+  , balInputs :: !Bcc
+  , balOutputs :: !Bcc
+  , balFees :: !Bcc
+  , balDeposit :: !Bcc
+  , balRewards :: !Bcc
+  , balWithdrawals :: !Bcc
+  , balTotal :: !Bcc
   }
 
 
@@ -74,14 +74,14 @@ queryStakeAddressBalance address = do
                 , balTotal = inputs - outputs + rewards - withdrawals
                 }
 
-    queryInputs :: MonadIO m => StakeAddressId -> ReaderT SqlBackend m Godx
+    queryInputs :: MonadIO m => StakeAddressId -> ReaderT SqlBackend m Bcc
     queryInputs saId = do
       res <- select . from $ \ txo -> do
                 where_ (txo ^. TxOutStakeAddressId ==. just (val saId))
                 pure (sum_ (txo ^. TxOutValue))
-      pure $ unValueSumGodx (listToMaybe res)
+      pure $ unValueSumBcc (listToMaybe res)
 
-    queryRewards :: MonadIO m => StakeAddressId -> ReaderT SqlBackend m Godx
+    queryRewards :: MonadIO m => StakeAddressId -> ReaderT SqlBackend m Bcc
     queryRewards saId = do
       -- This query does not run unless we are pretty close to the chain tip.
       -- Therefore to get current rewards, we limit the cacluation to current epoch minus 2.
@@ -90,16 +90,16 @@ queryStakeAddressBalance address = do
                 where_ (rwd ^. RewardAddrId ==. val saId)
                 where_ (rwd ^. RewardSpendableEpoch <=. val currentEpoch)
                 pure (sum_ (rwd ^. RewardAmount))
-      pure $ unValueSumGodx (listToMaybe res)
+      pure $ unValueSumBcc (listToMaybe res)
 
-    queryWithdrawals :: MonadIO m => StakeAddressId -> ReaderT SqlBackend m Godx
+    queryWithdrawals :: MonadIO m => StakeAddressId -> ReaderT SqlBackend m Bcc
     queryWithdrawals saId = do
       res <- select . from $ \ wdrl -> do
                 where_ (wdrl ^. WithdrawalAddrId ==. val saId)
                 pure (sum_ (wdrl ^. WithdrawalAmount))
-      pure $ unValueSumGodx (listToMaybe res)
+      pure $ unValueSumBcc (listToMaybe res)
 
-    queryOutputs :: MonadIO m => StakeAddressId -> ReaderT SqlBackend m (Godx, Godx, Godx)
+    queryOutputs :: MonadIO m => StakeAddressId -> ReaderT SqlBackend m (Bcc, Bcc, Bcc)
     queryOutputs saId = do
       res <- select . from $ \ (txOut `InnerJoin` tx `InnerJoin` txIn) -> do
                 on (txOut ^. TxOutTxId ==. tx ^. TxId)
@@ -108,9 +108,9 @@ queryStakeAddressBalance address = do
                 pure (sum_ (txOut ^. TxOutValue), sum_ (tx ^. TxFee), sum_ (tx ^. TxDeposit))
       pure $ maybe (0, 0, 0) convert (listToMaybe res)
 
-    convert :: (Value (Maybe Micro), Value (Maybe Micro), Value (Maybe Micro)) -> (Godx, Godx, Godx)
+    convert :: (Value (Maybe Micro), Value (Maybe Micro), Value (Maybe Micro)) -> (Bcc, Bcc, Bcc)
     convert (Value mval, Value mfee, Value mdep) =
-      (maybe 0 isaacToGodx mval, maybe 0 isaacToGodx mfee, maybe 0 isaacToGodx mdep)
+      (maybe 0 entropicToBcc mval, maybe 0 entropicToBcc mfee, maybe 0 entropicToBcc mdep)
 
 renderBalances :: [Balance] -> IO ()
 renderBalances xs = do
@@ -119,7 +119,7 @@ renderBalances xs = do
     mapM_ renderReward (List.sortOn (Down . balTotal) xs)
     putStrLn "-------------------------------------------------------------+----------------"
     putStr   "                          total                              | "
-    Text.putStrLn $ leftPad 14 (renderGodx . sum $ map balTotal xs)
+    Text.putStrLn $ leftPad 14 (renderBcc . sum $ map balTotal xs)
     putStrLn ""
   where
     renderReward :: Balance -> IO ()
@@ -128,6 +128,6 @@ renderBalances xs = do
         [ " "
         , balAddress b
         , separator
-        , leftPad 14 (renderGodx $ balTotal b)
+        , leftPad 14 (renderBcc $ balTotal b)
         ]
 

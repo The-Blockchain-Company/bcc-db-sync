@@ -4,7 +4,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Godx.DbSync.Era.Sophie.Query
+module Bcc.DbSync.Era.Sophie.Query
   ( queryPoolHashId
   , queryStakeAddress
   , queryStakePoolKeyHash
@@ -17,25 +17,25 @@ module Godx.DbSync.Era.Sophie.Query
   , queryPoolUpdateByBlock
   ) where
 
-import           Godx.Prelude hiding (from, maybeToEither, on)
+import           Bcc.Prelude hiding (from, maybeToEither, on)
 
-import           Godx.Db
-import qualified Godx.DbSync.Era.Sophie.Generic as Generic
+import           Bcc.Db
+import qualified Bcc.DbSync.Era.Sophie.Generic as Generic
 
-import qualified Godx.Ledger.Address as Ledger
-import           Godx.Ledger.Credential (Ptr (..), StakeReference (..))
-import qualified Godx.Ledger.Keys as Ledger
+import qualified Bcc.Ledger.Address as Ledger
+import           Bcc.Ledger.Credential (Ptr (..), StakeReference (..))
+import qualified Bcc.Ledger.Keys as Ledger
 
-import qualified Godx.Sync.Era.Sophie.Generic as Generic
-import           Godx.Sync.Util
+import qualified Bcc.Sync.Era.Sophie.Generic as Generic
+import           Bcc.Sync.Util
 
-import           Godx.Slotting.Slot (SlotNo (..))
+import           Bcc.Slotting.Slot (SlotNo (..))
 
 import           Database.Esqueleto.Legacy (InnerJoin (..), Value (..), desc, from, just, limit, on,
                    orderBy, select, val, where_, (==.), (^.))
 import           Database.Persist.Sql (SqlBackend)
 
-import           Shardagnostic.Consensus.Godx.Block (StandardCrypto)
+import           Shardagnostic.Consensus.Bcc.Block (StandardCrypto)
 
 
 queryPoolHashId :: MonadIO m => ByteString -> ReaderT SqlBackend m (Maybe PoolHashId)
@@ -104,7 +104,7 @@ queryStakeAddressRef addr =
                 pure (dlg ^. DelegationAddrId)
       pure $ unValue <$> listToMaybe res
 
-queryResolveInput :: MonadIO m => Generic.TxIn -> ReaderT SqlBackend m (Either LookupFail (TxId, DbIsaac))
+queryResolveInput :: MonadIO m => Generic.TxIn -> ReaderT SqlBackend m (Either LookupFail (TxId, DbEntropic))
 queryResolveInput txIn =
   queryTxOutValue (Generic.txInHash txIn, fromIntegral (Generic.txInIndex txIn))
 

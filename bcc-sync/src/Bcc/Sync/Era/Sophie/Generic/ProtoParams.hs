@@ -1,27 +1,27 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE RankNTypes #-}
-module Godx.Sync.Era.Sophie.Generic.ProtoParams
+module Bcc.Sync.Era.Sophie.Generic.ProtoParams
   ( ProtoParams (..)
   , epochProtoParams
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import qualified Godx.Ledger.Aurum as Aurum
-import           Godx.Ledger.Aurum.Language (Language)
-import qualified Godx.Ledger.Aurum.PParams as Aurum
-import qualified Godx.Ledger.Aurum.Scripts as Aurum
-import           Godx.Ledger.BaseTypes (UnitInterval)
-import qualified Godx.Ledger.BaseTypes as Ledger
-import           Godx.Ledger.Coin (Coin (..))
-import           Godx.Slotting.Slot (EpochNo (..))
+import qualified Bcc.Ledger.Aurum as Aurum
+import           Bcc.Ledger.Aurum.Language (Language)
+import qualified Bcc.Ledger.Aurum.PParams as Aurum
+import qualified Bcc.Ledger.Aurum.Scripts as Aurum
+import           Bcc.Ledger.BaseTypes (UnitInterval)
+import qualified Bcc.Ledger.BaseTypes as Ledger
+import           Bcc.Ledger.Coin (Coin (..))
+import           Bcc.Slotting.Slot (EpochNo (..))
 
-import           Godx.Sync.Types
+import           Bcc.Sync.Types
 
-import           Shardagnostic.Consensus.Godx.Block (LedgerState (..), StandardAllegra,
+import           Shardagnostic.Consensus.Bcc.Block (LedgerState (..), StandardAllegra,
                    StandardAurum, StandardCrypto, StandardJen, StandardSophie)
 
-import           Shardagnostic.Consensus.Godx (Nonce (..))
+import           Shardagnostic.Consensus.Bcc (Nonce (..))
 import           Shardagnostic.Consensus.Ledger.Extended (ExtLedgerState (..))
 import           Shardagnostic.Consensus.Sophie.Ledger.Block (SophieBlock)
 import qualified Shardagnostic.Consensus.Sophie.Ledger.Ledger as Consensus
@@ -63,7 +63,7 @@ data ProtoParams = ProtoParams
   , ppMaxCollateralInputs :: !(Maybe Natural)
   }
 
-epochProtoParams :: ExtLedgerState GodxBlock -> Maybe ProtoParams
+epochProtoParams :: ExtLedgerState BccBlock -> Maybe ProtoParams
 epochProtoParams lstate =
     case ledgerState lstate of
       LedgerStateCole _ -> Nothing

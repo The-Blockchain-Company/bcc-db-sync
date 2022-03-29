@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Godx.Sync.Api
+module Bcc.Sync.Api
   ( SyncEnv (..)
   , LedgerEnv (..)
   , SyncDataLayer (..)
@@ -10,25 +10,25 @@ module Godx.Sync.Api
   , getLatestPoints
   ) where
 
-import           Godx.Prelude (Proxy (..), catMaybes, find)
+import           Bcc.Prelude (Proxy (..), catMaybes, find)
 
-import           Godx.BM.Trace (Trace)
+import           Bcc.BM.Trace (Trace)
 
-import qualified Godx.Ledger.BaseTypes as Ledger
+import qualified Bcc.Ledger.BaseTypes as Ledger
 
-import           Godx.Db (textShow)
+import           Bcc.Db (textShow)
 
-import           Godx.Sync.Config.Godx
-import           Godx.Sync.Config.Sophie
-import           Godx.Sync.Config.Types
-import           Godx.Sync.Error
-import           Godx.Sync.LedgerState
-import           Godx.Sync.Types
+import           Bcc.Sync.Config.Bcc
+import           Bcc.Sync.Config.Sophie
+import           Bcc.Sync.Config.Types
+import           Bcc.Sync.Error
+import           Bcc.Sync.LedgerState
+import           Bcc.Sync.Types
 
-import           Godx.Slotting.Slot (SlotNo (..))
+import           Bcc.Slotting.Slot (SlotNo (..))
 
-import qualified Godx.Chain.Genesis as Cole
-import           Godx.Crypto.ProtocolMagic
+import qualified Bcc.Chain.Genesis as Cole
+import           Bcc.Crypto.ProtocolMagic
 
 import           Data.ByteString (ByteString)
 import           Data.Text (Text)
@@ -58,13 +58,13 @@ data SyncDataLayer = SyncDataLayer
   }
 
 mkSyncEnv
-    :: SyncDataLayer -> Trace IO Text -> ProtocolInfo IO GodxBlock -> Ledger.Network
+    :: SyncDataLayer -> Trace IO Text -> ProtocolInfo IO BccBlock -> Ledger.Network
     -> NetworkMagic -> SystemStart -> LedgerStateDir -> EpochSlot
     -> IO SyncEnv
 mkSyncEnv dataLayer trce protoInfo nw nwMagic systemStart dir stableEpochSlot = do
   ledgerEnv <- mkLedgerEnv trce protoInfo dir nw stableEpochSlot
   pure $ SyncEnv
-          { envProtocol = SyncProtocolGodx
+          { envProtocol = SyncProtocolBcc
           , envNetworkMagic = nwMagic
           , envSystemStart = systemStart
           , envDataLayer = dataLayer
@@ -74,36 +74,36 @@ mkSyncEnv dataLayer trce protoInfo nw nwMagic systemStart dir stableEpochSlot = 
 mkSyncEnvFromConfig :: SyncDataLayer -> Trace IO Text -> LedgerStateDir -> GenesisConfig -> IO (Either SyncNodeError SyncEnv)
 mkSyncEnvFromConfig trce dataLayer dir genCfg =
     case genCfg of
-      GenesisGodx _ bCfg sCfg _aCfg
+      GenesisBcc _ bCfg sCfg _aCfg
         | unProtocolMagicId (Cole.configProtocolMagicId bCfg) /= Sophie.sgNetworkMagic (scConfig sCfg) ->
-            pure . Left . NEGodxConfig $
+            pure . Left . NEBccConfig $
               mconcat
                 [ "ProtocolMagicId ", textShow (unProtocolMagicId $ Cole.configProtocolMagicId bCfg)
                 , " /= ", textShow (Sophie.sgNetworkMagic $ scConfig sCfg)
                 ]
         | Cole.gdStartTime (Cole.configGenesisData bCfg) /= Sophie.sgSystemStart (scConfig sCfg) ->
-            pure . Left . NEGodxConfig $
+            pure . Left . NEBccConfig $
               mconcat
                 [ "SystemStart ", textShow (Cole.gdStartTime $ Cole.configGenesisData bCfg)
                 , " /= ", textShow (Sophie.sgSystemStart $ scConfig sCfg)
                 ]
         | otherwise ->
-            Right <$> mkSyncEnv trce dataLayer (mkProtocolInfoGodx genCfg) (Sophie.sgNetworkId $ scConfig sCfg)
+            Right <$> mkSyncEnv trce dataLayer (mkProtocolInfoBcc genCfg) (Sophie.sgNetworkId $ scConfig sCfg)
                         (NetworkMagic . unProtocolMagicId $ Cole.configProtocolMagicId bCfg)
                         (SystemStart .Cole.gdStartTime $ Cole.configGenesisData bCfg)
                         dir (calculateStableEpochSlot $ scConfig sCfg)
 
 
-getLatestPoints :: SyncEnv -> IO [GodxPoint]
+getLatestPoints :: SyncEnv -> IO [BccPoint]
 getLatestPoints env = do
     files <- listLedgerStateFilesOrdered $ leDir (envLedger env)
     verifyFilePoints env files
 
-verifyFilePoints :: SyncEnv -> [LedgerStateFile] -> IO [GodxPoint]
+verifyFilePoints :: SyncEnv -> [LedgerStateFile] -> IO [BccPoint]
 verifyFilePoints env files =
     catMaybes <$> mapM validLedgerFileToPoint files
   where
-    validLedgerFileToPoint :: LedgerStateFile -> IO (Maybe GodxPoint)
+    validLedgerFileToPoint :: LedgerStateFile -> IO (Maybe BccPoint)
     validLedgerFileToPoint lsf = do
         hashes <- sdlGetSlotHash (envDataLayer env) (lsfSlotNo lsf)
         let valid  = find (\(_, h) -> lsfHash lsf == hashToAnnotation h) hashes
@@ -111,12 +111,12 @@ verifyFilePoints env files =
           Just (slot, hash) | slot == lsfSlotNo lsf -> pure $ convert (slot, hash)
           _ -> pure Nothing
 
-    convert :: (SlotNo, ByteString) -> Maybe GodxPoint
+    convert :: (SlotNo, ByteString) -> Maybe BccPoint
     convert (slot, hashBlob) =
       Point . Point.block slot <$> convertHashBlob hashBlob
 
-    convertHashBlob :: ByteString -> Maybe (HeaderHash GodxBlock)
-    convertHashBlob = Just . fromRawHash (Proxy @GodxBlock)
+    convertHashBlob :: ByteString -> Maybe (HeaderHash BccBlock)
+    convertHashBlob = Just . fromRawHash (Proxy @BccBlock)
 
 -- -------------------------------------------------------------------------------------------------
 -- This is incredibly suboptimal. It should work, for now, but may break at some future time and

@@ -1,17 +1,17 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-module Godx.DbSync.Era.Godx.Insert
+module Bcc.DbSync.Era.Bcc.Insert
   ( insertEpochSyncTime
   ) where
 
-import qualified Godx.Db as Db
+import qualified Bcc.Db as Db
 
-import           Godx.Prelude hiding (STM, atomically)
+import           Bcc.Prelude hiding (STM, atomically)
 
-import           Godx.Slotting.Slot (EpochNo (..))
+import           Bcc.Slotting.Slot (EpochNo (..))
 
-import           Godx.Db (SyncState)
+import           Bcc.Db (SyncState)
 
 import           Control.Monad.Class.MonadSTM.Strict (MonadSTM, STM, StrictTVar, atomically,
                    readTVar, writeTVar)

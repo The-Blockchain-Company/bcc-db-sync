@@ -1,21 +1,21 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.DbSync.Era.Sophie.Offline.Query
+module Bcc.DbSync.Era.Sophie.Offline.Query
   ( queryOfflinePoolData
   , queryPoolHashId
   ) where
 
-import           Godx.Prelude hiding (from, groupBy, on, retry)
+import           Bcc.Prelude hiding (from, groupBy, on, retry)
 
-import           Godx.DbSync.Era.Sophie.Offline.FetchQueue
+import           Bcc.DbSync.Era.Sophie.Offline.FetchQueue
 
 import           Data.Time (UTCTime)
 import           Data.Time.Clock.POSIX (POSIXTime)
 import qualified Data.Time.Clock.POSIX as Time
 
-import           Godx.Db
-import           Godx.Sync.Types
+import           Bcc.Db
+import           Bcc.Sync.Types
 
 import           Database.Esqueleto.Legacy (InnerJoin (..), SqlExpr, Value (..), ValueList, desc,
                    from, groupBy, in_, just, max_, notExists, on, orderBy, select, subList_select,

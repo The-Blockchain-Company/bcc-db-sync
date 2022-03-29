@@ -133,7 +133,7 @@
 
 * Note that this release requires the database to be dropped and recreated.
   It requires bcc-node 1.16 or later.
-* Add support for the bcc-node in Godx mode (#186, #188, #196)
+* Add support for the bcc-node in Bcc mode (#186, #188, #196)
 
 ## 2.1.0 -- July 2020
 
@@ -198,6 +198,6 @@
 
 ## 1.0.0 -- November 2019
 
-* First release of new explorer based on new Godx node.
+* First release of new explorer based on new Bcc node.
 * Syncs chain data from a local node into a PostgreSQL DB.
-* Compatible with new Godx node for Cole era.
+* Compatible with new Bcc node for Cole era.

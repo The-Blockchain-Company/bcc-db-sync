@@ -1,13 +1,13 @@
-module Godx.Sync.Metrics
+module Bcc.Sync.Metrics
   ( setNodeBlockHeight
   , setDbQueueLength
   , setDbBlockHeight
   , setDbSlotHeight
   ) where
 
-import           Godx.Slotting.Slot (SlotNo (..), WithOrigin (..), fromWithOrigin)
+import           Bcc.Slotting.Slot (SlotNo (..), WithOrigin (..), fromWithOrigin)
 
-import           Godx.Sync.Types
+import           Bcc.Sync.Types
 
 import           Numeric.Natural (Natural)
 

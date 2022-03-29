@@ -77,8 +77,8 @@ A table for transactions within a block on the chain.
 | `hash` | hash32type | The hash identifier of the transaction. |
 | `block_id` | integer (64) | The Block table index of the block that contains this transaction. |
 | `block_index` | uinteger | The index of this transaction with the block (zero based). |
-| `out_sum` | isaac | The sum of the transaction outputs (in Isaac). |
-| `fee` | isaac | The fees paid for this transaction. |
+| `out_sum` | entropic | The sum of the transaction outputs (in Entropic). |
+| `fee` | entropic | The fees paid for this transaction. |
 | `deposit` | integer (64) | Deposit (or deposit refund) in this transaction. Deposits are positive, refunds negative. |
 | `size` | uinteger | The size of the transaction in bytes. |
 | `invalid_before` | word64type | Transaction in invalid before this slot number. |
@@ -116,7 +116,7 @@ A table for transaction outputs.
 | `address_has_script` | boolean | Flag which shows if this address is locked by a script. |
 | `payment_cred` | hash28type | The payment credential part of the Sophie address. (NULL for Cole addresses). For a script-locked address, this is the script hash. |
 | `stake_address_id` | integer (64) | The StakeAddress table index for the stake address part of the Sophie address. (NULL for Cole addresses). |
-| `value` | isaac | The output value (in Isaac) of the transaction output. |
+| `value` | entropic | The output value (in Entropic) of the transaction output. |
 | `data_hash` | hash32type | The hash of the transaction output datum. (NULL for Txs without scripts). |
 
 ### `tx_in`
@@ -167,8 +167,8 @@ Aggregation of data within an epoch.
 | Column name | Type | Description |
 |-|-|-|
 | `id` | integer (64) |  |
-| `out_sum` | word128type | The sum of the transaction output values (in Isaac) in this epoch. |
-| `fees` | isaac | The sum of the fees (in Isaac) in this epoch. |
+| `out_sum` | word128type | The sum of the transaction output values (in Entropic) in this epoch. |
+| `fees` | entropic | The sum of the fees (in Entropic) in this epoch. |
 | `tx_count` | uinteger | The number of transactions in this epoch. |
 | `blk_count` | uinteger | The number of blocks in this epoch. |
 | `no` | uinteger | The epoch number. |
@@ -185,14 +185,14 @@ The treasury and rewards fields will be correct for the whole epoch, but all oth
 | Column name | Type | Description |
 |-|-|-|
 | `id` | integer (64) |  |
-| `slot_no` | uinteger | The slot number where this GodxPots snapshot was taken. |
-| `epoch_no` | uinteger | The epoch number where this GodxPots snapshot was taken. |
-| `treasury` | isaac | The amount (in Isaac) in the treasury pot. |
-| `reserves` | isaac | The amount (in Isaac) in the reserves pot. |
-| `rewards` | isaac | The amount (in Isaac) in the rewards pot. |
-| `utxo` | isaac | The amount (in Isaac) in the UTxO set. |
-| `deposits` | isaac | The amount (in Isaac) in the deposit pot. |
-| `fees` | isaac | The amount (in Isaac) in the fee pot. |
+| `slot_no` | uinteger | The slot number where this BccPots snapshot was taken. |
+| `epoch_no` | uinteger | The epoch number where this BccPots snapshot was taken. |
+| `treasury` | entropic | The amount (in Entropic) in the treasury pot. |
+| `reserves` | entropic | The amount (in Entropic) in the reserves pot. |
+| `rewards` | entropic | The amount (in Entropic) in the rewards pot. |
+| `utxo` | entropic | The amount (in Entropic) in the UTxO set. |
+| `deposits` | entropic | The amount (in Entropic) in the deposit pot. |
+| `fees` | entropic | The amount (in Entropic) in the fee pot. |
 | `block_id` | integer (64) | The Block table index of the block for which this snapshot was taken. |
 
 ### `pool_metadata_ref`
@@ -221,12 +221,12 @@ An on-chain pool update.
 | `hash_id` | integer (64) | The PoolHash table index of the pool this update refers to. |
 | `cert_index` | integer (32) | The index of this pool update within the certificates of this transaction. |
 | `vrf_key_hash` | hash32type | The hash of the pool's VRF key. |
-| `pledge` | isaac | The amount (in Isaac) the pool owner pledges to the pool. |
+| `pledge` | entropic | The amount (in Entropic) the pool owner pledges to the pool. |
 | `reward_addr` | addr29type | The pool's rewards address. |
 | `active_epoch_no` | integer (64) | The epoch number where this update becomes active. |
 | `meta_id` | integer (64) | The PoolMetadataRef table index this pool update refers to. |
 | `margin` | double | The margin (as a percentage) this pool charges. |
-| `fixed_cost` | isaac | The fixed per epoch fee (in BCC) this pool charges. |
+| `fixed_cost` | entropic | The fixed per epoch fee (in BCC) this pool charges. |
 | `registered_tx_id` | integer (64) | The Tx table index of the transaction in which provided this pool update. |
 
 ### `pool_owner`
@@ -343,7 +343,7 @@ A table for rewards earned by staking. The rewards earned in epoch `N` are added
 | `id` | integer (64) |  |
 | `addr_id` | integer (64) | The StakeAddress table index for the stake address that earned the reward. |
 | `type` | rewardtype | The source of the rewards; pool `member`, pool `owner`, `treasury` or `reserve` payment. |
-| `amount` | isaac | The reward amount (in Isaac). |
+| `amount` | entropic | The reward amount (in Entropic). |
 | `earned_epoch` | integer (64) | The epoch in which the reward was earned. |
 | `spendable_epoch` | integer (64) |  |
 | `pool_id` | integer (64) | The PoolHash table index for the pool the stake address was delegated to when the reward is earned. Will be NULL for payments from the treasury or the reserves. |
@@ -358,7 +358,7 @@ A table for withdrawals from a reward account.
 |-|-|-|
 | `id` | integer (64) |  |
 | `addr_id` | integer (64) | The StakeAddress table index for the stake address for which the withdrawal is for. |
-| `amount` | isaac | The withdrawal amount (in Isaac). |
+| `amount` | entropic | The withdrawal amount (in Entropic). |
 | `redeemer_id` | integer (64) | The Redeemer table index that is related with this withdrawal. |
 | `tx_id` | integer (64) | The Tx table index for the transaction that contains this withdrawal. |
 
@@ -373,7 +373,7 @@ A table containing the epoch stake distribution for each epoch.
 | `id` | integer (64) |  |
 | `addr_id` | integer (64) | The StakeAddress table index for the stake address for this EpochStake entry. |
 | `pool_id` | integer (64) | The PoolHash table index for the pool this entry is delegated to. |
-| `amount` | isaac | The amount (in Isaac) being staked. |
+| `amount` | entropic | The amount (in Entropic) being staked. |
 | `epoch_no` | integer (64) | The epoch number. |
 
 ### `treasury`
@@ -387,7 +387,7 @@ A table for payments from the treasury to a StakeAddress.
 | `id` | integer (64) |  |
 | `addr_id` | integer (64) | The StakeAddress table index for the stake address for this Treasury entry. |
 | `cert_index` | integer (32) | The index of this payment certificate within the certificates of this transaction. |
-| `amount` | int65type | The payment amount (in Isaac). |
+| `amount` | int65type | The payment amount (in Entropic). |
 | `tx_id` | integer (64) | The Tx table index for the transaction that contains this payment. |
 
 ### `reserve`
@@ -401,7 +401,7 @@ A table for payments from the reserves to a StakeAddress.
 | `id` | integer (64) |  |
 | `addr_id` | integer (64) | The StakeAddress table index for the stake address for this Treasury entry. |
 | `cert_index` | integer (32) | The index of this payment certificate within the certificates of this transaction. |
-| `amount` | int65type | The payment amount (in Isaac). |
+| `amount` | int65type | The payment amount (in Entropic). |
 | `tx_id` | integer (64) | The Tx table index for the transaction that contains this payment. |
 
 ### `pot_transfer`
@@ -414,8 +414,8 @@ A table containing transfers between the reserves pot and the treasury pot.
 |-|-|-|
 | `id` | integer (64) |  |
 | `cert_index` | integer (32) | The index of this transfer certificate within the certificates of this transaction. |
-| `treasury` | int65type | The amount (in Isaac) the treasury balance changes by. |
-| `reserves` | int65type | The amount (in Isaac) the reserves balance changes by. |
+| `treasury` | int65type | The amount (in Entropic) the treasury balance changes by. |
+| `reserves` | int65type | The amount (in Entropic) the reserves balance changes by. |
 | `tx_id` | integer (64) | The Tx table index for the transaction that contains this transfer. |
 
 ### `epoch_sync_time`
@@ -471,7 +471,7 @@ A table containing redeemers. A redeemer is provided for all items that are vali
 | `tx_id` | integer (64) | The Tx table index that contains this redeemer. |
 | `unit_mem` | word63type | The budget in Memory to run a script. |
 | `unit_steps` | word63type | The budget in Cpu steps to run a script. |
-| `fee` | isaac | The budget in fees to run a script. The fees depend on the ExUnits and the current prices. |
+| `fee` | entropic | The budget in fees to run a script. The fees depend on the ExUnits and the current prices. |
 | `purpose` | scriptpurposetype | What kind pf validation this redeemer is used for. It can be one of 'spend', 'mint', 'cert', 'reward'. |
 | `index` | uinteger | The index of the redeemer pointer in the transaction. |
 | `script_hash` | hash28type | The script hash this redeemer is used for. |
@@ -506,8 +506,8 @@ A table containing block chain parameter change proposals.
 | `max_block_size` | word64type | The maximum block size (in bytes). |
 | `max_tx_size` | word64type | The maximum transaction size (in bytes). |
 | `max_bh_size` | word64type | The maximum block header size (in bytes). |
-| `key_deposit` | isaac | The amount (in Isaac) require for a deposit to register a StakeAddress. |
-| `pool_deposit` | isaac | The amount (in Isaac) require for a deposit to register a stake pool. |
+| `key_deposit` | entropic | The amount (in Entropic) require for a deposit to register a StakeAddress. |
+| `pool_deposit` | entropic | The amount (in Entropic) require for a deposit to register a stake pool. |
 | `max_epoch` | word64type | The maximum number of epochs in the future that a pool retirement is allowed to be scheduled for. |
 | `optimal_pool_count` | word64type | The optimal number of stake pools. |
 | `influence` | double | The influence of the pledge on a stake pool's probability on minting a block. |
@@ -517,9 +517,9 @@ A table containing block chain parameter change proposals.
 | `entropy` | hash32type | The 32 byte string of extra random-ness to be added into the protocol's entropy pool. |
 | `protocol_major` | uinteger | The protocol major number. |
 | `protocol_minor` | uinteger | The protocol minor number. |
-| `min_utxo_value` | isaac | The minimum value of a UTxO entry. |
-| `min_pool_cost` | isaac | The minimum pool cost. |
-| `coins_per_utxo_word` | isaac | The cost per UTxO word. |
+| `min_utxo_value` | entropic | The minimum value of a UTxO entry. |
+| `min_pool_cost` | entropic | The minimum pool cost. |
+| `coins_per_utxo_word` | entropic | The cost per UTxO word. |
 | `cost_models` | string | The per language cost models. |
 | `price_mem` | double | The per word cost of script memory usage. |
 | `price_step` | double | The cost of script execution step usage. |
@@ -547,8 +547,8 @@ The accepted protocol parameters for an epoch.
 | `max_block_size` | uinteger | The maximum block size (in bytes). |
 | `max_tx_size` | uinteger | The maximum transaction size (in bytes). |
 | `max_bh_size` | uinteger | The maximum block header size (in bytes). |
-| `key_deposit` | isaac | The amount (in Isaac) require for a deposit to register a StakeAddress. |
-| `pool_deposit` | isaac | The amount (in Isaac) require for a deposit to register a stake pool. |
+| `key_deposit` | entropic | The amount (in Entropic) require for a deposit to register a StakeAddress. |
+| `pool_deposit` | entropic | The amount (in Entropic) require for a deposit to register a stake pool. |
 | `max_epoch` | uinteger | The maximum number of epochs in the future that a pool retirement is allowed to be scheduled for. |
 | `optimal_pool_count` | uinteger | The optimal number of stake pools. |
 | `influence` | double | The influence of the pledge on a stake pool's probability on minting a block. |
@@ -558,10 +558,10 @@ The accepted protocol parameters for an epoch.
 | `entropy` | hash32type | The 32 byte string of extra random-ness to be added into the protocol's entropy pool. |
 | `protocol_major` | uinteger | The protocol major number. |
 | `protocol_minor` | uinteger | The protocol minor number. |
-| `min_utxo_value` | isaac | The minimum value of a UTxO entry. |
-| `min_pool_cost` | isaac | The minimum pool cost. |
+| `min_utxo_value` | entropic | The minimum value of a UTxO entry. |
+| `min_pool_cost` | entropic | The minimum pool cost. |
 | `nonce` | hash32type | The nonce value for this epoch. |
-| `coins_per_utxo_word` | isaac | The cost per UTxO word. |
+| `coins_per_utxo_word` | entropic | The cost per UTxO word. |
 | `cost_models` | string | The per language cost models. |
 | `price_mem` | double | The per word cost of script memory usage. |
 | `price_step` | double | The cost of script execution step usage. |
@@ -615,7 +615,7 @@ This table is used to help validate the accounting of rewards. It contains the t
 |-|-|-|
 | `id` | integer (64) |  |
 | `earned_epoch` | uinteger | The epoch in which the reward was earned. |
-| `amount` | isaac | The total rewards for the epoch in Isaac. |
+| `amount` | entropic | The total rewards for the epoch in Entropic. |
 
 ### `reserved_pool_ticker`
 

@@ -21,7 +21,7 @@
 #     -v $PWD/config/pgpass:/pgpass \
 #     -v $PWD/data:/data \
 #     -e PGPASSFILE=/pgpass
-#     godXcoin/bcc-db-sync run \
+#     tbco/bcc-db-sync run \
 #      --config /configuration/configuration.yaml \
 #      --socket-path /node-ipc/node.socket \
 #      --state-dir /data

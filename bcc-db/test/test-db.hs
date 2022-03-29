@@ -8,10 +8,10 @@ import           Data.Maybe (isNothing)
 
 import           Test.Tasty (defaultMain, testGroup)
 
-import qualified Test.IO.Godx.Db.Insert
-import qualified Test.IO.Godx.Db.Migration
-import qualified Test.IO.Godx.Db.Rollback
-import qualified Test.IO.Godx.Db.TotalSupply
+import qualified Test.IO.Bcc.Db.Insert
+import qualified Test.IO.Bcc.Db.Migration
+import qualified Test.IO.Bcc.Db.Rollback
+import qualified Test.IO.Bcc.Db.TotalSupply
 
 import           System.Directory (getCurrentDirectory)
 import           System.Environment (lookupEnv, setEnv)
@@ -27,9 +27,9 @@ main = do
 
   defaultMain $
     testGroup "Database"
-      [ Test.IO.Godx.Db.Migration.tests
-      , Test.IO.Godx.Db.Insert.tests
-      , Test.IO.Godx.Db.TotalSupply.tests
-      , Test.IO.Godx.Db.Rollback.tests
+      [ Test.IO.Bcc.Db.Migration.tests
+      , Test.IO.Bcc.Db.Insert.tests
+      , Test.IO.Bcc.Db.TotalSupply.tests
+      , Test.IO.Bcc.Db.Rollback.tests
       ]
 

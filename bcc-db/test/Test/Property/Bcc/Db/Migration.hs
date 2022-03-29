@@ -1,11 +1,11 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Test.Property.Godx.Db.Migration
+module Test.Property.Bcc.Db.Migration
   ( genMigrationVersion
   , tests
   ) where
 
-import           Godx.Db
+import           Bcc.Db
 
 import           Hedgehog (Gen, Property, discover, (===))
 import qualified Hedgehog as H

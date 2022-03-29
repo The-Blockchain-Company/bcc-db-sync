@@ -3,7 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Godx.Sync.Config
+module Bcc.Sync.Config
   ( ConfigFile (..)
   , GenesisConfig (..)
   , GenesisFile (..)
@@ -17,24 +17,24 @@ module Godx.Sync.Config
   , SyncNodeParams (..)
   , bccLedgerConfig
   , genesisProtocolMagicId
-  , readGodxGenesisConfig
+  , readBccGenesisConfig
   , readSyncNodeConfig
   , configureLogging
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import qualified Godx.BM.Setup as Logging
-import           Godx.BM.Trace (Trace)
-import qualified Godx.BM.Trace as Logging
+import qualified Bcc.BM.Setup as Logging
+import           Bcc.BM.Trace (Trace)
+import qualified Bcc.BM.Trace as Logging
 
-import qualified Godx.BM.Configuration.Model as Logging
+import qualified Bcc.BM.Configuration.Model as Logging
 
-import           Godx.Sync.Config.Godx
-import           Godx.Sync.Config.Node
-import           Godx.Sync.Config.Sophie
-import           Godx.Sync.Config.Types
-import           Godx.Sync.Util
+import           Bcc.Sync.Config.Bcc
+import           Bcc.Sync.Config.Node
+import           Bcc.Sync.Config.Sophie
+import           Bcc.Sync.Config.Types
+import           Bcc.Sync.Util
 
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Text as Text

@@ -1,4 +1,4 @@
-module Godx.Db.Tool.Validate.Ledger
+module Bcc.Db.Tool.Validate.Ledger
   ( LedgerValidationParams (..)
   , validateLedger
   ) where
@@ -9,19 +9,19 @@ import           Data.Text (Text)
 import qualified Data.Text as Text
 import           Prelude
 
-import qualified Godx.Db as DB
-import           Godx.Db.Tool.Validate.Balance (ledgerAddrBalance)
-import           Godx.Db.Tool.Validate.Util
+import qualified Bcc.Db as DB
+import           Bcc.Db.Tool.Validate.Balance (ledgerAddrBalance)
+import           Bcc.Db.Tool.Validate.Util
 
-import           Godx.Sync.Config
-import           Godx.Sync.Config.Godx
-import           Godx.Sync.Error
-import           Godx.Sync.LedgerState
-import           Godx.Sync.Tracing.ToObjectOrphans ()
+import           Bcc.Sync.Config
+import           Bcc.Sync.Config.Bcc
+import           Bcc.Sync.Error
+import           Bcc.Sync.LedgerState
+import           Bcc.Sync.Tracing.ToObjectOrphans ()
 
-import           Godx.Slotting.Slot (SlotNo (..))
+import           Bcc.Slotting.Slot (SlotNo (..))
 
-import           Shardagnostic.Consensus.Godx.Node ()
+import           Shardagnostic.Consensus.Bcc.Node ()
 import           Shardagnostic.Consensus.Ledger.Extended
 import           Shardagnostic.Network.NodeToClient (withIOManager)
 
@@ -35,7 +35,7 @@ validateLedger :: LedgerValidationParams -> IO ()
 validateLedger params =
   withIOManager $ \ _ -> do
     enc <- readSyncNodeConfig (vpConfigFile params)
-    genCfg <- orDie renderSyncNodeError $ readGodxGenesisConfig enc
+    genCfg <- orDie renderSyncNodeError $ readBccGenesisConfig enc
     ledgerFiles <- listLedgerStateFilesOrdered (vpLedgerStateDir params)
     slotNo <- SlotNo <$> DB.runDbNoLogging DB.queryLatestSlotNo
     validate params genCfg slotNo ledgerFiles
@@ -56,10 +56,10 @@ validate params genCfg slotNo ledgerFiles =
           when logFailure . putStrLn $ redText "Ledger is newer than DB. Trying an older ledger."
           go rest False
 
-validateBalance :: SlotNo -> Text -> GodxLedgerState -> IO ()
+validateBalance :: SlotNo -> Text -> BccLedgerState -> IO ()
 validateBalance slotNo addr st = do
   balanceDB <- DB.runDbNoLogging $ DB.queryAddressBalanceAtSlot addr (unSlotNo slotNo)
-  let eiBalanceLedger = DB.word64ToGodx <$> ledgerAddrBalance addr (ledgerState $ clsState st)
+  let eiBalanceLedger = DB.word64ToBcc <$> ledgerAddrBalance addr (ledgerState $ clsState st)
   case eiBalanceLedger of
     Left str -> putStrLn $ redText (Text.unpack str)
     Right balanceLedger ->

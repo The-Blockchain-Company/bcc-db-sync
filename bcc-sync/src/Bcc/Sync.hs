@@ -8,7 +8,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.Sync
+module Bcc.Sync
   ( ConfigFile (..)
   , SyncCommand (..)
   , SyncNodeParams (..)
@@ -28,32 +28,32 @@ module Godx.Sync
   , runSyncNode
   ) where
 
-import           Godx.Prelude hiding (Meta, Nat, option, (%))
+import           Bcc.Prelude hiding (Meta, Nat, option, (%))
 
 import           Control.Tracer (Tracer)
 
-import           Godx.BM.Data.Tracer (ToLogObject (..))
-import           Godx.BM.Trace (Trace, appendName, logError, logInfo)
-import qualified Godx.BM.Trace as Logging
+import           Bcc.BM.Data.Tracer (ToLogObject (..))
+import           Bcc.BM.Trace (Trace, appendName, logError, logInfo)
+import qualified Bcc.BM.Trace as Logging
 
-import qualified Godx.Chain.Genesis as Cole
-import           Godx.Client.Subscription (subscribe)
-import qualified Godx.Crypto as Crypto
+import qualified Bcc.Chain.Genesis as Cole
+import           Bcc.Client.Subscription (subscribe)
+import qualified Bcc.Crypto as Crypto
 
-import           Godx.Slotting.Slot (SlotNo (..), WithOrigin (..))
+import           Bcc.Slotting.Slot (SlotNo (..), WithOrigin (..))
 
-import           Godx.Sync.Api
-import           Godx.Sync.Config
-import           Godx.Sync.Database (runDbStartup)
-import           Godx.Sync.DbAction
-import           Godx.Sync.Error
-import           Godx.Sync.Metrics
-import           Godx.Sync.Plugin (SyncNodePlugin (..))
-import           Godx.Sync.StateQuery (StateQueryTMVar, getSlotDetails, localStateQueryHandler,
+import           Bcc.Sync.Api
+import           Bcc.Sync.Config
+import           Bcc.Sync.Database (runDbStartup)
+import           Bcc.Sync.DbAction
+import           Bcc.Sync.Error
+import           Bcc.Sync.Metrics
+import           Bcc.Sync.Plugin (SyncNodePlugin (..))
+import           Bcc.Sync.StateQuery (StateQueryTMVar, getSlotDetails, localStateQueryHandler,
                    newStateQueryTMVar)
-import           Godx.Sync.Tracing.ToObjectOrphans ()
-import           Godx.Sync.Types
-import           Godx.Sync.Util
+import           Bcc.Sync.Tracing.ToObjectOrphans ()
+import           Bcc.Sync.Types
+import           Bcc.Sync.Util
 
 import qualified Codec.CBOR.Term as CBOR
 
@@ -72,8 +72,8 @@ import           Shardagnostic.Network.Driver.Simple (runPipelinedPeer)
 import           Shardagnostic.Consensus.Block.Abstract (CodecConfig)
 import           Shardagnostic.Consensus.Cole.Ledger.Config (mkColeCodecConfig)
 import           Shardagnostic.Consensus.Cole.Node ()
-import           Shardagnostic.Consensus.Godx.Block (GodxEras, CodecConfig (..))
-import           Shardagnostic.Consensus.Godx.Node ()
+import           Shardagnostic.Consensus.Bcc.Block (BccEras, CodecConfig (..))
+import           Shardagnostic.Consensus.Bcc.Node ()
 import           Shardagnostic.Consensus.HardFork.History.Qry (Interpreter)
 import           Shardagnostic.Consensus.Network.NodeToClient (ClientCodecs, cChainSyncCodec,
                    cStateQueryCodec, cTxSubmissionCodec)
@@ -142,7 +142,7 @@ runSyncNode dataLayer metricsSetters trce plugin enp insertValidateGenesisDist r
     logInfo trce $ "Using aurum genesis file from: " <> (show . unGenesisFile $ dncAurumGenesisFile enc)
 
     orDie renderSyncNodeError $ do
-      genCfg <- readGodxGenesisConfig enc
+      genCfg <- readBccGenesisConfig enc
       logProtocolMagicId trce $ genesisProtocolMagicId genCfg
 
       -- If the DB is empty it will be inserted, otherwise it will be validated (to make
@@ -152,14 +152,14 @@ runSyncNode dataLayer metricsSetters trce plugin enp insertValidateGenesisDist r
         -- Must run plugin startup after the genesis distribution has been inserted/validate.
       liftIO $ runDbStartup trce plugin
       case genCfg of
-          GenesisGodx _ bCfg _sCfg _aCfg -> do
+          GenesisBcc _ bCfg _sCfg _aCfg -> do
             syncEnv <- ExceptT $ mkSyncEnvFromConfig dataLayer trce (enpLedgerStateDir enp) genCfg
             liftIO $ runSyncNodeNodeClient metricsSetters syncEnv iomgr trce plugin
                         runDBThreadFunction (bccCodecConfig bCfg) (enpSocketPath enp)
   where
-    bccCodecConfig :: Cole.Config -> CodecConfig GodxBlock
+    bccCodecConfig :: Cole.Config -> CodecConfig BccBlock
     bccCodecConfig cfg =
-      GodxCodecConfig
+      BccCodecConfig
         (mkColeCodecConfig cfg)
         SophieCodecConfig
         SophieCodecConfig -- Allegra
@@ -175,7 +175,7 @@ runSyncNodeNodeClient
     -> Trace IO Text
     -> SyncNodePlugin
     -> RunDBThreadFunction
-    -> CodecConfig GodxBlock
+    -> CodecConfig BccBlock
     -> SocketPath
     -> IO ()
 runSyncNodeNodeClient metricsSetters env iomgr trce plugin runDBThreadFunction codecConfig (SocketPath socketPath) = do
@@ -193,7 +193,7 @@ runSyncNodeNodeClient metricsSetters env iomgr trce plugin runDBThreadFunction c
       ClientSubscriptionParams
         { cspAddress = Snocket.localAddressFromPath socketPath
         , cspConnectionAttemptDelay = Nothing
-        , cspErrorPolicies = networkErrorPolicies <> consensusErrorPolicy (Proxy @GodxBlock)
+        , cspErrorPolicies = networkErrorPolicies <> consensusErrorPolicy (Proxy @BccBlock)
         }
 
     networkSubscriptionTracers =
@@ -220,8 +220,8 @@ runSyncNodeNodeClient metricsSetters env iomgr trce plugin runDBThreadFunction c
 
 dbSyncProtocols
     :: Trace IO Text -> SyncEnv -> MetricSetters -> SyncNodePlugin
-    -> StateQueryTMVar GodxBlock (Interpreter (GodxEras StandardCrypto))
-    -> RunDBThreadFunction -> Network.NodeToClientVersion -> ClientCodecs GodxBlock IO
+    -> StateQueryTMVar BccBlock (Interpreter (BccEras StandardCrypto))
+    -> RunDBThreadFunction -> Network.NodeToClientVersion -> ClientCodecs BccBlock IO
     -> ConnectionId LocalAddress
     -> NodeToClientProtocols 'InitiatorMode BSL.ByteString IO () Void
 dbSyncProtocols trce env metricsSetters plugin queryVar runDBThreadFunction version codecs _connectionId =
@@ -231,7 +231,7 @@ dbSyncProtocols trce env metricsSetters plugin queryVar runDBThreadFunction vers
       , localStateQueryProtocol = localStateQuery
       }
   where
-    localChainSyncTracer :: Tracer IO (TraceSendRecv (ChainSync GodxBlock(Point GodxBlock) (Tip GodxBlock)))
+    localChainSyncTracer :: Tracer IO (TraceSendRecv (ChainSync BccBlock(Point BccBlock) (Tip BccBlock)))
     localChainSyncTracer = toLogObject $ appendName "ChainSync" trce
 
     localChainSyncPtcl :: RunMiniProtocol 'InitiatorMode BSL.ByteString IO () Void
@@ -294,10 +294,10 @@ logDbState dataLayer trce = do
     let getLatestBlock = sdlGetLatestBlock dataLayer
     mblk <- getLatestBlock
     case mblk of
-      Nothing -> logInfo trce "Godx.Db is empty"
+      Nothing -> logInfo trce "Bcc.Db is empty"
       Just block ->
           logInfo trce $ Text.concat
-                  [ "Godx.Db tip is at "
+                  [ "Bcc.Db tip is at "
                   , showTip block
                   ]
   where
@@ -333,17 +333,17 @@ chainSyncClient
     -> MetricSetters
     -> Trace IO Text
     -> SyncEnv
-    -> StateQueryTMVar GodxBlock (Interpreter (GodxEras StandardCrypto))
-    -> [Point GodxBlock]
+    -> StateQueryTMVar BccBlock (Interpreter (BccEras StandardCrypto))
+    -> [Point BccBlock]
     -> WithOrigin BlockNo
     -> DbActionQueue
-    -> ChainSyncClientPipelined GodxBlock (Point GodxBlock) (Tip GodxBlock) IO ()
+    -> ChainSyncClientPipelined BccBlock (Point BccBlock) (Tip BccBlock) IO ()
 chainSyncClient _plugin metricsSetters trce env queryVar latestPoints currentTip actionQueue = do
     ChainSyncClientPipelined $ pure $ clientPipelinedStIdle currentTip latestPoints
   where
     clientPipelinedStIdle
-        :: WithOrigin BlockNo -> [GodxPoint]
-        -> ClientPipelinedStIdle 'Z GodxBlock (Point GodxBlock) (Tip GodxBlock) IO ()
+        :: WithOrigin BlockNo -> [BccPoint]
+        -> ClientPipelinedStIdle 'Z BccBlock (Point BccBlock) (Tip BccBlock) IO ()
     clientPipelinedStIdle clintTip points =
       -- Notify the core node about the our latest points at which we are
       -- synchronised.  This client is not persistent and thus it just
@@ -359,13 +359,13 @@ chainSyncClient _plugin metricsSetters trce env queryVar latestPoints currentTip
     policy :: MkPipelineDecision
     policy = pipelineDecisionLowHighMark 1 50
 
-    goTip :: MkPipelineDecision -> Nat n -> WithOrigin BlockNo -> Tip GodxBlock -> Maybe [GodxPoint]
-          -> ClientPipelinedStIdle n GodxBlock (Point GodxBlock) (Tip GodxBlock) IO ()
+    goTip :: MkPipelineDecision -> Nat n -> WithOrigin BlockNo -> Tip BccBlock -> Maybe [BccPoint]
+          -> ClientPipelinedStIdle n BccBlock (Point BccBlock) (Tip BccBlock) IO ()
     goTip mkPipelineDecision n clientTip serverTip mPoint =
       go mkPipelineDecision n clientTip (getTipBlockNo serverTip) mPoint
 
-    go :: MkPipelineDecision -> Nat n -> WithOrigin BlockNo -> WithOrigin BlockNo -> Maybe [GodxPoint]
-        -> ClientPipelinedStIdle n GodxBlock (Point GodxBlock) (Tip GodxBlock) IO ()
+    go :: MkPipelineDecision -> Nat n -> WithOrigin BlockNo -> WithOrigin BlockNo -> Maybe [BccPoint]
+        -> ClientPipelinedStIdle n BccBlock (Point BccBlock) (Tip BccBlock) IO ()
     go mkPipelineDecision n clientTip serverTip mPoint =
       case (mPoint, n, runPipelineDecision mkPipelineDecision n clientTip serverTip) of
         (Just points, _, _) -> drainThePipe n $ clientPipelinedStIdle clientTip points
@@ -386,9 +386,9 @@ chainSyncClient _plugin metricsSetters trce env queryVar latestPoints currentTip
             (mkClientStNext $ goTip mkPipelineDecision' n')
 
     mkClientStNext
-        :: (WithOrigin BlockNo -> Tip GodxBlock -> Maybe [GodxPoint]
-        -> ClientPipelinedStIdle n GodxBlock (Point GodxBlock) (Tip GodxBlock) IO ())
-        -> ClientStNext n GodxBlock (Point GodxBlock) (Tip GodxBlock) IO ()
+        :: (WithOrigin BlockNo -> Tip BccBlock -> Maybe [BccPoint]
+        -> ClientPipelinedStIdle n BccBlock (Point BccBlock) (Tip BccBlock) IO ())
+        -> ClientStNext n BccBlock (Point BccBlock) (Tip BccBlock) IO ()
     mkClientStNext finish =
       ClientStNext
         { recvMsgRollForward = \blk tip ->
@@ -420,12 +420,12 @@ logProtocolMagicId tracer pm =
     ]
 
 drainThePipe
-    :: Nat n -> ClientPipelinedStIdle 'Z GodxBlock (Point GodxBlock) (Tip GodxBlock) IO ()
-    -> ClientPipelinedStIdle  n GodxBlock (Point GodxBlock) (Tip GodxBlock) IO ()
+    :: Nat n -> ClientPipelinedStIdle 'Z BccBlock (Point BccBlock) (Tip BccBlock) IO ()
+    -> ClientPipelinedStIdle  n BccBlock (Point BccBlock) (Tip BccBlock) IO ()
 drainThePipe n0 client = go n0
   where
     go :: forall n'. Nat n'
-       -> ClientPipelinedStIdle n' GodxBlock (Point GodxBlock) (Tip GodxBlock) IO ()
+       -> ClientPipelinedStIdle n' BccBlock (Point BccBlock) (Tip BccBlock) IO ()
     go n =
       case n of
         Zero -> client

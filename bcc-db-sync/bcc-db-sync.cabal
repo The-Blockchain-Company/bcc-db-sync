@@ -4,8 +4,8 @@ cabal-version:          2.4
 
 name:                   bcc-db-sync
 version:                10.0.1
-synopsis:               The Godx DB Sync node
-description:            A Godx node that follows the Godx chain and inserts data from the
+synopsis:               The Bcc DB Sync node
+description:            A Bcc node that follows the Bcc chain and inserts data from the
                         chain into a PostgresQL database.
 homepage:               https://github.com/The-Blockchain-Company/bcc-db-sync
 bug-reports:            https://github.com/The-Blockchain-Company/bcc-db-sync/issues
@@ -42,44 +42,44 @@ library
                         -Wunused-imports
                         -Wunused-packages
 
-  exposed-modules:      Godx.DbSync
+  exposed-modules:      Bcc.DbSync
 
-                        Godx.DbSync.Era
+                        Bcc.DbSync.Era
 
-                        Godx.DbSync.Era.Cole.Genesis
-                        Godx.DbSync.Era.Cole.Insert
-                        Godx.DbSync.Era.Cole.Util
+                        Bcc.DbSync.Era.Cole.Genesis
+                        Bcc.DbSync.Era.Cole.Insert
+                        Bcc.DbSync.Era.Cole.Util
 
-                        Godx.DbSync.Era.Godx.Insert
-                        Godx.DbSync.Era.Godx.Util
+                        Bcc.DbSync.Era.Bcc.Insert
+                        Bcc.DbSync.Era.Bcc.Util
 
-                        Godx.DbSync.Era.Sophie.Adjust
-                        Godx.DbSync.Era.Sophie.Genesis
-                        Godx.DbSync.Era.Sophie.Generic
-                        Godx.DbSync.Era.Sophie.Generic.Block
-                        Godx.DbSync.Era.Sophie.Generic.Metadata
-                        Godx.DbSync.Era.Sophie.Generic.ParamProposal
-                        Godx.DbSync.Era.Sophie.Generic.Tx
-                        Godx.DbSync.Era.Sophie.Generic.Util
-                        Godx.DbSync.Era.Sophie.Generic.Witness
-                        Godx.DbSync.Era.Sophie.Insert
-                        Godx.DbSync.Era.Sophie.Insert.Epoch
-                        Godx.DbSync.Era.Sophie.Offline
-                        Godx.DbSync.Era.Sophie.Offline.FetchQueue
-                        Godx.DbSync.Era.Sophie.Offline.Http
-                        Godx.DbSync.Era.Sophie.Offline.Query
-                        Godx.DbSync.Era.Sophie.Offline.Types
-                        Godx.DbSync.Era.Sophie.Query
-                        Godx.DbSync.Era.Sophie.Validate
+                        Bcc.DbSync.Era.Sophie.Adjust
+                        Bcc.DbSync.Era.Sophie.Genesis
+                        Bcc.DbSync.Era.Sophie.Generic
+                        Bcc.DbSync.Era.Sophie.Generic.Block
+                        Bcc.DbSync.Era.Sophie.Generic.Metadata
+                        Bcc.DbSync.Era.Sophie.Generic.ParamProposal
+                        Bcc.DbSync.Era.Sophie.Generic.Tx
+                        Bcc.DbSync.Era.Sophie.Generic.Util
+                        Bcc.DbSync.Era.Sophie.Generic.Witness
+                        Bcc.DbSync.Era.Sophie.Insert
+                        Bcc.DbSync.Era.Sophie.Insert.Epoch
+                        Bcc.DbSync.Era.Sophie.Offline
+                        Bcc.DbSync.Era.Sophie.Offline.FetchQueue
+                        Bcc.DbSync.Era.Sophie.Offline.Http
+                        Bcc.DbSync.Era.Sophie.Offline.Query
+                        Bcc.DbSync.Era.Sophie.Offline.Types
+                        Bcc.DbSync.Era.Sophie.Query
+                        Bcc.DbSync.Era.Sophie.Validate
 
-                        Godx.DbSync.Era.Util
+                        Bcc.DbSync.Era.Util
 
-                        Godx.DbSync.Metrics
+                        Bcc.DbSync.Metrics
 
-                        Godx.DbSync.Plugin.Default
-                        Godx.DbSync.Plugin.Epoch
+                        Bcc.DbSync.Plugin.Default
+                        Bcc.DbSync.Plugin.Epoch
 
-                        Godx.DbSync.Rollback
+                        Bcc.DbSync.Rollback
 
   build-depends:        base                            >= 4.14         && < 4.16
                       , aeson

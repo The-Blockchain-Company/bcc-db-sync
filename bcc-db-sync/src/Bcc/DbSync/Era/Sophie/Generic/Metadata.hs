@@ -7,7 +7,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.DbSync.Era.Sophie.Generic.Metadata
+module Bcc.DbSync.Era.Sophie.Generic.Metadata
   ( fromAllegraMetadata
   , fromAurumMetadata
   , fromSophieMetadata
@@ -15,12 +15,12 @@ module Godx.DbSync.Era.Sophie.Generic.Metadata
   , metadataValueToJsonNoSchema
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.Api.Sophie (TxMetadataValue (..))
+import           Bcc.Api.Sophie (TxMetadataValue (..))
 
-import qualified Godx.Ledger.Aurum.Data as Aurum
-import qualified Godx.Ledger.SophieMA.AuxiliaryData as SophieMa
+import qualified Bcc.Ledger.Aurum.Data as Aurum
+import qualified Bcc.Ledger.SophieMA.AuxiliaryData as SophieMa
 
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Text as Aeson.Text
@@ -32,7 +32,7 @@ import qualified Data.Text.Lazy as Text.Lazy
 import           Data.Tuple.Extra (both)
 import qualified Data.Vector as Vector
 
-import           Shardagnostic.Consensus.Godx.Block (StandardAllegra, StandardAurum, StandardJen)
+import           Shardagnostic.Consensus.Bcc.Block (StandardAllegra, StandardAurum, StandardJen)
 
 import qualified Sophie.Spec.Ledger.Metadata as Sophie
 

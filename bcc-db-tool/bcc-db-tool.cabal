@@ -30,29 +30,29 @@ library
                         -Wunused-imports
                         -Wunused-packages
 
-  exposed-modules:      Godx.Db.Tool
+  exposed-modules:      Bcc.Db.Tool
 
-  other-modules:        Godx.Db.Tool.PrepareSnapshot
-                        Godx.Db.Tool.Report
-                        Godx.Db.Tool.Report.Balance
-                        Godx.Db.Tool.Report.Display
-                        Godx.Db.Tool.Report.StakeReward
-                        Godx.Db.Tool.Report.StakeReward.History
-                        Godx.Db.Tool.Report.StakeReward.Latest
-                        Godx.Db.Tool.Report.Synced
-                        Godx.Db.Tool.Report.Transactions
-                        Godx.Db.Tool.UtxoSet
-                        Godx.Db.Tool.Validation
-                        Godx.Db.Tool.Validate.GodxPots
-                        Godx.Db.Tool.Validate.Balance
-                        Godx.Db.Tool.Validate.BlockProperties
-                        Godx.Db.Tool.Validate.BlockTxs
-                        Godx.Db.Tool.Validate.EpochTable
-                        Godx.Db.Tool.Validate.Ledger
-                        Godx.Db.Tool.Validate.PoolOwner
-                        Godx.Db.Tool.Validate.TotalSupply
-                        Godx.Db.Tool.Validate.TxAccounting
-                        Godx.Db.Tool.Validate.Util
+  other-modules:        Bcc.Db.Tool.PrepareSnapshot
+                        Bcc.Db.Tool.Report
+                        Bcc.Db.Tool.Report.Balance
+                        Bcc.Db.Tool.Report.Display
+                        Bcc.Db.Tool.Report.StakeReward
+                        Bcc.Db.Tool.Report.StakeReward.History
+                        Bcc.Db.Tool.Report.StakeReward.Latest
+                        Bcc.Db.Tool.Report.Synced
+                        Bcc.Db.Tool.Report.Transactions
+                        Bcc.Db.Tool.UtxoSet
+                        Bcc.Db.Tool.Validation
+                        Bcc.Db.Tool.Validate.BccPots
+                        Bcc.Db.Tool.Validate.Balance
+                        Bcc.Db.Tool.Validate.BlockProperties
+                        Bcc.Db.Tool.Validate.BlockTxs
+                        Bcc.Db.Tool.Validate.EpochTable
+                        Bcc.Db.Tool.Validate.Ledger
+                        Bcc.Db.Tool.Validate.PoolOwner
+                        Bcc.Db.Tool.Validate.TotalSupply
+                        Bcc.Db.Tool.Validate.TxAccounting
+                        Bcc.Db.Tool.Validate.Util
                         Paths_bcc_db_tool
 
   build-depends:        base                            >= 4.14         && < 4.16

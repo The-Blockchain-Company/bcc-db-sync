@@ -2,7 +2,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.DbSync.Era.Sophie.Offline.Types
+module Bcc.DbSync.Era.Sophie.Offline.Types
   ( PoolDescription (..)
   , PoolHomepage (..)
   , PoolOfflineMetadata (..)
@@ -10,7 +10,7 @@ module Godx.DbSync.Era.Sophie.Offline.Types
   , PoolTicker (..)
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
 import           Control.Monad.Fail (fail)
 

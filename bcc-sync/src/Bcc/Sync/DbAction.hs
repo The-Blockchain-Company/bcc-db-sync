@@ -2,7 +2,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.Sync.DbAction
+module Bcc.Sync.DbAction
   ( DbAction (..)
   , DbActionQueue (..)
   , blockingFlushDbActionQueue
@@ -13,9 +13,9 @@ module Godx.Sync.DbAction
   , waitRollback
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.Sync.Types
+import           Bcc.Sync.Types
 
 import qualified Control.Concurrent.STM as STM
 import           Control.Concurrent.STM.TBQueue (TBQueue)
@@ -25,20 +25,20 @@ import           Control.Monad.Class.MonadSTM.Strict (StrictTMVar, newEmptyTMVar
 
 data DbAction
   = DbApplyBlock !BlockDetails
-  | DbRollBackToPoint !GodxPoint (StrictTMVar IO (Maybe [GodxPoint]))
+  | DbRollBackToPoint !BccPoint (StrictTMVar IO (Maybe [BccPoint]))
   | DbFinish
 
 newtype DbActionQueue = DbActionQueue
   { dbActQueue :: TBQueue DbAction
   }
 
-mkDbApply :: GodxBlock -> SlotDetails -> DbAction
+mkDbApply :: BccBlock -> SlotDetails -> DbAction
 mkDbApply cblk details =
   DbApplyBlock (BlockDetails cblk details)
 
 -- | This simulates a synhronous operations, since the thread waits for the db
 -- worker thread to finish the rollback.
-waitRollback :: DbActionQueue -> GodxPoint -> IO (Maybe [GodxPoint])
+waitRollback :: DbActionQueue -> BccPoint -> IO (Maybe [BccPoint])
 waitRollback queue point = do
     resultVar <- newEmptyTMVarIO
     atomically $ writeDbActionQueue queue $ DbRollBackToPoint point resultVar

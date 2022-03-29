@@ -3,28 +3,28 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.DbSync.Era.Sophie.Generic.ParamProposal
+module Bcc.DbSync.Era.Sophie.Generic.ParamProposal
   ( ParamProposal (..)
   , convertParamProposal
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.DbSync.Era.Sophie.Generic.Util (unKeyHashRaw)
-import           Godx.DbSync.Era.Sophie.Generic.Witness (Witness (..))
+import           Bcc.DbSync.Era.Sophie.Generic.Util (unKeyHashRaw)
+import           Bcc.DbSync.Era.Sophie.Generic.Witness (Witness (..))
 
-import qualified Godx.Ledger.Aurum as Aurum
-import           Godx.Ledger.Aurum.Language (Language)
-import qualified Godx.Ledger.Aurum.PParams as Aurum
-import qualified Godx.Ledger.Aurum.Scripts as Aurum
-import           Godx.Ledger.BaseTypes (UnitInterval, strictMaybeToMaybe)
-import qualified Godx.Ledger.BaseTypes as Ledger
-import           Godx.Ledger.Coin (Coin)
-import qualified Godx.Ledger.Keys as Ledger
-import           Godx.Ledger.Sophie (SophieEra)
-import qualified Godx.Ledger.SophieMA as SophieMA
+import qualified Bcc.Ledger.Aurum as Aurum
+import           Bcc.Ledger.Aurum.Language (Language)
+import qualified Bcc.Ledger.Aurum.PParams as Aurum
+import qualified Bcc.Ledger.Aurum.Scripts as Aurum
+import           Bcc.Ledger.BaseTypes (UnitInterval, strictMaybeToMaybe)
+import qualified Bcc.Ledger.BaseTypes as Ledger
+import           Bcc.Ledger.Coin (Coin)
+import qualified Bcc.Ledger.Keys as Ledger
+import           Bcc.Ledger.Sophie (SophieEra)
+import qualified Bcc.Ledger.SophieMA as SophieMA
 
-import           Godx.Slotting.Slot (EpochNo (..))
+import           Bcc.Slotting.Slot (EpochNo (..))
 
 import qualified Data.Map.Strict as Map
 

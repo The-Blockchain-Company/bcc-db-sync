@@ -7,36 +7,36 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.DbSync.Era.Cole.Insert
+module Bcc.DbSync.Era.Cole.Insert
   ( insertColeBlock
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.BM.Trace (Trace, logDebug, logInfo)
-import           Godx.Binary (serialize')
+import           Bcc.BM.Trace (Trace, logDebug, logInfo)
+import           Bcc.Binary (serialize')
 
 import           Control.Monad.Trans.Control (MonadBaseControl)
 import           Control.Monad.Trans.Except.Extra (firstExceptT)
 
-import qualified Godx.Binary as Binary
+import qualified Bcc.Binary as Binary
 
 -- Import all 'bcc-ledger' functions and data types qualified so they do not
--- clash with the Godx.Db functions and data types which are also imported
+-- clash with the Bcc.Db functions and data types which are also imported
 -- qualified.
-import qualified Godx.Chain.Block as Cole hiding (blockHash)
-import qualified Godx.Chain.Common as Cole
-import qualified Godx.Chain.UTxO as Cole
-import qualified Godx.Chain.Update as Cole hiding (protocolVersion)
+import qualified Bcc.Chain.Block as Cole hiding (blockHash)
+import qualified Bcc.Chain.Common as Cole
+import qualified Bcc.Chain.UTxO as Cole
+import qualified Bcc.Chain.Update as Cole hiding (protocolVersion)
 
-import qualified Godx.Crypto as Crypto (serializeCborHash)
+import qualified Bcc.Crypto as Crypto (serializeCborHash)
 
-import           Godx.Db (DbIsaac (..), SyncState (..))
-import           Godx.DbSync.Era.Util (liftLookupFail)
+import           Bcc.Db (DbEntropic (..), SyncState (..))
+import           Bcc.DbSync.Era.Util (liftLookupFail)
 
-import           Godx.Sync.Types
+import           Bcc.Sync.Types
 
-import           Godx.Slotting.Slot (EpochNo (..), EpochSize (..))
+import           Bcc.Slotting.Slot (EpochNo (..), EpochSize (..))
 
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Text as Text
@@ -44,17 +44,17 @@ import qualified Data.Text.Encoding as Text
 
 import           Database.Persist.Sql (SqlBackend)
 
-import qualified Godx.Db as DB
-import qualified Godx.DbSync.Era.Cole.Util as Cole
-import           Godx.Sync.Error
-import           Godx.Sync.Util
+import qualified Bcc.Db as DB
+import qualified Bcc.DbSync.Era.Cole.Util as Cole
+import           Bcc.Sync.Error
+import           Bcc.Sync.Util
 
 import           Shardagnostic.Consensus.Cole.Ledger (ColeBlock (..))
 
 -- Trivial local data type for use in place of a tuple.
 data ValueFee = ValueFee
-  { vfValue :: !DbIsaac
-  , vfFee :: !DbIsaac
+  { vfValue :: !DbEntropic
+  , vfFee :: !DbEntropic
   }
 
 insertColeBlock
@@ -223,16 +223,16 @@ insertTxOut _tracer txId index txout =
               , DB.txOutAddressHasScript = False
               , DB.txOutPaymentCred = Nothing -- Cole does not have a payment credential.
               , DB.txOutStakeAddressId = Nothing -- Cole does not have a stake address.
-              , DB.txOutValue = DbIsaac (Cole.unsafeGetIsaac $ Cole.txOutValue txout)
+              , DB.txOutValue = DbEntropic (Cole.unsafeGetEntropic $ Cole.txOutValue txout)
               , DB.txOutDataHash = Nothing
               }
 
 
 insertTxIn
     :: (MonadBaseControl IO m, MonadIO m)
-    => Trace IO Text -> DB.TxId -> (Cole.TxIn, DB.TxId, DbIsaac)
+    => Trace IO Text -> DB.TxId -> (Cole.TxIn, DB.TxId, DbEntropic)
     -> ExceptT SyncNodeError (ReaderT SqlBackend m) ()
-insertTxIn _tracer txInId (Cole.TxInUtxo _txHash inIndex, txOutId, _isaac) = do
+insertTxIn _tracer txInId (Cole.TxInUtxo _txHash inIndex, txOutId, _entropic) = do
   void . lift . DB.insertTxIn $
             DB.TxIn
               { DB.txInTxInId = txInId
@@ -243,28 +243,28 @@ insertTxIn _tracer txInId (Cole.TxInUtxo _txHash inIndex, txOutId, _isaac) = do
 
 -- -----------------------------------------------------------------------------
 
-resolveTxInputs :: MonadIO m => Cole.TxIn -> ExceptT SyncNodeError (ReaderT SqlBackend m) (Cole.TxIn, DB.TxId, DbIsaac)
+resolveTxInputs :: MonadIO m => Cole.TxIn -> ExceptT SyncNodeError (ReaderT SqlBackend m) (Cole.TxIn, DB.TxId, DbEntropic)
 resolveTxInputs txIn@(Cole.TxInUtxo txHash index) = do
     res <- liftLookupFail "resolveInput" $ DB.queryTxOutValue (Cole.unTxHash txHash, fromIntegral index)
     pure $ convert res
   where
-    convert :: (DB.TxId, DbIsaac) -> (Cole.TxIn, DB.TxId, DbIsaac)
-    convert (txId, isaac) = (txIn, txId, isaac)
+    convert :: (DB.TxId, DbEntropic) -> (Cole.TxIn, DB.TxId, DbEntropic)
+    convert (txId, entropic) = (txIn, txId, entropic)
 
-calculateTxFee :: Cole.Tx -> [(Cole.TxIn, DB.TxId, DbIsaac)] -> Either SyncNodeError ValueFee
+calculateTxFee :: Cole.Tx -> [(Cole.TxIn, DB.TxId, DbEntropic)] -> Either SyncNodeError ValueFee
 calculateTxFee tx resolvedInputs = do
       outval <- first (\e -> NEError $ "calculateTxFee: " <> textShow e) output
       when (null resolvedInputs) $
         Left $ NEError "calculateTxFee: List of transaction inputs is zero."
-      let inval = sum $ map (unDbIsaac . thrd3) resolvedInputs
+      let inval = sum $ map (unDbEntropic . thrd3) resolvedInputs
       if inval < outval
         then Left $ NEInvariant "calculateTxFee" $ EInvInOut inval outval
-        else Right $ ValueFee (DbIsaac outval) (DbIsaac $ inval - outval)
+        else Right $ ValueFee (DbEntropic outval) (DbEntropic $ inval - outval)
   where
-    output :: Either Cole.IsaacError Word64
+    output :: Either Cole.EntropicError Word64
     output =
-      Cole.unsafeGetIsaac
-        <$> Cole.sumIsaac (map Cole.txOutValue $ Cole.txOutputs tx)
+      Cole.unsafeGetEntropic
+        <$> Cole.sumEntropic (map Cole.txOutValue $ Cole.txOutputs tx)
 
 -- | An 'ExceptT' version of 'mapM_' which will 'left' the first 'Left' it finds.
 mapMVExceptT :: Monad m => (a -> ExceptT e m ()) -> [a] -> ExceptT e m ()

@@ -9,7 +9,7 @@
   "LastKnownBlockVersion-Major": 3,
   "LastKnownBlockVersion-Minor": 0,
   "MaxKnownMajorProtocolVersion": 2,
-  "Protocol": "Godx",
+  "Protocol": "Bcc",
   "RequiresNetworkMagic": "RequiresMagic",
   "SophieGenesisFile": "testnet-sophie-genesis.json",
   "SophieGenesisHash": "849a1764f152e1b09c89c0dfdbcbdd38d711d1fec2db5dfa0f87cf2737a0eaf4",

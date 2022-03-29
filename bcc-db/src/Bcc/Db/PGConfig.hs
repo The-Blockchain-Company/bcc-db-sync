@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Godx.Db.PGConfig
+module Bcc.Db.PGConfig
   ( PGConfig (..)
   , PGPassFile (..)
   , readPGPassFileEnv

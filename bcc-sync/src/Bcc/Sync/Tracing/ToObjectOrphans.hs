@@ -4,14 +4,14 @@
 
 {-# OPTIONS_GHC -fno-warn-orphans  #-}
 
-module Godx.Sync.Tracing.ToObjectOrphans () where
+module Bcc.Sync.Tracing.ToObjectOrphans () where
 
 import           Data.Aeson ((.=))
 import           Data.Text (Text)
 import qualified Data.Text as Text
 
-import           Godx.BM.Data.Tracer
-import           Godx.Tracing.OrphanInstances.Network ()
+import           Bcc.BM.Data.Tracer
+import           Bcc.Tracing.OrphanInstances.Network ()
 
 import           Shardagnostic.Consensus.Cole.Ledger.Block (ColeBlock)
 import           Shardagnostic.Network.Block (Point (..), Tip (..))

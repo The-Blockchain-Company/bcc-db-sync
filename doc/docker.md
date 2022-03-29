@@ -35,7 +35,7 @@ docker run \
   -v $PWD/config/network/mainnet/bcc-db-sync:/config
   -v $PWD/config/network/mainnet/genesis:/genesis
   -v $PWD/node-ipc:/node-ipc \
-  godXcoin/bcc-db-sync \
+  tbco/bcc-db-sync \
     run --config /config/config.yaml --socket-path /node-ipc/node.socket # command
 ```
 

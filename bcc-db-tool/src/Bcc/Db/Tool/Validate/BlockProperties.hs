@@ -1,10 +1,10 @@
-module Godx.Db.Tool.Validate.BlockProperties
+module Bcc.Db.Tool.Validate.BlockProperties
   ( validateBlockProperties
   ) where
 
-import           Godx.Db.Tool.Validate.Util
+import           Bcc.Db.Tool.Validate.Util
 
-import           Godx.Db hiding (queryBlockTxCount)
+import           Bcc.Db hiding (queryBlockTxCount)
 
 import           Control.Monad.IO.Class (MonadIO)
 import           Control.Monad.Trans.Reader (ReaderT)

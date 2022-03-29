@@ -1,6 +1,6 @@
 **Validated: 2020/02/19**
 
-# Building and Running the Godx DB Sync Node
+# Building and Running the Bcc DB Sync Node
 
 The bcc-db-sync node is built and tested to run on Linux. It may run on Mac OS X or Windows but
 that is unsupported.
@@ -10,7 +10,7 @@ emulator like GNU Screen or TMux.
 Setup [tbco binary cache](https://github.com/The-Blockchain-Company/bcc-node/blob/master/doc/getting-started/building-the-node-using-nix.md#tbco-binary-cache)
 to avoid several hours of build time.
 
-The db sync node is designed to work with a locally running Godx Node. The two git repositories need to be checked out so that
+The db sync node is designed to work with a locally running Bcc Node. The two git repositories need to be checked out so that
 they are both at the same level. eg:
 
 ```

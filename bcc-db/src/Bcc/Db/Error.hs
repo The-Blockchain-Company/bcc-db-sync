@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.Db.Error
+module Bcc.Db.Error
   ( LookupFail (..)
   , renderLookupFail
   ) where

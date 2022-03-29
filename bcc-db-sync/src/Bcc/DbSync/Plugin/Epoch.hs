@@ -3,18 +3,18 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.DbSync.Plugin.Epoch
+module Bcc.DbSync.Plugin.Epoch
   ( epochPluginOnStartup
   , epochPluginInsertBlock
   , epochPluginRollbackBlock
   ) where
 
-import           Godx.Prelude hiding (from, on, replace)
+import           Bcc.Prelude hiding (from, on, replace)
 
-import           Godx.BM.Trace (Trace, logError, logInfo)
+import           Bcc.BM.Trace (Trace, logError, logInfo)
 
-import qualified Godx.Chain.Block as Cole
-import           Godx.Slotting.Slot (EpochNo (..))
+import qualified Bcc.Chain.Block as Cole
+import           Bcc.Slotting.Slot (EpochNo (..))
 
 import           Control.Monad.Logger (LoggingT)
 import           Control.Monad.Trans.Control (MonadBaseControl)
@@ -27,16 +27,16 @@ import           Database.Esqueleto.Legacy (Value (..), desc, from, limit, order
 import           Database.Persist.Class (replace)
 import           Database.Persist.Sql (SqlBackend)
 
-import           Godx.Db (EntityField (..), EpochId, SyncState (..))
-import qualified Godx.Db as DB
+import           Bcc.Db (EntityField (..), EpochId, SyncState (..))
+import qualified Bcc.Db as DB
 
-import           Godx.Sync.Api
-import           Godx.Sync.Error
-import           Godx.Sync.Types
-import           Godx.Sync.Util
+import           Bcc.Sync.Api
+import           Bcc.Sync.Error
+import           Bcc.Sync.Types
+import           Bcc.Sync.Util
 
 import           Shardagnostic.Consensus.Cole.Ledger (ColeBlock (..))
-import           Shardagnostic.Consensus.Godx.Block (HardForkBlock (..))
+import           Shardagnostic.Consensus.Bcc.Block (HardForkBlock (..))
 
 import           System.IO.Unsafe (unsafePerformIO)
 
@@ -94,7 +94,7 @@ epochPluginInsertBlock backend trce _dbSyncEnv blockDetails =
 
 -- Nothing to be done here.
 -- Rollback will take place in the Default plugin and the epoch table will just be recalculated.
-epochPluginRollbackBlock :: Trace IO Text -> GodxPoint -> IO (Either SyncNodeError ())
+epochPluginRollbackBlock :: Trace IO Text -> BccPoint -> IO (Either SyncNodeError ())
 epochPluginRollbackBlock _ _ = pure $ Right ()
 
 -- -------------------------------------------------------------------------------------------------

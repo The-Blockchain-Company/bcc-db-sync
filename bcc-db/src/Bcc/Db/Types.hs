@@ -5,9 +5,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Godx.Db.Types
-  ( Godx (..)
-  , DbIsaac (..)
+module Bcc.Db.Types
+  ( Bcc (..)
+  , DbEntropic (..)
   , DbInt65 (..)
   , DbWord64 (..)
   , RewardSource (..)
@@ -16,9 +16,9 @@ module Godx.Db.Types
   , ScriptType (..)
   , deltaCoinToDbInt65
   , integerToDbInt65
-  , isaacToGodx
-  , renderGodx
-  , scientificToGodx
+  , entropicToBcc
+  , renderBcc
+  , scientificToBcc
   , readDbInt65
   , showDbInt65
   , readRewardSource
@@ -30,10 +30,10 @@ module Godx.Db.Types
   , renderSyncState
   , rewardTypeToSource
   , showRewardSource
-  , word64ToGodx
+  , word64ToBcc
   ) where
 
-import           Godx.Ledger.Coin (DeltaCoin (..))
+import           Bcc.Ledger.Coin (DeltaCoin (..))
 
 import           Data.Aeson.Encoding (unsafeToEncoding)
 import           Data.Aeson.Types (FromJSON (..), ToJSON (..))
@@ -52,26 +52,26 @@ import           Quiet (Quiet (..))
 import qualified Sophie.Spec.Ledger.Rewards as Sophie
 
 
-newtype Godx = Godx
-  { unGodx :: Micro
+newtype Bcc = Bcc
+  { unBcc :: Micro
   } deriving (Eq, Num, Ord, Generic)
 
-instance FromJSON Godx where
+instance FromJSON Bcc where
   parseJSON =
-    Aeson.withScientific "Godx" (pure . scientificToGodx)
+    Aeson.withScientific "Bcc" (pure . scientificToBcc)
 
-instance ToJSON Godx where
-    --toJSON (Godx bcc) = Data.Aeson.Types.Number $ fromRational $ toRational bcc
+instance ToJSON Bcc where
+    --toJSON (Bcc bcc) = Data.Aeson.Types.Number $ fromRational $ toRational bcc
     -- `Number` results in it becoming `7.3112484749601107e10` while the old explorer is returning `73112484749.601107`
-    toEncoding (Godx bcc) =
+    toEncoding (Bcc bcc) =
         unsafeToEncoding $   -- convert ByteString to Aeson's Encoding
         BS.string8 $         -- convert String to ByteString using Latin1 encoding
         showFixed True bcc   -- convert Micro to String chopping off trailing zeros
 
-    toJSON = error "Godx.toJSON not supported due to numeric issues. Use toEncoding instead."
+    toJSON = error "Bcc.toJSON not supported due to numeric issues. Use toEncoding instead."
 
-instance Show Godx where
-    show (Godx bcc) = showFixed True bcc
+instance Show Bcc where
+    show (Bcc bcc) = showFixed True bcc
 
 -- This is horrible. Need a 'Word64' with an extra sign bit.
 data DbInt65
@@ -80,10 +80,10 @@ data DbInt65
   deriving (Eq, Generic, Show)
 
 -- Newtype wrapper around Word64 so we can hand define a PersistentField instance.
-newtype DbIsaac
-  = DbIsaac { unDbIsaac :: Word64 }
+newtype DbEntropic
+  = DbEntropic { unDbEntropic :: Word64 }
   deriving (Eq, Generic)
-  deriving (Read, Show) via (Quiet DbIsaac)
+  deriving (Read, Show) via (Quiet DbEntropic)
 
 -- Newtype wrapper around Word64 so we can hand define a PersistentField instance.
 newtype DbWord64
@@ -127,16 +127,16 @@ integerToDbInt65 i =
     then PosInt65 (fromIntegral i)
     else NegInt65 (fromIntegral $ negate i)
 
-isaacToGodx :: Micro -> Godx
-isaacToGodx ll =
-  Godx (ll / 1000000)
+entropicToBcc :: Micro -> Bcc
+entropicToBcc ll =
+  Bcc (ll / 1000000)
 
-renderGodx :: Godx -> Text
-renderGodx (Godx a) = Text.pack (show a)
+renderBcc :: Bcc -> Text
+renderBcc (Bcc a) = Text.pack (show a)
 
-scientificToGodx :: Scientific -> Godx
-scientificToGodx s =
-  word64ToGodx $ floor (s * 1000000)
+scientificToBcc :: Scientific -> Bcc
+scientificToBcc s =
+  word64ToBcc $ floor (s * 1000000)
 
 readDbInt65 :: String -> DbInt65
 readDbInt65 str =
@@ -221,6 +221,6 @@ readScriptType str =
     "zerepoch" -> Zerepoch
     _other -> error $ "readScriptType: Unknown ScriptType " ++ str
 
-word64ToGodx :: Word64 -> Godx
-word64ToGodx w =
-  Godx (fromIntegral w / 1000000)
+word64ToBcc :: Word64 -> Bcc
+word64ToBcc w =
+  Bcc (fromIntegral w / 1000000)

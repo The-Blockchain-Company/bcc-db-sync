@@ -9,27 +9,27 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.DbSync.Era.Sophie.Genesis
+module Bcc.DbSync.Era.Sophie.Genesis
   ( insertValidateGenesisDist
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.BM.Trace (Trace, logInfo)
+import           Bcc.BM.Trace (Trace, logInfo)
 
 import           Control.Monad.Trans.Control (MonadBaseControl)
 import           Control.Monad.Trans.Except.Extra (newExceptT)
 
-import qualified Godx.Db as DB
+import qualified Bcc.Db as DB
 
-import qualified Godx.DbSync.Era.Sophie.Generic.Util as Generic
-import           Godx.DbSync.Era.Util (liftLookupFail)
-import           Godx.Sync.Error
-import           Godx.Sync.Util
+import qualified Bcc.DbSync.Era.Sophie.Generic.Util as Generic
+import           Bcc.DbSync.Era.Util (liftLookupFail)
+import           Bcc.Sync.Error
+import           Bcc.Sync.Util
 
-import qualified Godx.Ledger.Address as Ledger
-import qualified Godx.Ledger.Coin as Ledger
-import           Godx.Ledger.Era (Crypto)
+import qualified Bcc.Ledger.Address as Ledger
+import qualified Bcc.Ledger.Coin as Ledger
+import           Bcc.Ledger.Era (Crypto)
 
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Map.Strict as Map
@@ -39,7 +39,7 @@ import qualified Data.Time.Clock as Time
 
 import           Database.Persist.Sql (SqlBackend)
 
-import           Shardagnostic.Consensus.Godx.Block (StandardCrypto, StandardSophie)
+import           Shardagnostic.Consensus.Bcc.Block (StandardCrypto, StandardSophie)
 import           Shardagnostic.Consensus.Sophie.Node (SophieGenesis (..))
 
 import qualified Sophie.Spec.Ledger.Genesis as Sophie
@@ -115,7 +115,7 @@ insertValidateGenesisDist backend tracer networkName cfg = do
                                 <> renderByteArray (configGenesisHash cfg)
 
                 supply <- lift DB.queryTotalSupply
-                liftIO $ logInfo tracer ("Total genesis supply of Godx: " <> DB.renderGodx supply)
+                liftIO $ logInfo tracer ("Total genesis supply of Bcc: " <> DB.renderBcc supply)
 
 -- | Validate that the initial Genesis distribution in the DB matches the Genesis data.
 validateGenesisDistribution
@@ -163,7 +163,7 @@ validateGenesisDistribution tracer networkName cfg bid =
     supply <- lift DB.queryGenesisSupply
     liftIO $ do
       logInfo tracer "Initial genesis distribution present and correct"
-      logInfo tracer ("Total genesis supply of Godx: " <> DB.renderGodx supply)
+      logInfo tracer ("Total genesis supply of Bcc: " <> DB.renderBcc supply)
 
 -- -----------------------------------------------------------------------------
 
@@ -179,8 +179,8 @@ insertTxOuts blkId (Sophie.TxIn txInId _, txOut) = do
               { DB.txHash = Generic.unTxHash txInId
               , DB.txBlockId = blkId
               , DB.txBlockIndex = 0
-              , DB.txOutSum = Generic.coinToDbIsaac (txOutCoin txOut)
-              , DB.txFee = DB.DbIsaac 0
+              , DB.txOutSum = Generic.coinToDbEntropic (txOutCoin txOut)
+              , DB.txFee = DB.DbEntropic 0
               , DB.txDeposit = 0
               , DB.txSize = 0 -- Genesis distribution address to not have a size.
               , DB.txInvalidHereafter = Nothing
@@ -197,7 +197,7 @@ insertTxOuts blkId (Sophie.TxIn txInId _, txOut) = do
               , DB.txOutAddressHasScript = hasScript (txOutAddress txOut)
               , DB.txOutPaymentCred = Generic.maybePaymentCred (txOutAddress txOut)
               , DB.txOutStakeAddressId = Nothing -- No stake addresses in Sophie Genesis
-              , DB.txOutValue = Generic.coinToDbIsaac (txOutCoin txOut)
+              , DB.txOutValue = Generic.coinToDbEntropic (txOutCoin txOut)
               , DB.txOutDataHash = Nothing -- No data hash in Sophie Genesis
               }
   where
@@ -217,9 +217,9 @@ configGenesisHash _ =  BS.take 28 ("GenesisHash " <> BS.replicate 28 '\0')
 genesisHashSlotLeader :: SophieGenesis StandardSophie -> ByteString
 genesisHashSlotLeader = configGenesisHash
 
-configGenesisSupply :: SophieGenesis StandardSophie -> DB.Godx
+configGenesisSupply :: SophieGenesis StandardSophie -> DB.Bcc
 configGenesisSupply =
-  DB.word64ToGodx . fromIntegral . sum . map (Ledger.unCoin . snd) . genesisTxoAssocList
+  DB.word64ToBcc . fromIntegral . sum . map (Ledger.unCoin . snd) . genesisTxoAssocList
 
 genesisTxos :: SophieGenesis StandardSophie -> [Sophie.TxOut StandardSophie]
 genesisTxos = map (uncurry Sophie.TxOut) . genesisTxoAssocList

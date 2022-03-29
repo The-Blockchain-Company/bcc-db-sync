@@ -1,15 +1,15 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-module Godx.DbSync.Era.Util
+module Bcc.DbSync.Era.Util
     ( liftLookupFail
     ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
 import           Control.Monad.Trans.Except.Extra (firstExceptT, newExceptT)
 
-import qualified Godx.Db as DB
+import qualified Bcc.Db as DB
 
-import           Godx.Sync.Error
+import           Bcc.Sync.Error
 
 liftLookupFail :: Monad m => Text -> m (Either DB.LookupFail a) -> ExceptT SyncNodeError m a
 liftLookupFail loc =

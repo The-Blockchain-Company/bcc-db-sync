@@ -57,7 +57,7 @@
   "updateQuorum": 5,
   "networkId": "Mainnet",
   "initialFunds": {},
-  "maxIsaacSupply": 45000000000000000,
+  "maxEntropicSupply": 45000000000000000,
   "networkMagic": 764824073,
   "epochLength": 432000,
   "systemStart": "2017-09-23T21:44:51Z",

@@ -9,9 +9,9 @@
 -- in the definition of renderAddress.
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
-module Godx.DbSync.Era.Sophie.Generic.Util
+module Bcc.DbSync.Era.Sophie.Generic.Util
   ( annotateStakingCred
-  , coinToDbIsaac
+  , coinToDbEntropic
   , getPaymentCred
   , hasCredScript
   , getCredentialScriptHash
@@ -31,26 +31,26 @@ module Godx.DbSync.Era.Sophie.Generic.Util
   , unTxHash
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import qualified Godx.Api.Sophie as Api
+import qualified Bcc.Api.Sophie as Api
 
-import qualified Godx.Crypto.Hash as Crypto
+import qualified Bcc.Crypto.Hash as Crypto
 
-import           Godx.Db (DbIsaac (..))
-import qualified Godx.Db as Db
+import           Bcc.Db (DbEntropic (..))
+import qualified Bcc.Db as Db
 
-import qualified Godx.Ledger.Address as Ledger
-import           Godx.Ledger.Aurum.Language (Language)
-import           Godx.Ledger.Aurum.Scripts (CostModel (..))
-import qualified Godx.Ledger.BaseTypes as Ledger
-import qualified Godx.Ledger.Credential as Ledger
-import qualified Godx.Ledger.Keys as Ledger
+import qualified Bcc.Ledger.Address as Ledger
+import           Bcc.Ledger.Aurum.Language (Language)
+import           Bcc.Ledger.Aurum.Scripts (CostModel (..))
+import qualified Bcc.Ledger.BaseTypes as Ledger
+import qualified Bcc.Ledger.Credential as Ledger
+import qualified Bcc.Ledger.Keys as Ledger
 
-import           Godx.Ledger.Coin (Coin (..), DeltaCoin)
-import qualified Godx.Ledger.SafeHash as Ledger
+import           Bcc.Ledger.Coin (Coin (..), DeltaCoin)
+import qualified Bcc.Ledger.SafeHash as Ledger
 
-import           Godx.Sync.Util
+import           Bcc.Sync.Util
 
 import qualified Data.Binary.Put as Binary
 import qualified Data.ByteString.Base16 as Base16
@@ -60,7 +60,7 @@ import qualified Data.List as List
 import qualified Data.Map.Strict as Map
 import qualified Data.Text.Encoding as Text
 
-import           Shardagnostic.Consensus.Godx.Block (StandardAllegra, StandardCrypto, StandardJen,
+import           Shardagnostic.Consensus.Bcc.Block (StandardAllegra, StandardCrypto, StandardJen,
                    StandardSophie)
 
 import qualified Sophie.Spec.Ledger.Scripts as Sophie
@@ -71,8 +71,8 @@ import qualified Sophie.Spec.Ledger.TxBody as Sophie
 annotateStakingCred :: Ledger.Network -> Ledger.StakeCredential era -> Ledger.RewardAcnt era
 annotateStakingCred = Sophie.RewardAcnt
 
-coinToDbIsaac :: Coin -> DbIsaac
-coinToDbIsaac = DbIsaac . fromIntegral . unCoin
+coinToDbEntropic :: Coin -> DbEntropic
+coinToDbEntropic = DbEntropic . fromIntegral . unCoin
 
 getPaymentCred :: Ledger.Addr StandardCrypto -> Maybe (Ledger.PaymentCredential StandardCrypto)
 getPaymentCred addr =

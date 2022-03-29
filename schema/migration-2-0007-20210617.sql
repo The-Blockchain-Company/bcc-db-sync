@@ -6,10 +6,10 @@ DECLARE
 BEGIN
   SELECT stage_two + 1 INTO next_version FROM schema_version ;
   IF next_version = 7 THEN
-    EXECUTE 'ALTER TABLE "epoch_param" ADD COLUMN "bccxx_per_u_tx_o_word" isaac NULL' ;
+    EXECUTE 'ALTER TABLE "epoch_param" ADD COLUMN "bccxx_per_u_tx_o_word" entropic NULL' ;
     EXECUTE 'ALTER TABLE "epoch_param" ADD COLUMN "cost_models" VARCHAR NULL' ;
-    EXECUTE 'ALTER TABLE "epoch_param" ADD COLUMN "price_mem" isaac NULL' ;
-    EXECUTE 'ALTER TABLE "epoch_param" ADD COLUMN "price_step" isaac NULL' ;
+    EXECUTE 'ALTER TABLE "epoch_param" ADD COLUMN "price_mem" entropic NULL' ;
+    EXECUTE 'ALTER TABLE "epoch_param" ADD COLUMN "price_step" entropic NULL' ;
     EXECUTE 'ALTER TABLE "epoch_param" ADD COLUMN "max_tx_ex_mem" word64type NULL' ;
     EXECUTE 'ALTER TABLE "epoch_param" ADD COLUMN "max_tx_ex_steps" word64type NULL' ;
     EXECUTE 'ALTER TABLE "epoch_param" ADD COLUMN "max_block_ex_mem" word64type NULL' ;

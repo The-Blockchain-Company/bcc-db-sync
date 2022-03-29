@@ -1,11 +1,11 @@
 {-# LANGUAGE ScopedTypeVariables #-}
-module Godx.Db.Tool.Validate.TxAccounting
+module Bcc.Db.Tool.Validate.TxAccounting
   ( validateTxAccounting
   ) where
 
-import           Godx.Db.Tool.Validate.Util
+import           Bcc.Db.Tool.Validate.Util
 
-import           Godx.Db
+import           Bcc.Db
 
 import           Control.Monad (replicateM, when)
 import           Control.Monad.IO.Class (MonadIO, liftIO)
@@ -43,9 +43,9 @@ validateTxAccounting = do
 
 data ValidateError = ValidateError
   { veTxId :: !Word64
-  , veFee :: !Godx
+  , veFee :: !Bcc
   , veDeposit :: !Int64
-  , veWithdrawal :: !Godx
+  , veWithdrawal :: !Bcc
   , inputs :: ![TxOut]
   , outputs :: ![TxOut]
   }
@@ -77,7 +77,7 @@ reportError ve =
     showTxOut txo =
       mconcat
         [ "TxId ", show (unTxId $ txOutTxId txo)
-        , " Value ", show (word64ToGodx . unDbIsaac $ txOutValue txo)
+        , " Value ", show (word64ToBcc . unDbEntropic $ txOutValue txo)
         ]
 
 -- For a given TxId, validate the input/output accounting.
@@ -93,14 +93,14 @@ validateAccounting txId = do
     when (deposit < 0 && sumValues ins + bccRefund deposit + withdrawal /= fee + sumValues outs) $
       left (ValidateError txId fee deposit withdrawal ins outs)
   where
-    sumValues :: [TxOut] -> Godx
-    sumValues txs = word64ToGodx $ sum (map (unDbIsaac . txOutValue) txs)
+    sumValues :: [TxOut] -> Bcc
+    sumValues txs = word64ToBcc $ sum (map (unDbEntropic . txOutValue) txs)
 
-    bccDeposit :: Int64 -> Godx
-    bccDeposit = word64ToGodx . fromIntegral
+    bccDeposit :: Int64 -> Bcc
+    bccDeposit = word64ToBcc . fromIntegral
 
-    bccRefund :: Int64 -> Godx
-    bccRefund = word64ToGodx . fromIntegral . negate
+    bccRefund :: Int64 -> Bcc
+    bccRefund = word64ToBcc . fromIntegral . negate
 
 -- -------------------------------------------------------------------------------------------------
 
@@ -114,15 +114,15 @@ queryTestTxIds = do
               pure countRows
   pure (maybe 0 (unTxId . unValue) (listToMaybe lower), maybe 0 unValue (listToMaybe upper))
 
-queryTxFeeDeposit :: MonadIO m => Word64 -> ReaderT SqlBackend m (Godx, Int64)
+queryTxFeeDeposit :: MonadIO m => Word64 -> ReaderT SqlBackend m (Bcc, Int64)
 queryTxFeeDeposit txId = do
     res <- select . from $ \ tx -> do
               where_ (tx ^. TxId ==. val (toSqlKey $ fromIntegral txId))
               pure (tx ^. TxFee, tx ^. TxDeposit)
     pure $ maybe (0, 0) convert (listToMaybe res)
   where
-    convert :: (Value DbIsaac, Value Int64) -> (Godx, Int64)
-    convert (Value (DbIsaac w64), Value i64) = (word64ToGodx w64, i64)
+    convert :: (Value DbEntropic, Value Int64) -> (Bcc, Int64)
+    convert (Value (DbEntropic w64), Value i64) = (word64ToBcc w64, i64)
 
 queryTxInputs :: MonadIO m => Word64 -> ReaderT SqlBackend m [TxOut]
 queryTxInputs txId = do
@@ -143,11 +143,11 @@ queryTxOutputs txId = do
   pure $ entityVal <$> res
 
 
-queryTxWithdrawal :: MonadIO m => Word64 -> ReaderT SqlBackend m Godx
+queryTxWithdrawal :: MonadIO m => Word64 -> ReaderT SqlBackend m Bcc
 queryTxWithdrawal txId = do
   res <- select . from $ \ withdraw -> do
             where_ (withdraw ^. WithdrawalTxId ==. val (toSqlKey $ fromIntegral txId))
             pure (withdraw ^. WithdrawalAmount)
   -- It is probably not possible to have two withdrawals in a single Tx.
   -- If it is possible then there will be an accounting error.
-  pure $ maybe 0 (word64ToGodx . unDbIsaac . unValue) (listToMaybe res)
+  pure $ maybe 0 (word64ToBcc . unDbEntropic . unValue) (listToMaybe res)

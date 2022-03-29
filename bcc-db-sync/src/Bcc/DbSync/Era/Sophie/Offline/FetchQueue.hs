@@ -1,15 +1,15 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.DbSync.Era.Sophie.Offline.FetchQueue
+module Bcc.DbSync.Era.Sophie.Offline.FetchQueue
   ( newRetry
   , retryAgain
   , showRetryTimes
   ) where
 
 
-import           Godx.Prelude hiding (retry)
-import           Godx.Sync.Types
+import           Bcc.Prelude hiding (retry)
+import           Bcc.Sync.Types
 
 import qualified Data.Text as Text
 import           Data.Time.Clock.POSIX (POSIXTime)

@@ -4,7 +4,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
-module Godx.DbSync.Era.Sophie.Generic.Block
+module Bcc.DbSync.Era.Sophie.Generic.Block
   ( Block (..)
   , BlockEra (..)
   , fromSophieBlock
@@ -15,29 +15,29 @@ module Godx.DbSync.Era.Sophie.Generic.Block
   , slotLeaderHash
   ) where
 
-import qualified Godx.Api.Sophie as Api
+import qualified Bcc.Api.Sophie as Api
 
-import qualified Godx.Crypto.Hash as Crypto
-import qualified Godx.Crypto.KES.Class as KES
+import qualified Bcc.Crypto.Hash as Crypto
+import qualified Bcc.Crypto.KES.Class as KES
 
-import           Godx.Crypto.VRF.Optimum (OptimumVRF)
+import           Bcc.Crypto.VRF.Optimum (OptimumVRF)
 
-import           Godx.DbSync.Era.Sophie.Generic.Tx
-import           Godx.DbSync.Era.Sophie.Generic.Util
+import           Bcc.DbSync.Era.Sophie.Generic.Tx
+import           Bcc.DbSync.Era.Sophie.Generic.Util
 
-import           Godx.Ledger.Aurum ()
-import           Godx.Ledger.Core (Witnesses)
-import qualified Godx.Ledger.Core as Ledger
-import           Godx.Ledger.Crypto (VRF)
-import           Godx.Ledger.Era (Crypto, SupportsSegWit (..))
-import qualified Godx.Ledger.Era as Ledger
-import           Godx.Ledger.SafeHash (SafeToHash)
+import           Bcc.Ledger.Aurum ()
+import           Bcc.Ledger.Core (Witnesses)
+import qualified Bcc.Ledger.Core as Ledger
+import           Bcc.Ledger.Crypto (VRF)
+import           Bcc.Ledger.Era (Crypto, SupportsSegWit (..))
+import qualified Bcc.Ledger.Era as Ledger
+import           Bcc.Ledger.SafeHash (SafeToHash)
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.Slotting.Slot (SlotNo (..))
+import           Bcc.Slotting.Slot (SlotNo (..))
 
-import           Shardagnostic.Consensus.Godx.Block (StandardAllegra, StandardAurum, StandardJen,
+import           Shardagnostic.Consensus.Bcc.Block (StandardAllegra, StandardAurum, StandardJen,
                    StandardSophie)
 import           Shardagnostic.Consensus.Sophie.Ledger.Block (SophieBasedEra, SophieBlock)
 import qualified Shardagnostic.Consensus.Sophie.Ledger.Block as Consensus
@@ -165,7 +165,7 @@ blockNumber = Sophie.bheaderBlockNo . blockBody
 blockPrevHash :: SophieBasedEra era => SophieBlock era -> ByteString
 blockPrevHash blk =
   case Sophie.bheaderPrev (Sophie.bhbody . Sophie.bheader $ Consensus.sophieBlockRaw blk) of
-    Sophie.GenesisHash -> "Godx.DbSync.Era.Sophie.Generic.Block.blockPrevHash"
+    Sophie.GenesisHash -> "Bcc.DbSync.Era.Sophie.Generic.Block.blockPrevHash"
     Sophie.BlockHash h -> Crypto.hashToBytes (Sophie.unHashHeader h)
 
 blockOpCert :: SophieBasedEra era => SophieBlock era -> ByteString

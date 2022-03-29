@@ -2,17 +2,17 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.DbSync.Era.Sophie.Offline.Http
+module Bcc.DbSync.Era.Sophie.Offline.Http
   ( FetchError (..)
   , httpGet512BytesMax
   , renderFetchError
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
 import           Control.Monad.Trans.Except.Extra (handleExceptT, hoistEither)
 
-import           Godx.Db (PoolUrl (..), textShow)
+import           Bcc.Db (PoolUrl (..), textShow)
 
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Text as Text

@@ -1,31 +1,31 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-module Godx.Sync.Era.Sophie.Generic.StakeDist
+module Bcc.Sync.Era.Sophie.Generic.StakeDist
   ( StakeDist (..)
   , epochStakeDist
   , stakeDistPoolHashKeys
   , stakeDistStakeCreds
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import qualified Godx.Ledger.BaseTypes as Ledger
-import           Godx.Ledger.Coin (Coin (..))
-import           Godx.Ledger.Credential (Credential)
-import           Godx.Ledger.Era (Crypto)
-import           Godx.Ledger.Keys (KeyHash, KeyRole (..))
+import qualified Bcc.Ledger.BaseTypes as Ledger
+import           Bcc.Ledger.Coin (Coin (..))
+import           Bcc.Ledger.Credential (Credential)
+import           Bcc.Ledger.Era (Crypto)
+import           Bcc.Ledger.Keys (KeyHash, KeyRole (..))
 
-import           Godx.Slotting.Slot (EpochNo (..))
+import           Bcc.Slotting.Slot (EpochNo (..))
 
-import           Godx.Sync.Era.Sophie.Generic.StakeCred
-import           Godx.Sync.Types
+import           Bcc.Sync.Era.Sophie.Generic.StakeCred
+import           Bcc.Sync.Types
 
 import           Data.Coerce (coerce)
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 
-import           Shardagnostic.Consensus.Godx.Block (LedgerState (..), StandardCrypto)
+import           Shardagnostic.Consensus.Bcc.Block (LedgerState (..), StandardCrypto)
 
 import           Shardagnostic.Consensus.Ledger.Extended (ExtLedgerState (..))
 import           Shardagnostic.Consensus.Sophie.Ledger.Block (SophieBlock)
@@ -40,7 +40,7 @@ data StakeDist = StakeDist
   , sdistStakeMap :: !(Map StakeCred (Coin, KeyHash 'StakePool StandardCrypto))
   } deriving Eq
 
-epochStakeDist :: Ledger.Network -> EpochNo -> ExtLedgerState GodxBlock -> Maybe StakeDist
+epochStakeDist :: Ledger.Network -> EpochNo -> ExtLedgerState BccBlock -> Maybe StakeDist
 epochStakeDist network epoch els =
   case ledgerState els of
     LedgerStateCole _ -> Nothing

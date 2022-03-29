@@ -5,7 +5,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Godx.Sync.Config.Node
+module Bcc.Sync.Config.Node
   ( NodeConfig (..)
   , parseNodeConfig
   ) where
@@ -13,22 +13,22 @@ module Godx.Sync.Config.Node
 -- Node really should export something like this, but doesn't and it actually seemed to
 -- be easier and faster to just parse out the bits we need here.
 
-import qualified Godx.Chain.Update as Cole
+import qualified Bcc.Chain.Update as Cole
 
-import           Godx.Crypto (RequiresNetworkMagic (..))
+import           Bcc.Crypto (RequiresNetworkMagic (..))
 
-import           Godx.Db (textShow)
+import           Bcc.Db (textShow)
 
-import           Godx.Sync.Config.Types
+import           Bcc.Sync.Config.Types
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
 import           Data.Aeson (FromJSON (..), Object, (.:), (.:?))
 import qualified Data.Aeson as Aeson
 import           Data.Aeson.Types (Parser)
 import qualified Data.Yaml as Yaml
 
-import qualified Shardagnostic.Consensus.Godx.CanHardFork as Sophie
+import qualified Shardagnostic.Consensus.Bcc.CanHardFork as Sophie
 
 data NodeConfig = NodeConfig
   { ncProtocol :: !SyncProtocol

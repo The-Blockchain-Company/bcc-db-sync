@@ -3,15 +3,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
 
-module Godx.Sync.Config.Cole
+module Bcc.Sync.Config.Cole
   ( readColeGenesisConfig
   ) where
 
-import qualified Godx.Chain.Genesis as Cole
-import           Godx.Crypto (decodeAbstractHash)
+import qualified Bcc.Chain.Genesis as Cole
+import           Bcc.Crypto (decodeAbstractHash)
 
-import           Godx.Sync.Config.Types
-import           Godx.Sync.Error
+import           Bcc.Sync.Config.Types
+import           Bcc.Sync.Error
 
 import           Control.Monad.Trans.Except (ExceptT)
 import           Control.Monad.Trans.Except.Extra (firstExceptT, hoistEither)

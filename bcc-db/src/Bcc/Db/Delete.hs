@@ -1,18 +1,18 @@
-module Godx.Db.Delete
+module Bcc.Db.Delete
   ( deleteCascadeBlock
   , deleteCascadeAfter
   , deleteCascadeBlockNo
   , deleteCascadeSlotNo
   ) where
 
-import           Godx.Slotting.Slot (SlotNo (..))
+import           Bcc.Slotting.Slot (SlotNo (..))
 
 import           Control.Monad.IO.Class (MonadIO)
 import           Control.Monad.Trans.Reader (ReaderT)
 
 import           Database.Persist.Sql (SqlBackend, delete, selectKeysList, (==.))
 
-import           Godx.Db.Schema
+import           Bcc.Db.Schema
 
 import           Shardagnostic.Network.Block (BlockNo (..))
 

@@ -1,42 +1,42 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Godx.DbSync.Plugin.Default
+module Bcc.DbSync.Plugin.Default
   ( defDbSyncNodePlugin
   , insertDefaultBlock
   , rollbackToPoint
   ) where
 
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.BM.Trace (Trace, logDebug, logInfo)
+import           Bcc.BM.Trace (Trace, logDebug, logInfo)
 
-import qualified Godx.Db as DB
+import qualified Bcc.Db as DB
 
-import           Godx.DbSync.Era
+import           Bcc.DbSync.Era
 
-import           Godx.DbSync.Era.Cole.Insert (insertColeBlock)
-import           Godx.DbSync.Era.Godx.Insert (insertEpochSyncTime)
-import           Godx.DbSync.Era.Sophie.Adjust (adjustEpochRewards)
-import qualified Godx.DbSync.Era.Sophie.Generic as Generic
-import           Godx.DbSync.Era.Sophie.Insert (insertSophieBlock)
-import           Godx.DbSync.Era.Sophie.Insert.Epoch
-import           Godx.DbSync.Era.Sophie.Validate
-import           Godx.DbSync.Rollback (rollbackToPoint)
+import           Bcc.DbSync.Era.Cole.Insert (insertColeBlock)
+import           Bcc.DbSync.Era.Bcc.Insert (insertEpochSyncTime)
+import           Bcc.DbSync.Era.Sophie.Adjust (adjustEpochRewards)
+import qualified Bcc.DbSync.Era.Sophie.Generic as Generic
+import           Bcc.DbSync.Era.Sophie.Insert (insertSophieBlock)
+import           Bcc.DbSync.Era.Sophie.Insert.Epoch
+import           Bcc.DbSync.Era.Sophie.Validate
+import           Bcc.DbSync.Rollback (rollbackToPoint)
 
-import           Godx.Ledger.Coin (Coin (..))
-import           Godx.Ledger.Credential (StakeCredential)
-import           Godx.Ledger.Crypto (StandardCrypto)
+import           Bcc.Ledger.Coin (Coin (..))
+import           Bcc.Ledger.Credential (StakeCredential)
+import           Bcc.Ledger.Crypto (StandardCrypto)
 
-import           Godx.Slotting.Slot (EpochNo (..))
+import           Bcc.Slotting.Slot (EpochNo (..))
 
-import           Godx.Sync.Api
-import           Godx.Sync.Error
-import           Godx.Sync.LedgerState
-import           Godx.Sync.Plugin
-import           Godx.Sync.Types
-import           Godx.Sync.Util
+import           Bcc.Sync.Api
+import           Bcc.Sync.Error
+import           Bcc.Sync.LedgerState
+import           Bcc.Sync.Plugin
+import           Bcc.Sync.Types
+import           Bcc.Sync.Util
 
 import           Control.Monad.Catch (MonadCatch)
 import           Control.Monad.Class.MonadSTM.Strict (putTMVar, tryTakeTMVar)
@@ -48,7 +48,7 @@ import qualified Data.Map.Strict as Map
 
 import           Database.Persist.Sql (SqlBackend)
 
-import           Shardagnostic.Consensus.Godx.Block (HardForkBlock (..))
+import           Shardagnostic.Consensus.Bcc.Block (HardForkBlock (..))
 
 import           System.IO.Unsafe (unsafePerformIO)
 
@@ -70,7 +70,7 @@ insertDefaultBlock
     -> IO (Either SyncNodeError ())
 insertDefaultBlock backend tracer env blockDetails = do
     thisIsAnUglyHack tracer (envLedger env)
-    DB.runDbGodxcoinLogging backend tracer $
+    DB.runDbBcccoinLogging backend tracer $
       runExceptT (traverse_ insert blockDetails)
   where
     insert
@@ -131,7 +131,7 @@ thisIsAnUglyHack tracer lenv = do
 
 handleLedgerEvents
     :: (MonadBaseControl IO m, MonadIO m)
-    => Trace IO Text -> LedgerEnv -> GodxPoint -> [LedgerEvent]
+    => Trace IO Text -> LedgerEnv -> BccPoint -> [LedgerEvent]
     -> ExceptT SyncNodeError (ReaderT SqlBackend m) ()
 handleLedgerEvents tracer lenv point =
     mapM_ handler

@@ -2,9 +2,9 @@
 
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Godx.Db.Schema.Orphans where
+module Bcc.Db.Schema.Orphans where
 
-import           Godx.Db.Types (DbInt65 (..), DbIsaac (..), DbWord64 (..), ScriptPurpose,
+import           Bcc.Db.Types (DbInt65 (..), DbEntropic (..), DbWord64 (..), ScriptPurpose,
                    ScriptType (..), SyncState, readDbInt65, readScriptPurpose, readScriptType,
                    readSyncState, renderScriptPurpose, renderScriptType, renderSyncState,
                    showDbInt65)
@@ -32,17 +32,17 @@ instance PersistField DbInt65 where
   fromPersistValue x =
     Left $ mconcat [ "Failed to parse Haskell type DbInt65: ", Text.pack (show x) ]
 
-instance PersistField DbIsaac where
-  toPersistValue = PersistText . Text.pack . show . unDbIsaac
-  fromPersistValue (PersistInt64 i) = Right $ DbIsaac (fromIntegral i)
-  fromPersistValue (PersistText bs) = Right $ DbIsaac (read $ Text.unpack bs)
+instance PersistField DbEntropic where
+  toPersistValue = PersistText . Text.pack . show . unDbEntropic
+  fromPersistValue (PersistInt64 i) = Right $ DbEntropic (fromIntegral i)
+  fromPersistValue (PersistText bs) = Right $ DbEntropic (read $ Text.unpack bs)
   fromPersistValue x@(PersistRational r) =
     -- If the value is greater than MAX_INT64, it comes back as a PersistRational (wat??).
     if denominator r == 1
-      then Right $ DbIsaac (fromIntegral $ numerator r)
-      else Left $ mconcat [ "Failed to parse Haskell type DbIsaac: ", Text.pack (show x) ]
+      then Right $ DbEntropic (fromIntegral $ numerator r)
+      else Left $ mconcat [ "Failed to parse Haskell type DbEntropic: ", Text.pack (show x) ]
   fromPersistValue x =
-    Left $ mconcat [ "Failed to parse Haskell type DbIsaac: ", Text.pack (show x) ]
+    Left $ mconcat [ "Failed to parse Haskell type DbEntropic: ", Text.pack (show x) ]
 
 instance PersistField DbWord64 where
   toPersistValue = PersistText . Text.pack . show . unDbWord64

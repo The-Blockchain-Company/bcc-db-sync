@@ -130,7 +130,7 @@
 ## 2.0.0 -- May 2020
 
 * Note that this release requires the database to be dropped and recreated
-* Schema change to removes SQL views previously used by by Godx GraphQL (#92)
+* Schema change to removes SQL views previously used by by Bcc GraphQL (#92)
 * Add a column to the Tx table to record the order of txs within a block (#94)
 * Flatten the DB schema migrations
 

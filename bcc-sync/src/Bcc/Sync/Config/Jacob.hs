@@ -3,17 +3,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
 
-module Godx.Sync.Config.Aurum
+module Bcc.Sync.Config.Aurum
   ( readAurumGenesisConfig
   ) where
 
 
-import qualified Godx.Crypto.Hash as Crypto
+import qualified Bcc.Crypto.Hash as Crypto
 
-import           Godx.Db (textShow)
+import           Bcc.Db (textShow)
 
-import           Godx.Sync.Config.Types
-import           Godx.Sync.Error
+import           Bcc.Sync.Config.Types
+import           Bcc.Sync.Error
 
 import           Control.Monad.Trans.Except (ExceptT)
 import           Control.Monad.Trans.Except.Extra (firstExceptT, handleIOExceptT, hoistEither, left)
@@ -25,8 +25,8 @@ import           Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
 
-import           Godx.Api.Orphans ()
-import           Godx.Ledger.Aurum.Genesis
+import           Bcc.Api.Orphans ()
+import           Bcc.Ledger.Aurum.Genesis
 
 readAurumGenesisConfig
     :: SyncNodeConfig

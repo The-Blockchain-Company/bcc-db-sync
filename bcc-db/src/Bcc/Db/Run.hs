@@ -3,7 +3,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.Db.Run
+module Bcc.Db.Run
   ( getBackendGhci
   , ghciDebugQuery
   , runDbHandleLogger
@@ -15,12 +15,12 @@ module Godx.Db.Run
   , transactionCommit
   ) where
 
-import           Godx.BM.Data.LogItem (LOContent (..), LogObject (..), PrivacyAnnotation (..),
+import           Bcc.BM.Data.LogItem (LOContent (..), LogObject (..), PrivacyAnnotation (..),
                    mkLOMeta)
-import           Godx.BM.Data.Severity (Severity (..))
-import           Godx.BM.Trace (Trace)
+import           Bcc.BM.Data.Severity (Severity (..))
+import           Bcc.BM.Trace (Trace)
 
-import           Godx.Db.PGConfig
+import           Bcc.Db.PGConfig
 
 import           Control.Monad.IO.Class (MonadIO, liftIO)
 import           Control.Monad.Logger (LogLevel (..), LogSource, LoggingT, NoLoggingT,

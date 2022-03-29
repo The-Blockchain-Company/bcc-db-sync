@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Test.IO.Godx.Db.Migration where
+module Test.IO.Bcc.Db.Migration where
 
-import           Godx.Db (LogFileDir (..), MigrationDir (..), MigrationValidate (..),
+import           Bcc.Db (LogFileDir (..), MigrationDir (..), MigrationValidate (..),
                    MigrationValidateError (..), MigrationVersion (..), SchemaVersion (..),
                    getMigrationScripts, querySchemaVersion, readPGPassFileEnv, runDbNoLogging,
                    runMigrations, validateMigrations)

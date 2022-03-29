@@ -1,12 +1,12 @@
-module Godx.DbSync.Plugin.Extended
+module Bcc.DbSync.Plugin.Extended
   ( extendedDbSyncNodePlugin
   ) where
 
-import           Godx.DbSync.Plugin.Default (defDbSyncNodePlugin)
-import           Godx.DbSync.Plugin.Epoch (epochPluginInsertBlock, epochPluginOnStartup,
+import           Bcc.DbSync.Plugin.Default (defDbSyncNodePlugin)
+import           Bcc.DbSync.Plugin.Epoch (epochPluginInsertBlock, epochPluginOnStartup,
                    epochPluginRollbackBlock)
 
-import           Godx.Sync (SyncNodePlugin (..))
+import           Bcc.Sync (SyncNodePlugin (..))
 
 import           Database.Persist.Sql (SqlBackend)
 

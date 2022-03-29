@@ -1,7 +1,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Godx.Db.Migration
+module Bcc.Db.Migration
   ( MigrationDir (..)
   , LogFileDir (..)
   , applyMigration
@@ -39,13 +39,13 @@ import           Data.Time.Format (defaultTimeLocale, formatTime, iso8601DateFor
 import           Database.Persist.Sql (SqlBackend, SqlPersistT, entityVal, getMigration,
                    selectFirst)
 
-import           Godx.Crypto.Hash (Blake2b_256, ByteString, Hash, hashToStringAsHex, hashWith)
-import           Godx.Db.Migration.Haskell
-import           Godx.Db.Migration.Version
-import           Godx.Db.PGConfig
-import           Godx.Db.Run
-import           Godx.Db.Schema
-import           Godx.Db.Text
+import           Bcc.Crypto.Hash (Blake2b_256, ByteString, Hash, hashToStringAsHex, hashWith)
+import           Bcc.Db.Migration.Haskell
+import           Bcc.Db.Migration.Version
+import           Bcc.Db.PGConfig
+import           Bcc.Db.Run
+import           Bcc.Db.Schema
+import           Bcc.Db.Text
 
 import           System.Directory (listDirectory)
 import           System.Exit (ExitCode (..), exitFailure)
@@ -158,7 +158,7 @@ createMigration (MigrationDir migdir) = do
     create :: ReaderT SqlBackend (NoLoggingT IO) (Maybe (MigrationVersion, Text))
     create = do
       ver <- getSchemaVersion
-      statements <- getMigration migrateGodxDb
+      statements <- getMigration migrateBccDb
       if null statements
         then pure Nothing
         else do

@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import           Godx.Db (schemaDocs)
+import           Bcc.Db (schemaDocs)
 
 import           Data.Text (Text)
 import qualified Data.Text as Text

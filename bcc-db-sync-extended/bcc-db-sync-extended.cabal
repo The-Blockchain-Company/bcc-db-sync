@@ -4,8 +4,8 @@ cabal-version:          2.4
 
 name:                   bcc-db-sync-extended
 version:                10.0.1
-synopsis:               The Extended Godx DB Sync node
-description:            A Godx node that follows the Godx chain and inserts data from the
+synopsis:               The Extended Bcc DB Sync node
+description:            A Bcc node that follows the Bcc chain and inserts data from the
                         chain into a PostgresQL database. It is "extended" because it maintains an
                         extra Epoch table.
 homepage:               https://github.com/The-Blockchain-Company/bcc-db-sync
@@ -42,7 +42,7 @@ library
                         -Wunused-imports
                         -Wunused-packages
 
-  exposed-modules:      Godx.DbSync.Plugin.Extended
+  exposed-modules:      Bcc.DbSync.Plugin.Extended
 
   build-depends:        base                            >= 4.14         && < 4.16
                       , bcc-db-sync

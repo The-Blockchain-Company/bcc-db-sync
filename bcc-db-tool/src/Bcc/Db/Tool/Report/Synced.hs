@@ -1,8 +1,8 @@
-module Godx.Db.Tool.Report.Synced
+module Bcc.Db.Tool.Report.Synced
   ( assertFullySynced
   ) where
 
-import qualified Godx.Db as Db
+import qualified Bcc.Db as Db
 
 import           Control.Monad (when)
 import           Control.Monad.IO.Class (MonadIO)

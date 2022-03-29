@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.Sync.Util
+module Bcc.Sync.Util
   ( bccBlockSlotNo
   , fmap3
   , getSyncStatus
@@ -26,18 +26,18 @@ module Godx.Sync.Util
   , thrd3
   ) where
 
-import           Godx.Prelude hiding (catch)
+import           Bcc.Prelude hiding (catch)
 
-import           Godx.BM.Trace (Trace, logError)
+import           Bcc.BM.Trace (Trace, logError)
 
-import           Godx.Db (SyncState (..), textShow)
+import           Bcc.Db (SyncState (..), textShow)
 
-import           Godx.Ledger.Coin (Coin (..))
+import           Bcc.Ledger.Coin (Coin (..))
 
-import           Godx.Sync.Config.Types ()
-import           Godx.Sync.Types
+import           Bcc.Sync.Config.Types ()
+import           Bcc.Sync.Types
 
-import           Godx.Slotting.Slot (SlotNo (..), WithOrigin (..), withOrigin)
+import           Bcc.Slotting.Slot (SlotNo (..), WithOrigin (..), withOrigin)
 
 import           Control.Exception.Lifted (catch)
 import           Control.Monad.Trans.Control (MonadBaseControl)
@@ -61,7 +61,7 @@ import qualified Shardagnostic.Network.Point as Point
 import           System.IO.Unsafe (unsafePerformIO)
 import           System.Posix.Process (exitImmediately)
 
-bccBlockSlotNo :: GodxBlock -> SlotNo
+bccBlockSlotNo :: BccBlock -> SlotNo
 bccBlockSlotNo = blockSlot
 
 fmap3 :: (Functor f, Functor g, Functor h) => (a -> b) -> f (g (h a)) -> f (g (h b))
@@ -149,13 +149,13 @@ renderByteArray :: ByteArrayAccess bin => bin -> Text
 renderByteArray =
   Text.decodeUtf8 . Base16.encode . Data.ByteArray.convert
 
-renderPoint :: GodxPoint -> Text
+renderPoint :: BccPoint -> Text
 renderPoint point =
   case getPoint point of
     Origin -> "genesis"
     At blk -> mconcat
                 [ "slot ", textShow (unSlotNo $ Point.blockPointSlot blk), ", hash "
-                , renderByteArray $ toRawHash (Proxy @GodxBlock) (Point.blockPointHash blk)
+                , renderByteArray $ toRawHash (Proxy @BccBlock) (Point.blockPointHash blk)
                 ]
 renderSlotList :: [SlotNo] -> Text
 renderSlotList xs

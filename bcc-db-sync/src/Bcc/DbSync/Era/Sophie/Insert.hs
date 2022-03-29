@@ -7,7 +7,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Godx.DbSync.Era.Sophie.Insert
+module Bcc.DbSync.Era.Sophie.Insert
   ( insertSophieBlock
   , postEpochRewards
   , postEpochStake
@@ -16,43 +16,43 @@ module Godx.DbSync.Era.Sophie.Insert
   , safeDecodeUtf8
   ) where
 
-import           Godx.Prelude
+import           Bcc.Prelude
 
-import           Godx.Api (SerialiseAsCBOR (..))
-import           Godx.Api.Sophie (TxMetadataValue (..), makeTransactionMetadata,
+import           Bcc.Api (SerialiseAsCBOR (..))
+import           Bcc.Api.Sophie (TxMetadataValue (..), makeTransactionMetadata,
                    metadataValueToJsonNoSchema)
 
-import           Godx.BM.Trace (Trace, logDebug, logInfo, logWarning)
+import           Bcc.BM.Trace (Trace, logDebug, logInfo, logWarning)
 
-import qualified Godx.Crypto.Hash as Crypto
+import qualified Bcc.Crypto.Hash as Crypto
 
-import           Godx.Db (DbIsaac (..), DbWord64 (..), SyncState (..))
-import qualified Godx.Db as DB
+import           Bcc.Db (DbEntropic (..), DbWord64 (..), SyncState (..))
+import qualified Bcc.Db as DB
 
-import           Godx.DbSync.Era
-import qualified Godx.DbSync.Era.Sophie.Generic as Generic
-import           Godx.DbSync.Era.Sophie.Generic.ParamProposal
-import           Godx.DbSync.Era.Sophie.Insert.Epoch
-import           Godx.DbSync.Era.Sophie.Query
-import           Godx.DbSync.Era.Util (liftLookupFail)
+import           Bcc.DbSync.Era
+import qualified Bcc.DbSync.Era.Sophie.Generic as Generic
+import           Bcc.DbSync.Era.Sophie.Generic.ParamProposal
+import           Bcc.DbSync.Era.Sophie.Insert.Epoch
+import           Bcc.DbSync.Era.Sophie.Query
+import           Bcc.DbSync.Era.Util (liftLookupFail)
 
-import qualified Godx.Ledger.Address as Ledger
-import qualified Godx.Ledger.Aurum.Scripts as Ledger
-import qualified Godx.Ledger.BaseTypes as Ledger
-import           Godx.Ledger.Coin (Coin (..))
-import qualified Godx.Ledger.Coin as Ledger
-import qualified Godx.Ledger.Credential as Ledger
-import qualified Godx.Ledger.Keys as Ledger
+import qualified Bcc.Ledger.Address as Ledger
+import qualified Bcc.Ledger.Aurum.Scripts as Ledger
+import qualified Bcc.Ledger.BaseTypes as Ledger
+import           Bcc.Ledger.Coin (Coin (..))
+import qualified Bcc.Ledger.Coin as Ledger
+import qualified Bcc.Ledger.Credential as Ledger
+import qualified Bcc.Ledger.Keys as Ledger
 
-import           Godx.Sync.Error
-import           Godx.Sync.LedgerState
-import           Godx.Sync.Types
-import           Godx.Sync.Util
+import           Bcc.Sync.Error
+import           Bcc.Sync.LedgerState
+import           Bcc.Sync.Types
+import           Bcc.Sync.Util
 
-import           Godx.Ledger.Jen.Value (AssetName (..), PolicyID (..), Value (..))
+import           Bcc.Ledger.Jen.Value (AssetName (..), PolicyID (..), Value (..))
 
-import           Godx.Slotting.Block (BlockNo (..))
-import           Godx.Slotting.Slot (EpochNo (..), EpochSize (..), SlotNo (..))
+import           Bcc.Slotting.Block (BlockNo (..))
+import           Bcc.Slotting.Slot (EpochNo (..), EpochSize (..), SlotNo (..))
 
 import           Control.Monad.Class.MonadSTM.Strict (tryReadTBQueue)
 import           Control.Monad.Catch (MonadCatch)
@@ -71,7 +71,7 @@ import qualified Data.Text.Encoding.Error as Text
 
 import           Database.Persist.Sql (SqlBackend)
 
-import           Shardagnostic.Consensus.Godx.Block (StandardCrypto)
+import           Shardagnostic.Consensus.Bcc.Block (StandardCrypto)
 
 import qualified Sophie.Spec.Ledger.PParams as Sophie
 import qualified Sophie.Spec.Ledger.STS.Chain as Sophie
@@ -174,7 +174,7 @@ insertOnNewEpoch
 insertOnNewEpoch tracer blkId slotNo epochNo newEpoch = do
     whenJust (Generic.euProtoParams epochUpdate) $ \ params ->
       insertEpochParam tracer blkId epochNo params (Generic.euNonce epochUpdate)
-    whenJust (Generic.neGodxPots newEpoch) $ \pots ->
+    whenJust (Generic.neBccPots newEpoch) $ \pots ->
       insertPots blkId slotNo epochNo pots
   where
     epochUpdate :: Generic.EpochUpdate
@@ -191,15 +191,15 @@ insertTx tracer network lStateSnap blkId epochNo slotNo blockIndex tx = do
         outSum = unCoin $ Generic.txOutSum tx
         withdrawalSum = unCoin $ Generic.txWithdrawalSum tx
     resolvedInputs <- mapM resolveTxInputs (Generic.txInputs tx)
-    let inSum = fromIntegral $ sum $ map (unDbIsaac . thrd3) resolvedInputs
+    let inSum = fromIntegral $ sum $ map (unDbEntropic . thrd3) resolvedInputs
     -- Insert transaction and get txId from the DB.
     txId <- lift . DB.insertTx $
               DB.Tx
                 { DB.txHash = Generic.txHash tx
                 , DB.txBlockId = blkId
                 , DB.txBlockIndex = blockIndex
-                , DB.txOutSum = DB.DbIsaac (fromIntegral outSum)
-                , DB.txFee = DB.DbIsaac (fromIntegral . unCoin $ Generic.txFees tx)
+                , DB.txOutSum = DB.DbEntropic (fromIntegral outSum)
+                , DB.txFee = DB.DbEntropic (fromIntegral . unCoin $ Generic.txFees tx)
                 , DB.txDeposit = fromIntegral (inSum + withdrawalSum) - fromIntegral (outSum + fees)
                 , DB.txSize = Generic.txSize tx
                 , DB.txInvalidBefore = DbWord64 . unSlotNo <$> Generic.txInvalidBefore tx
@@ -232,13 +232,13 @@ insertTx tracer network lStateSnap blkId epochNo slotNo blockIndex tx = do
 
     mapM_ (insertScript tracer txId) $ Generic.txScripts tx
 
-resolveTxInputs :: MonadIO m => Generic.TxIn -> ExceptT SyncNodeError (ReaderT SqlBackend m) (Generic.TxIn, DB.TxId, DbIsaac)
+resolveTxInputs :: MonadIO m => Generic.TxIn -> ExceptT SyncNodeError (ReaderT SqlBackend m) (Generic.TxIn, DB.TxId, DbEntropic)
 resolveTxInputs txIn = do
     res <- liftLookupFail "resolveTxInputs" $ queryResolveInput txIn
     pure $ convert res
   where
-    convert :: (DB.TxId, DbIsaac) -> (Generic.TxIn, DB.TxId, DbIsaac)
-    convert (txId, isaac) = (txIn, txId, isaac)
+    convert :: (DB.TxId, DbEntropic) -> (Generic.TxIn, DB.TxId, DbEntropic)
+    convert (txId, entropic) = (txIn, txId, entropic)
 
 insertTxOut
     :: (MonadBaseControl IO m, MonadIO m)
@@ -255,7 +255,7 @@ insertTxOut tracer txId (Generic.TxOut index addr value maMap dataHash) = do
                   , DB.txOutAddressHasScript = hasScript
                   , DB.txOutPaymentCred = Generic.maybePaymentCred addr
                   , DB.txOutStakeAddressId = mSaId
-                  , DB.txOutValue = Generic.coinToDbIsaac value
+                  , DB.txOutValue = Generic.coinToDbEntropic value
                   , DB.txOutDataHash = dataHash
                   }
     insertMaTxOut tracer txOutId maMap
@@ -266,9 +266,9 @@ insertTxOut tracer txId (Generic.TxOut index addr value maMap dataHash) = do
 insertTxIn
     :: (MonadBaseControl IO m, MonadIO m)
     => Trace IO Text -> DB.TxId -> [(DB.RedeemerId, Generic.TxRedeemer)]
-    -> (Generic.TxIn, DB.TxId, DbIsaac)
+    -> (Generic.TxIn, DB.TxId, DbEntropic)
     -> ExceptT SyncNodeError (ReaderT SqlBackend m) ()
-insertTxIn _tracer txInId redeemers (Generic.TxIn _txHash index txInRedeemerIndex, txOutId, _isaac) = do
+insertTxIn _tracer txInId redeemers (Generic.TxIn _txHash index txInRedeemerIndex, txOutId, _entropic) = do
     void . lift . DB.insertTxIn $
             DB.TxIn
               { DB.txInTxInId = txInId
@@ -339,18 +339,18 @@ insertPoolRegister
     -> ExceptT SyncNodeError (ReaderT SqlBackend m) ()
 insertPoolRegister tracer lStateSnap network (EpochNo epoch) blkId txId idx params = do
 
-    when (fromIntegral (Ledger.unCoin $ Sophie._poolPledge params) > maxIsaac) $
+    when (fromIntegral (Ledger.unCoin $ Sophie._poolPledge params) > maxEntropic) $
       liftIO . logWarning tracer $
         mconcat
           [ "Bad pledge amount: ", textShow (Ledger.unCoin $ Sophie._poolPledge params)
-          , " > maxIsaac."
+          , " > maxEntropic."
           ]
 
-    when (fromIntegral (Ledger.unCoin $ Sophie._poolCost params) > maxIsaac) $
+    when (fromIntegral (Ledger.unCoin $ Sophie._poolCost params) > maxEntropic) $
       liftIO . logWarning tracer $
         mconcat
           [ "Bad fixed cost amount: ", textShow (Ledger.unCoin $ Sophie._poolCost params)
-          , " > maxIsaac."
+          , " > maxEntropic."
           ]
 
     poolHashId <- insertPoolHash (Sophie._poolId params)
@@ -366,12 +366,12 @@ insertPoolRegister tracer lStateSnap network (EpochNo epoch) blkId txId idx para
                         { DB.poolUpdateHashId = poolHashId
                         , DB.poolUpdateCertIndex = idx
                         , DB.poolUpdateVrfKeyHash = Crypto.hashToBytes (Sophie._poolVrf params)
-                        , DB.poolUpdatePledge = Generic.coinToDbIsaac (Sophie._poolPledge params)
+                        , DB.poolUpdatePledge = Generic.coinToDbEntropic (Sophie._poolPledge params)
                         , DB.poolUpdateRewardAddr = Generic.serialiseRewardAcntWithNetwork network (Sophie._poolRAcnt params)
                         , DB.poolUpdateActiveEpochNo = epoch + epochActivationDelay
                         , DB.poolUpdateMetaId = mdId
                         , DB.poolUpdateMargin = realToFrac $ Ledger.unboundRational (Sophie._poolMargin params)
-                        , DB.poolUpdateFixedCost = Generic.coinToDbIsaac (Sophie._poolCost params)
+                        , DB.poolUpdateFixedCost = Generic.coinToDbEntropic (Sophie._poolCost params)
                         , DB.poolUpdateRegisteredTxId = txId
                         }
 
@@ -391,8 +391,8 @@ insertPoolRegister tracer lStateSnap network (EpochNo epoch) blkId txId idx para
           pure $ if otherUpdates then 3 else 2
 
 
-maxIsaac :: Word64
-maxIsaac = 45000000000000000
+maxEntropic :: Word64
+maxEntropic = 45000000000000000
 
 insertPoolHash
     :: forall m . (MonadBaseControl IO m, MonadIO m)
@@ -612,7 +612,7 @@ insertWithdrawals _tracer txId redeemers (Generic.TxWithdrawal index account coi
       DB.Withdrawal
         { DB.withdrawalAddrId = addrId
         , DB.withdrawalTxId = txId
-        , DB.withdrawalAmount = Generic.coinToDbIsaac coin
+        , DB.withdrawalAmount = Generic.coinToDbEntropic coin
         , DB.withdrawalRedeemerId = fst <$> find redeemerMatches redeemers
         }
   where
@@ -672,8 +672,8 @@ insertParamProposal _tracer txId pp =
       , DB.paramProposalMaxBlockSize = fromIntegral <$> pppMaxBhSize pp
       , DB.paramProposalMaxTxSize = fromIntegral <$> pppMaxTxSize pp
       , DB.paramProposalMaxBhSize = fromIntegral <$> pppMaxBhSize pp
-      , DB.paramProposalKeyDeposit = Generic.coinToDbIsaac <$> pppKeyDeposit pp
-      , DB.paramProposalPoolDeposit = Generic.coinToDbIsaac <$> pppPoolDeposit pp
+      , DB.paramProposalKeyDeposit = Generic.coinToDbEntropic <$> pppKeyDeposit pp
+      , DB.paramProposalPoolDeposit = Generic.coinToDbEntropic <$> pppPoolDeposit pp
       , DB.paramProposalMaxEpoch = unEpochNo <$> pppMaxEpoch pp
       , DB.paramProposalOptimalPoolCount = fromIntegral <$> pppOptimalPoolCount pp
       , DB.paramProposalInfluence = fromRational <$> pppInfluence pp
@@ -683,12 +683,12 @@ insertParamProposal _tracer txId pp =
       , DB.paramProposalEntropy = Generic.nonceToBytes =<< pppEntropy pp
       , DB.paramProposalProtocolMajor = fromIntegral . Sophie.pvMajor <$> pppProtocolVersion pp
       , DB.paramProposalProtocolMinor = fromIntegral . Sophie.pvMinor <$> pppProtocolVersion pp
-      , DB.paramProposalMinUtxoValue = Generic.coinToDbIsaac <$> pppMinUtxoValue pp
-      , DB.paramProposalMinPoolCost = Generic.coinToDbIsaac <$> pppMinPoolCost pp
+      , DB.paramProposalMinUtxoValue = Generic.coinToDbEntropic <$> pppMinUtxoValue pp
+      , DB.paramProposalMinPoolCost = Generic.coinToDbEntropic <$> pppMinPoolCost pp
 
       -- New for Aurum
 
-      , DB.paramProposalCoinsPerUtxoWord = Generic.coinToDbIsaac <$> pppCoinsPerUtxoWord pp
+      , DB.paramProposalCoinsPerUtxoWord = Generic.coinToDbEntropic <$> pppCoinsPerUtxoWord pp
       , DB.paramProposalCostModels = Generic.renderLanguageCostModel <$> pppCostmdls pp
       , DB.paramProposalPriceMem = realToFrac <$> pppPriceMem pp
       , DB.paramProposalPriceStep = realToFrac <$> pppPriceStep pp
@@ -712,7 +712,7 @@ insertRedeemer _tr txId redeemer = do
         { DB.redeemerTxId = txId
         , DB.redeemerUnitMem = Generic.txRedeemerMem redeemer
         , DB.redeemerUnitSteps = Generic.txRedeemerSteps redeemer
-        , DB.redeemerFee = DB.DbIsaac (fromIntegral . unCoin $ Generic.txRedeemerFee redeemer)
+        , DB.redeemerFee = DB.DbEntropic (fromIntegral . unCoin $ Generic.txRedeemerFee redeemer)
         , DB.redeemerPurpose = mkPurpose $ Generic.txRedeemerPurpose redeemer
         , DB.redeemerIndex = Generic.txRedeemerIndex redeemer
         , DB.redeemerScriptHash = scriptHash
@@ -795,8 +795,8 @@ insertEpochParam _tracer blkId (EpochNo epoch) params nonce =
       , DB.epochParamMaxBlockSize = fromIntegral (Generic.ppMaxBBSize params)
       , DB.epochParamMaxTxSize = fromIntegral (Generic.ppMaxTxSize params)
       , DB.epochParamMaxBhSize = fromIntegral (Generic.ppMaxBHSize params)
-      , DB.epochParamKeyDeposit = Generic.coinToDbIsaac (Generic.ppKeyDeposit params)
-      , DB.epochParamPoolDeposit = Generic.coinToDbIsaac (Generic.ppPoolDeposit params)
+      , DB.epochParamKeyDeposit = Generic.coinToDbEntropic (Generic.ppKeyDeposit params)
+      , DB.epochParamPoolDeposit = Generic.coinToDbEntropic (Generic.ppPoolDeposit params)
       , DB.epochParamMaxEpoch = unEpochNo (Generic.ppMaxEpoch params)
       , DB.epochParamOptimalPoolCount = fromIntegral (Generic.ppOptialPoolCount params)
       , DB.epochParamInfluence = fromRational (Generic.ppInfluence params)
@@ -806,10 +806,10 @@ insertEpochParam _tracer blkId (EpochNo epoch) params nonce =
       , DB.epochParamEntropy = Generic.nonceToBytes $ Generic.ppExtraEntropy params
       , DB.epochParamProtocolMajor = fromIntegral $ Sophie.pvMajor (Generic.ppProtocolVersion params)
       , DB.epochParamProtocolMinor = fromIntegral $ Sophie.pvMinor (Generic.ppProtocolVersion params)
-      , DB.epochParamMinUtxoValue = Generic.coinToDbIsaac (Generic.ppMinUTxOValue params)
-      , DB.epochParamMinPoolCost = Generic.coinToDbIsaac (Generic.ppMinPoolCost params)
+      , DB.epochParamMinUtxoValue = Generic.coinToDbEntropic (Generic.ppMinUTxOValue params)
+      , DB.epochParamMinPoolCost = Generic.coinToDbEntropic (Generic.ppMinPoolCost params)
       , DB.epochParamNonce = Generic.nonceToBytes nonce
-      , DB.epochParamCoinsPerUtxoWord = Generic.coinToDbIsaac <$> Generic.ppCoinsPerUtxoWord params
+      , DB.epochParamCoinsPerUtxoWord = Generic.coinToDbEntropic <$> Generic.ppCoinsPerUtxoWord params
       , DB.epochParamCostModels = Generic.renderLanguageCostModel <$> Generic.ppCostmdls params
       , DB.epochParamPriceMem = realToFrac <$> Generic.ppPriceMem params
       , DB.epochParamPriceStep = realToFrac <$> Generic.ppPriceStep params
@@ -900,18 +900,18 @@ insertPots
     :: (MonadBaseControl IO m, MonadIO m)
     => DB.BlockId
     -> SlotNo -> EpochNo
-    -> Sophie.GodxPots
+    -> Sophie.BccPots
     -> ExceptT e (ReaderT SqlBackend m) ()
 insertPots blockId slotNo epochNo pots =
-    void . lift $ DB.insertGodxPots $
-      DB.GodxPots
+    void . lift $ DB.insertBccPots $
+      DB.BccPots
         { DB.adaPotsSlotNo = unSlotNo slotNo
         , DB.adaPotsEpochNo = unEpochNo epochNo
-        , DB.adaPotsTreasury = Generic.coinToDbIsaac $ Sophie.treasuryGodxPot pots
-        , DB.adaPotsReserves = Generic.coinToDbIsaac $ Sophie.reservesGodxPot pots
-        , DB.adaPotsRewards = Generic.coinToDbIsaac $ Sophie.rewardsGodxPot pots
-        , DB.adaPotsUtxo = Generic.coinToDbIsaac $ Sophie.utxoGodxPot pots
-        , DB.adaPotsDeposits = Generic.coinToDbIsaac $ Sophie.depositsGodxPot pots
-        , DB.adaPotsFees = Generic.coinToDbIsaac $ Sophie.feesGodxPot pots
+        , DB.adaPotsTreasury = Generic.coinToDbEntropic $ Sophie.treasuryBccPot pots
+        , DB.adaPotsReserves = Generic.coinToDbEntropic $ Sophie.reservesBccPot pots
+        , DB.adaPotsRewards = Generic.coinToDbEntropic $ Sophie.rewardsBccPot pots
+        , DB.adaPotsUtxo = Generic.coinToDbEntropic $ Sophie.utxoBccPot pots
+        , DB.adaPotsDeposits = Generic.coinToDbEntropic $ Sophie.depositsBccPot pots
+        , DB.adaPotsFees = Generic.coinToDbEntropic $ Sophie.feesBccPot pots
         , DB.adaPotsBlockId = blockId
         }

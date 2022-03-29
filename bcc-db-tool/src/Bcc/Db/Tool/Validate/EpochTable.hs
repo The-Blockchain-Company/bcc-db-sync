@@ -1,15 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Godx.Db.Tool.Validate.EpochTable
+module Bcc.Db.Tool.Validate.EpochTable
   ( validateEpochTable
   ) where
 
-import           Godx.Db.Tool.Validate.Util
+import           Bcc.Db.Tool.Validate.Util
 
 import           Control.Monad (when)
 
 import           Data.Word (Word64)
 
-import           Godx.Db
+import           Bcc.Db
 
 
 -- | Validate that the total supply is decreasing.

@@ -4,8 +4,8 @@ cabal-version:          2.2
 
 name:                   bcc-sync
 version:                10.0.1
-synopsis:               The Godx Sync node
-description:            A Godx node that follows the Godx chain and inserts data from the
+synopsis:               The Bcc Sync node
+description:            A Bcc node that follows the Bcc chain and inserts data from the
                         chain into a PostgresQL database.
 homepage:               https://github.com/The-Blockchain-Company/bcc-db-sync
 bug-reports:            https://github.com/The-Blockchain-Company/bcc-db-sync/issues
@@ -32,39 +32,39 @@ library
                         -Wunused-imports
                         -Wunused-packages
 
-  exposed-modules:      Godx.Sync
-                        Godx.Sync.Api
-                        Godx.Sync.Config
-                        Godx.Sync.Config.Aurum
-                        Godx.Sync.Config.Cole
-                        Godx.Sync.Config.Godx
-                        Godx.Sync.Config.Node
-                        Godx.Sync.Config.Sophie
-                        Godx.Sync.Config.Types
-                        Godx.Sync.Database
-                        Godx.Sync.DbAction
-                        Godx.Sync.Error
+  exposed-modules:      Bcc.Sync
+                        Bcc.Sync.Api
+                        Bcc.Sync.Config
+                        Bcc.Sync.Config.Aurum
+                        Bcc.Sync.Config.Cole
+                        Bcc.Sync.Config.Bcc
+                        Bcc.Sync.Config.Node
+                        Bcc.Sync.Config.Sophie
+                        Bcc.Sync.Config.Types
+                        Bcc.Sync.Database
+                        Bcc.Sync.DbAction
+                        Bcc.Sync.Error
 
-                        Godx.Sync.LedgerEvent
-                        Godx.Sync.LedgerState
+                        Bcc.Sync.LedgerEvent
+                        Bcc.Sync.LedgerState
 
-                        Godx.Sync.Era.Cole.Util
-                        Godx.Sync.Era.Godx.Util
+                        Bcc.Sync.Era.Cole.Util
+                        Bcc.Sync.Era.Bcc.Util
 
-                        Godx.Sync.Era.Sophie.Generic
-                        Godx.Sync.Era.Sophie.Generic.EpochUpdate
-                        Godx.Sync.Era.Sophie.Generic.ProtoParams
-                        Godx.Sync.Era.Sophie.Generic.Rewards
-                        Godx.Sync.Era.Sophie.Generic.StakeCred
-                        Godx.Sync.Era.Sophie.Generic.StakeDist
+                        Bcc.Sync.Era.Sophie.Generic
+                        Bcc.Sync.Era.Sophie.Generic.EpochUpdate
+                        Bcc.Sync.Era.Sophie.Generic.ProtoParams
+                        Bcc.Sync.Era.Sophie.Generic.Rewards
+                        Bcc.Sync.Era.Sophie.Generic.StakeCred
+                        Bcc.Sync.Era.Sophie.Generic.StakeDist
 
-                        Godx.Sync.Metrics
-                        Godx.Sync.Plugin
+                        Bcc.Sync.Metrics
+                        Bcc.Sync.Plugin
 
-                        Godx.Sync.StateQuery
-                        Godx.Sync.Tracing.ToObjectOrphans
-                        Godx.Sync.Types
-                        Godx.Sync.Util
+                        Bcc.Sync.StateQuery
+                        Bcc.Sync.Tracing.ToObjectOrphans
+                        Bcc.Sync.Types
+                        Bcc.Sync.Util
 
   build-depends:        base                            >= 4.14         && < 4.16
                       , aeson

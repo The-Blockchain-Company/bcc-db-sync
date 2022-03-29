@@ -8,7 +8,7 @@ module Test.Property.Upstream
 -- Test things that come from upstream packages that have at any stage gone wrong
 -- or for which
 
-import           Godx.Chain.Common (decodeAddressBase58, isRedeemAddress)
+import           Bcc.Chain.Common (decodeAddressBase58, isRedeemAddress)
 
 import           Hedgehog (Property, discover, (===))
 import qualified Hedgehog as H

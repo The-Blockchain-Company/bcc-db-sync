@@ -1,6 +1,6 @@
 module Main where
 
-import           Godx.Crypto.Hash
+import           Bcc.Crypto.Hash
 import           Control.Monad (foldM, forM)
 
 import qualified Data.ByteString.Char8 as BS

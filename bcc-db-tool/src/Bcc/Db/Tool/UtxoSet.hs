@@ -1,14 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Godx.Db.Tool.UtxoSet
+module Bcc.Db.Tool.UtxoSet
   ( utxoSetAtSlot
   ) where
 
-import           Godx.Chain.Common (decodeAddressBase58, isRedeemAddress)
+import           Bcc.Chain.Common (decodeAddressBase58, isRedeemAddress)
 
 import           Data.Time.Clock (UTCTime)
 import           Data.Word (Word64)
 
-import           Godx.Db
+import           Bcc.Db
 
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.List as List
@@ -32,23 +32,23 @@ utxoSetAtSlot slotNo = do
     then reportSlotDate slotNo eUtcTime
     else do
       putStr $ unlines
-        [ "\nGenesis supply: " ++ show genesisSupply ++ " Godx"
+        [ "\nGenesis supply: " ++ show genesisSupply ++ " Bcc"
         , "\nAt slot number " ++ show slotNo ++ ":"
         , "   Date: " ++ either (const "unknown") show eUtcTime
-        , "   Supply: " ++ show supply ++ " Godx"
-        , "   Fees: " ++ show fees ++ " Godx"
+        , "   Supply: " ++ show supply ++ " Bcc"
+        , "   Fees: " ++ show fees ++ " Bcc"
         , "   Supply + fees == genesis supply: " ++ show (fees + supply == genesisSupply)
         , "\nFrom database:"
         , "  Utxo entries: " ++ show (length utxoSet)
-        , "  Utxo supply : " ++ show (utxoSetSum utxoSet) ++ " Godx"
+        , "  Utxo supply : " ++ show (utxoSetSum utxoSet) ++ " Bcc"
         , "\nAfter aggregation:"
         , "  Utxo entries: " ++ show (length aggregated)
-        , "  Utxo supply : " ++ show (sum $ map snd aggregated) ++ " Isaac"
+        , "  Utxo supply : " ++ show (sum $ map snd aggregated) ++ " Entropic"
         , "\nAfter paritioning:"
         , "  Accepted Utxo entries: " ++ show (length accept)
         , "  Rejected Utxo entries: " ++ show (length reject)
-        , "  Accepted Utxo supply: " ++ show (sum $ map snd accept) ++ " Isaac"
-        , "  Rejected Utxo supply: " ++ show (sum $ map snd reject) ++ " Isaac"
+        , "  Accepted Utxo supply: " ++ show (sum $ map snd accept) ++ " Entropic"
+        , "  Rejected Utxo supply: " ++ show (sum $ map snd reject) ++ " Entropic"
         , "  Accepted + rejected == totalSupply: "
               ++ show (sum (map snd accept) + sum (map snd reject) == sum (map snd aggregated))
         , ""
@@ -65,7 +65,7 @@ aggregateUtxos xs =
   List.sortOn (Text.length . fst)
     . Map.toList
     . Map.fromListWith (+)
-    $ map (\(x, _) -> (txOutAddress x, unDbIsaac (txOutValue x))) xs
+    $ map (\(x, _) -> (txOutAddress x, unDbEntropic (txOutValue x))) xs
 
 isRedeemTextAddress :: Text -> Bool
 isRedeemTextAddress addr =
@@ -83,7 +83,7 @@ partitionUtxos =
     accept (addr, _) =
       Text.length addr <= 180 && not (isRedeemTextAddress addr)
 
-queryAtSlot :: Word64 -> IO (Godx, [(TxOut, ByteString)], Godx, Either LookupFail UTCTime)
+queryAtSlot :: Word64 -> IO (Bcc, [(TxOut, ByteString)], Bcc, Either LookupFail UTCTime)
 queryAtSlot slotNo =
   -- Run the following queries in a single transaction.
   runDbNoLogging $ do
@@ -108,9 +108,9 @@ showUtxo (addr, value) =
     , "    }"
     ]
 
-utxoSetSum :: [(TxOut, a)] -> Godx
+utxoSetSum :: [(TxOut, a)] -> Bcc
 utxoSetSum xs =
-  word64ToGodx . sum $ map (unDbIsaac . txOutValue . fst) xs
+  word64ToBcc . sum $ map (unDbEntropic . txOutValue . fst) xs
 
 writeUtxos :: FilePath -> [(Text, Word64)] -> IO ()
 writeUtxos fname xs = do

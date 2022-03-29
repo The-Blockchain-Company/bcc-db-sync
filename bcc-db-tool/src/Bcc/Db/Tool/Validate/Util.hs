@@ -1,4 +1,4 @@
-module Godx.Db.Tool.Validate.Util
+module Bcc.Db.Tool.Validate.Util
   ( codeGreen
   , codeRed
   , codeReset
@@ -9,7 +9,7 @@ module Godx.Db.Tool.Validate.Util
   , utxoSetSum
   ) where
 
-import           Godx.Db
+import           Bcc.Db
 
 import           System.Console.ANSI (setSGRCode)
 import           System.Console.ANSI.Types (Color (..), ColorIntensity (..), ConsoleLayer (..),
@@ -38,6 +38,6 @@ redText s = codeRed ++ s ++ codeReset
 putStrF :: String -> IO ()
 putStrF s = putStr s >> hFlush stdout
 
-utxoSetSum :: [(TxOut, a)] -> Godx
+utxoSetSum :: [(TxOut, a)] -> Bcc
 utxoSetSum xs =
-  word64ToGodx . sum $ map (unDbIsaac . txOutValue . fst) xs
+  word64ToBcc . sum $ map (unDbEntropic . txOutValue . fst) xs
