@@ -69,7 +69,7 @@ convertParamProposal :: Witness era -> Sophie.Update era -> [ParamProposal]
 convertParamProposal witness (Sophie.Update pp epoch) =
   case witness of
     Sophie {} -> sophieParamProposal epoch pp
-    Allegra {} -> evieOrJenParamProposal epoch pp
+    Evie {} -> evieOrJenParamProposal epoch pp
     Jen {} -> evieOrJenParamProposal epoch pp
     Aurum {} -> aurumParamProposal epoch pp
 

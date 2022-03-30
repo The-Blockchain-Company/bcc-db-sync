@@ -6,7 +6,7 @@ module Bcc.DbSync.Era.Sophie.Generic.Witness
   ) where
 
 
-import           Bcc.Ledger.Allegra (AllegraEra)
+import           Bcc.Ledger.Evie (AllegraEra)
 import           Bcc.Ledger.Aurum (AurumEra)
 import           Bcc.Ledger.Jen (JenEra)
 import           Bcc.Ledger.Sophie (SophieEra)
@@ -30,12 +30,12 @@ instance Show (Evidence c) where
 
 data Witness era where
   Sophie :: Evidence c -> Witness (SophieEra c)
-  Allegra :: Evidence c -> Witness (AllegraEra c)
+  Evie :: Evidence c -> Witness (AllegraEra c)
   Jen :: Evidence c -> Witness (JenEra c)
   Aurum :: Evidence c -> Witness (AurumEra c)
 
 instance Show (Witness e) where
   show (Sophie c) = "Sophie " ++ show c
-  show (Allegra c) = "Allegra " ++ show c
+  show (Evie c) = "Evie " ++ show c
   show (Jen c) = "Jen " ++ show c
   show (Aurum c) = "Aurum " ++ show c

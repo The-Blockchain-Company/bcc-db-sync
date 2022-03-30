@@ -44,7 +44,7 @@ import qualified Bcc.Chain.Update as Cole
 import           Bcc.Crypto (RequiresNetworkMagic (..))
 import qualified Bcc.Crypto.Hash as Crypto
 
-import           Bcc.Ledger.Allegra (AllegraEra)
+import           Bcc.Ledger.Evie (AllegraEra)
 
 import           Bcc.Slotting.Slot (SlotNo (..))
 

@@ -84,7 +84,7 @@ epochPluginInsertBlock backend trce _dbSyncEnv blockDetails =
         BlockJen {} -> epochUpdate details
         BlockAurum {} -> epochUpdate details
 
-    -- What we do here is completely independent of Sophie/Allegra/Jen eras.
+    -- What we do here is completely independent of Sophie/Evie/Jen eras.
     epochUpdate :: SlotDetails -> ReaderT SqlBackend (LoggingT IO) (Either SyncNodeError ())
     epochUpdate details = do
       when (sdSlotTime details > sdCurrentTime details) $

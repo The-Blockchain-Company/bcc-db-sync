@@ -384,7 +384,7 @@ The UTxO set is dependent on time, this will return it for a given timestamp
       and consuming_input.tx_out_index = tx_out.index
     left join tx as consuming_tx on consuming_tx.id = consuming_input.tx_in_id
     left join block as consuming_block on consuming_block.id = consuming_tx.block_id
-    where ( -- Ommit outputs from genesis after Allegra hard fork
+    where ( -- Ommit outputs from genesis after Evie hard fork
 			const.effective_time_ < '2020-12-16 21:44:00'
 			or generating_block.epoch_no is not null
 			)

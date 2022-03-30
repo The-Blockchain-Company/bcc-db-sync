@@ -46,7 +46,7 @@ data NodeConfig = NodeConfig
   -- Sophie hardfok parameters
   , ncSophieHardFork :: !Sophie.TriggerHardFork
 
-  -- Allegra hardfok parameters
+  -- Evie hardfok parameters
   , ncAllegraHardFork :: !Sophie.TriggerHardFork
 
   -- Jen hardfok parameters

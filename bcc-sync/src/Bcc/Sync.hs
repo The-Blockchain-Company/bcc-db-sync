@@ -162,7 +162,7 @@ runSyncNode dataLayer metricsSetters trce plugin enp insertValidateGenesisDist r
       BccCodecConfig
         (mkColeCodecConfig cfg)
         SophieCodecConfig
-        SophieCodecConfig -- Allegra
+        SophieCodecConfig -- Evie
         SophieCodecConfig -- Jen
         SophieCodecConfig -- Aurum
 

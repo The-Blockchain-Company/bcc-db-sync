@@ -51,7 +51,7 @@ data Reward = Reward
   } deriving (Eq, Ord, Show)
 
 -- The `ledger-specs` code defines a `RewardUpdate` type that is parameterised over
--- Sophie/Allegra/Jen. This is a huge pain in the neck for `db-sync` so we define a
+-- Sophie/Evie/Jen. This is a huge pain in the neck for `db-sync` so we define a
 -- generic one instead.
 data Rewards = Rewards
   { rwdEpoch :: !EpochNo
@@ -82,7 +82,7 @@ rewardBlockEra :: Sophie.ProtVer -> BlockEra
 rewardBlockEra pv =
   case pv of
     Sophie.ProtVer 2 0 -> Sophie
-    Sophie.ProtVer 3 0 -> Allegra
+    Sophie.ProtVer 3 0 -> Evie
     Sophie.ProtVer 4 0 -> Jen
     Sophie.ProtVer 5 0 -> Aurum
     Sophie.ProtVer 6 0 -> Aurum
@@ -179,7 +179,7 @@ filterByEra :: BlockEra -> Map StakeCred (Set Reward) -> Map StakeCred (Set Rewa
 filterByEra be rmap =
   case be of
     Sophie -> Map.map takeFirstReward rmap
-    Allegra -> rmap
+    Evie -> rmap
     Jen -> rmap
     Aurum -> rmap
 

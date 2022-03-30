@@ -52,7 +52,7 @@ import qualified Sophie.Spec.Ledger.Tx as Sophie
 
 data BlockEra
   = Sophie
-  | Allegra
+  | Evie
   | Jen
   | Aurum
   deriving (Eq, Show)
@@ -77,7 +77,7 @@ data Block = Block
 fromAllegraBlock :: SophieBlock StandardAllegra -> Block
 fromAllegraBlock blk =
   Block
-    { blkEra = Allegra
+    { blkEra = Evie
     , blkHash = blockHash blk
     , blkPreviousHash = blockPrevHash blk
     , blkCreatorPoolHash = creatorPoolHash blk

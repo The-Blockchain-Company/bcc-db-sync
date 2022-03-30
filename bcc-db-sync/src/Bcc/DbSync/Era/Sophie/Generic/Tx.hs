@@ -139,7 +139,7 @@ fromAllegraTx (blkIndex, tx) =
       , txSize = fromIntegral $ getField @"txsize" tx
       , txValidContract = True
       , txInputs = map (fromTxIn Nothing) (toList $ SophieMa.inputs rawTxBody)
-      , txCollateralInputs = [] -- Allegra does not have collateral inputs
+      , txCollateralInputs = [] -- Evie does not have collateral inputs
       , txOutputs = zipWith fromTxOut [0 .. ] $ toList (SophieMa.outputs rawTxBody)
       , txFees = SophieMa.txfee rawTxBody
       , txOutSum = Coin . sum $ map txOutValue (SophieMa.outputs rawTxBody)
@@ -150,12 +150,12 @@ fromAllegraTx (blkIndex, tx) =
       , txMetadata = fromAllegraMetadata <$> txMeta tx
       , txCertificates = zipWith (TxCertificate Nothing) [0..] (map coerceCertificate . toList $ SophieMa.certs rawTxBody)
       , txWithdrawals = map (mkTxWithdrawal Nothing) (Map.toList . Sophie.unWdrl $ SophieMa.wdrls rawTxBody)
-      , txParamProposal = maybe [] (convertParamProposal (Allegra Standard)) $ strictMaybeToMaybe (SophieMa.update rawTxBody)
-      , txMint = mempty     -- Allegra does not support Multi-Assets
-      , txRedeemer = []     -- Allegra does not support Redeemers
-      , txScriptSizes = []    -- Allegra does not support scripts
-      , txScripts = []        -- We don't populate scripts for Allegra
-      , txScriptsFee = Coin 0 -- Allegra does not support scripts
+      , txParamProposal = maybe [] (convertParamProposal (Evie Standard)) $ strictMaybeToMaybe (SophieMa.update rawTxBody)
+      , txMint = mempty     -- Evie does not support Multi-Assets
+      , txRedeemer = []     -- Evie does not support Redeemers
+      , txScriptSizes = []    -- Evie does not support scripts
+      , txScripts = []        -- We don't populate scripts for Evie
+      , txScriptsFee = Coin 0 -- Evie does not support scripts
       }
   where
     fromTxOut :: Word16 -> Sophie.TxOut StandardAllegra -> TxOut
@@ -164,8 +164,8 @@ fromAllegraTx (blkIndex, tx) =
         { txOutIndex = index
         , txOutAddress = coerceAddress addr
         , txOutBccValue = bcc
-        , txOutMaValue = mempty -- Allegra does not support Multi-Assets
-        , txOutDataHash = mempty -- Allegra does not support scripts
+        , txOutMaValue = mempty -- Evie does not support Multi-Assets
+        , txOutDataHash = mempty -- Evie does not support scripts
         }
 
     txMeta :: Sophie.Tx StandardAllegra -> Maybe (SophieMa.AuxiliaryData StandardAllegra)

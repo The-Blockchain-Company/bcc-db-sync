@@ -45,7 +45,7 @@ data BlockDetails = BlockDetails
 
 data BlockEra
   = Sophie
-  | Allegra
+  | Evie
   | Jen
   | Aurum
   deriving (Eq, Show)
