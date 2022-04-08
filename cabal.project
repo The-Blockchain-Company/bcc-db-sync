@@ -110,7 +110,7 @@ source-repository-package
 source-repository-package
   type: git
   location: https://github.com/The-Blockchain-Company/bcc-ledger-specs
-  tag: e1109f35aee321bbf899a5e2cc4de3eec583f9b7 
+  tag:  955922d28b81e067f00f4af00d347d20e2f01ae7
 
   subdir:
     aurum/impl
@@ -143,7 +143,7 @@ source-repository-package
 source-repository-package
   type: git
   location: https://github.com/The-Blockchain-Company/bcc-prelude
-  tag: 9aa92040d1510162610b1082ae8b69d43be7a84f
+  tag: c1f053a9dbc2763ad2163281a356a2cf0f4d7858
   --sha256:
   subdir:
     bcc-prelude
