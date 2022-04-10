@@ -22,7 +22,7 @@ services:
         max-file: "10"
 
   bcc-node:
-    image: tbco/bcc-node:1.29.0
+    image: tbco/bcc-node
     environment:
       - NETWORK=${NETWORK:-mainnet}
     volumes:
